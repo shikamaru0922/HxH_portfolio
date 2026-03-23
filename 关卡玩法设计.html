@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关卡玩法设计</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0a0f;
+  --bg-card: #12121a;
+  --bg-surface: #1a1a26;
+  --bg-hover: #22223a;
+  --accent-gold: #d4a853;
+  --accent-gold-dim: #a07d3a;
+  --accent-teal: #3dc9a0;
+  --accent-teal-dim: #2a8d70;
+  --accent-coral: #e06852;
+  --accent-purple: #9b7ee8;
+  --accent-blue: #5b9ee8;
+  --text-primary: #e8e4dc;
+  --text-secondary: #9e9a92;
+  --text-tertiary: #6a675f;
+  --border: #2a2a3a;
+  --border-light: #3a3a4e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 400;
+  line-height: 1.85;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === NOISE OVERLAY === */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* === LAYOUT === */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* === HERO === */
+.hero {
+  padding: 6rem 0 4rem;
+  text-align: center;
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+}
+
+.hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-gold-dim);
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 540px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+/* === TOC === */
+.toc {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.toc-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-gold-dim);
+  margin-bottom: 1rem;
+}
+
+.toc-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+}
+
+.toc-list a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.3rem 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  transition: color 0.2s;
+}
+
+.toc-list a:hover { color: var(--accent-gold); }
+
+.toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  min-width: 1.6rem;
+}
+
+/* === SECTIONS === */
+section {
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+section:first-of-type { border-top: none; }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-gold-dim);
+  margin-bottom: 0.8rem;
+}
+
+h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+h3 {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 2rem 0 0.8rem;
+  color: var(--text-primary);
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+p strong, li strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* === FORMULA BOX === */
+.formula {
+  margin: 1.5rem 0;
+  padding: 1.2rem 1.6rem;
+  background: var(--bg-surface);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 0 8px 8px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+  line-height: 1.8;
+}
+
+.formula .dim { color: var(--text-tertiary); }
+
+/* === CHAIN === */
+.chain {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.chain-item {
+  padding: 0.4rem 0.9rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.chain-arrow { color: var(--text-tertiary); font-size: 0.9rem; }
+
+/* === INSIGHT BLOCK === */
+.insight {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(61,201,160,0.06), rgba(155,126,232,0.04));
+  border: 1px solid rgba(61,201,160,0.15);
+  border-radius: 10px;
+}
+
+.insight-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+  margin-bottom: 0.6rem;
+}
+
+.insight p { color: var(--text-primary); margin-bottom: 0; }
+
+/* === DISCUSSION BLOCK === */
+.discussion {
+  margin: 1.5rem 0;
+  padding: 1.2rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.discussion .speaker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.4rem;
+}
+
+.discussion .speaker.me { color: var(--accent-purple); }
+.discussion .speaker.ai { color: var(--accent-blue); }
+
+.discussion p { color: var(--text-secondary); margin-bottom: 0; font-size: 0.95rem; }
+
+/* === RULE BLOCK === */
+.rule-block {
+  margin: 1.2rem 0;
+  padding: 1rem 1.4rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  line-height: 2;
+  color: var(--text-secondary);
+}
+
+.rule-block .keyword { color: var(--accent-coral); }
+.rule-block .result { color: var(--accent-teal); }
+
+/* === ROOM CARD === */
+.room-card {
+  margin: 2.5rem 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.room-card:hover { border-color: var(--border-light); }
+
+.room-header {
+  padding: 1.5rem 2rem 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.room-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.room-title-group { flex: 1; }
+
+.room-title {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.room-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+.room-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.tag-cognition { color: var(--accent-teal); border-color: rgba(61,201,160,0.3); }
+.tag-execution { color: var(--accent-coral); border-color: rgba(224,104,82,0.3); }
+.tag-logic { color: var(--accent-purple); border-color: rgba(155,126,232,0.3); }
+.tag-memory { color: var(--accent-blue); border-color: rgba(91,158,232,0.3); }
+.tag-rhythm { color: var(--accent-gold); border-color: rgba(212,168,83,0.3); }
+.tag-psychology { color: #e06888; border-color: rgba(224,104,136,0.3); }
+.tag-composite { color: #e8e4dc; border-color: rgba(232,228,220,0.3); }
+
+.room-map {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+}
+
+.room-map svg {
+  width: 100%;
+  max-width: 620px;
+}
+
+.room-body { padding: 1.2rem 2rem 1.8rem; }
+
+.room-body p { font-size: 0.95rem; }
+
+.room-params {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.param {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.param span { color: var(--text-secondary); }
+
+/* === EXPERIENCE CURVE === */
+.curve {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.curve-track {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.curve-node {
+  flex: 1;
+  min-width: 75px;
+  text-align: center;
+  position: relative;
+  padding: 0.8rem 0.3rem;
+}
+
+.curve-node::before {
+  content: '';
+  position: absolute;
+  top: 1.2rem;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border);
+}
+
+.curve-node:first-child::before { left: 50%; }
+.curve-node:last-child::before { right: 50%; }
+
+.curve-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  margin: 0 auto 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.curve-node:nth-child(4) .curve-dot,
+.curve-node:nth-child(6) .curve-dot { background: var(--accent-coral); }
+.curve-node:nth-child(8) .curve-dot { background: var(--accent-teal); }
+
+.curve-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.curve-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+/* === FOOTER === */
+footer {
+  padding: 3rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+footer p {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .container { padding: 0 1.2rem; }
+  .toc-list { grid-template-columns: 1fr; }
+  .room-header { flex-wrap: wrap; }
+  .room-header { padding: 1.2rem 1.2rem 0.8rem; }
+  .room-body { padding: 1rem 1.2rem 1.5rem; }
+  .room-map { padding: 1rem; }
+  .curve-track { gap: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ========== HERO ========== -->
+<div class="hero">
+  <div class="hero-label">Level Design Study · 2026.03.18</div>
+  <h1>关卡玩法设计<br/><span>从一条规则到八个关卡</span></h1>
+  <p class="hero-sub">一次关于玩法构造分析法的完整讨论——如何用同一个玩法、零新资产，仅通过空间设计雕刻出八种截然不同的体验。</p>
+</div>
+
+<!-- ========== TOC ========== -->
+<nav class="toc">
+  <div class="toc-title">目录 · Contents</div>
+  <ul class="toc-list">
+    <li><a href="#debate"><span class="toc-num">序章</span>压力板开门：它是规则还是玩法？</a></li>
+    <li><a href="#atomic"><span class="toc-num">01</span>拆分的规则要原子化</a></li>
+    <li><a href="#formula"><span class="toc-num">02</span>玩法里一定会有目标：目标 + 机制 = 玩法</a></li>
+    <li><a href="#rooms"><span class="toc-num">03</span>玩法设计 Example：八个关卡示例</a></li>
+    <li><a href="#curve"><span class="toc-num">04</span>体验曲线总结</a></li>
+  </ul>
+</nav>
+
+<!-- ========== SECTION 1: DEBATE ========== -->
+<section id="debate">
+  <div class="section-label">序章</div>
+  <h2>压力板开门：它是规则还是玩法？</h2>
+
+  <p>讨论的起点是一个具体的问题：<strong>在游戏中，"玩家站到指定区域（压力板/重力开关），门就会打开"——这件事到底是规则，还是玩法？</strong></p>
+
+  <div class="discussion">
+    <div class="speaker ai">判断</div>
+    <p>"站上去，门就开"是一条规则，不是玩法。用框架验证：它就是一个"名词+动词"的因果陈述——玩家（名词）站上压力板（名词），门（名词）打开（动词）。它是冷冰冰的物理法则，玩家执行这个动作的时候没有任何决策、没有目标张力、没有体验波动。看到板子，站上去，门开了，走过去。整个过程是线性的、无摩擦的。</p>
+  </div>
+
+  <p>如何最简化地扩展它？只需要再叠加<strong>一条规则</strong>：<strong>玩家离开压力板，门会关上。</strong></p>
+
+  <div class="insight">
+    <div class="insight-label">关键跃迁</div>
+    <p>就这么一条规则的叠加，"目标"就诞生了——<strong>我需要让这个板子保持被按下的状态，同时我还要穿过那扇门。</strong>这就是框架里说的"机制是目标的孵化器"。</p>
+  </div>
+</section>
+
+<!-- ========== SECTION 2: ATOMIC ========== -->
+<section id="atomic">
+  <div class="section-label">Part 01</div>
+  <h2>拆分的规则要原子化</h2>
+
+  <div class="discussion">
+    <div class="speaker me">追问</div>
+    <p>"玩家站上去门就开"这句话其实偷懒了，它把两条规则压缩成了一句自然语言。要拆到无法再拆为止，中间应该有一个独立的实体——触发器。</p>
+  </div>
+
+  <p>真正原子化地拆，应该是：</p>
+
+  <div class="rule-block">
+    <span class="keyword">规则A：</span>玩家站上触发器 → <span class="result">触发器变为 ON</span><br/>
+    <span class="keyword">规则B：</span>触发器 ON → <span class="result">门打开</span>
+  </div>
+
+  <p>这个拆法不是在咬文嚼字，它有一个非常实际的设计意义——<strong>触发器作为中间层被独立出来之后，它就变成了一个可以被复用的接口。</strong></p>
+  <p>规则A的左边可以换：不一定是玩家站上去，也可以是箱子压上去、射击命中、NPC走过去。规则B的右边也可以换：不一定是开门，也可以是升起平台、放下桥、触发陷阱。</p>
+
+  <div class="insight">
+    <div class="insight-label">设计启示</div>
+    <p>触发器把输入端和输出端解耦了。"如何最简化地扩展"的答案就藏在这个拆分里：你不需要设计新机制，你只需要替换规则A或规则B的任意一端。</p>
+  </div>
+</section>
+
+<!-- ========== SECTION 3: FORMULA ========== -->
+<section id="formula">
+  <div class="section-label">Part 02</div>
+  <h2>玩法里一定会有目标：目标 + 机制 = 玩法</h2>
+
+  <p>原来的链条是：属性 → 规则 → 机制 → 玩法。但"机制到玩法"之间的跃迁条件是模糊的。讨论中将其明确了——<strong>机制本身只是规则的组合结构，它不自动等于玩法。必须有一个目标注入进来，机制才被激活成玩法。</strong></p>
+
+  <div class="formula">
+    <span class="dim">目标</span> + <span class="dim">机制（一个或多个）</span> = 玩法
+  </div>
+
+  <p>回到压力板的例子来验证：两条规则组合成了机制，结构没问题，但玩家走上去门就开了，走过去就完事，没有任何阻力。缺的就是那个目标。加上"离开板子门会关"这条规则，目标瞬间出现——"我要让板子保持按下的同时穿过门"。机制才真正被激活，变成了玩法。</p>
+
+  <div class="formula">
+    <span style="color: var(--accent-teal);">规则是原子</span> · <span style="color: var(--accent-purple);">机制是结构</span> · <span style="color: var(--accent-coral);">目标是点火器</span><br/>
+    <span class="dim">三者齐了才是玩法</span>
+  </div>
+</section>
+
+<!-- ========== SECTION 4: ROOMS ========== -->
+<section id="rooms">
+  <div class="section-label">Part 03</div>
+  <h2>玩法设计 Example：八个关卡示例</h2>
+  <p>约束条件：只用"压力板+门"这一个玩法，不加任何新规则、新机制、新资产。变量只有——板和门的数量、空间布局、连接关系、延迟参数、可视性。</p>
+
+  <!-- ROOM 1 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">01</div>
+      <div class="room-title-group">
+        <div class="room-title">教学 — "踩上去，门就开"</div>
+        <div class="room-subtitle">零成本建立因果认知</div>
+      </div>
+      <div class="room-tag tag-cognition">认知</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 200">
+        <rect x="40" y="20" width="540" height="160" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Entrance -->
+        <line x1="40" y1="80" x2="40" y2="120" stroke="#0a0a0f" stroke-width="4"/>
+        <!-- Door -->
+        <rect x="520" y="82" width="14" height="36" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="552" y="104" font-family="JetBrains Mono" font-size="11" fill="#a07d3a">Door</text>
+        <!-- Plate -->
+        <rect x="370" y="84" width="32" height="32" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="386" y="134" font-family="JetBrains Mono" font-size="11" fill="#2a8d70" text-anchor="middle">Plate</text>
+        <!-- Player -->
+        <circle cx="80" cy="100" r="10" fill="#9b7ee8" opacity="0.8"/>
+        <text x="80" y="130" font-family="JetBrains Mono" font-size="11" fill="#9b7ee8" text-anchor="middle">Player</text>
+        <!-- Path -->
+        <path d="M93 100 L360 100" fill="none" stroke="#9b7ee8" stroke-width="1.2" stroke-dasharray="6 4" opacity="0.4"/>
+        <path d="M405 100 L515 100" fill="none" stroke="#9b7ee8" stroke-width="1.2" stroke-dasharray="6 4" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>没有任何挑战，玩家站上去门开了，延迟给3秒以上，慢慢走过去就行。唯一目的是让玩家脑子里建立一条铁律：<strong>板亮=门开，板灭=门关。</strong></p>
+      <div class="room-params">
+        <div class="param">延迟 <span>3s+（无时间压力）</span></div>
+        <div class="param">板×门 <span>1×1</span></div>
+        <div class="param">视野 <span>完全可见</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 2 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">02</div>
+      <div class="room-title-group">
+        <div class="room-title">时间压力 — "我知道怎么回事了，但来得及吗？"</div>
+        <div class="room-subtitle">知识变成执行的第一个矛盾</div>
+      </div>
+      <div class="room-tag tag-execution">执行</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 280">
+        <rect x="30" y="20" width="560" height="240" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Internal wall creating L-path -->
+        <line x1="240" y1="20" x2="240" y2="180" stroke="#6a675f" stroke-width="2"/>
+        <line x1="240" y1="180" x2="380" y2="180" stroke="#6a675f" stroke-width="2"/>
+        <!-- Entrance -->
+        <line x1="30" y1="65" x2="30" y2="95" stroke="#0a0a0f" stroke-width="4"/>
+        <!-- Plate -->
+        <rect x="120" y="65" width="30" height="30" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="135" y="112" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">Plate</text>
+        <!-- Door -->
+        <rect x="525" y="210" width="14" height="34" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="508" y="232" font-family="JetBrains Mono" font-size="10" fill="#a07d3a" text-anchor="end">Door</text>
+        <!-- Player -->
+        <circle cx="65" cy="80" r="9" fill="#9b7ee8" opacity="0.8"/>
+        <!-- Sprint path -->
+        <path d="M135 100 L135 220 L400 220 L400 227 L520 227" fill="none" stroke="#e06852" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.5"/>
+        <text x="460" y="216" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle">Sprint!</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>玩法没变，但空间把"执行"变成了挑战。内墙把板和门的直线距离拉长成L形路线，延迟压缩到1.5-2秒，玩家必须踩完立刻跑。体验从"我懂了"变成<strong>"我来得及吗"</strong>。</p>
+      <div class="room-params">
+        <div class="param">延迟 <span>1.5-2s（紧张）</span></div>
+        <div class="param">板×门 <span>1×1</span></div>
+        <div class="param">路径 <span>L形绕墙</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 3 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">03</div>
+      <div class="room-title-group">
+        <div class="room-title">逻辑序列 — "两个板，两扇门，什么顺序？"</div>
+        <div class="room-subtitle">数量翻倍，挑战从执行变成推理</div>
+      </div>
+      <div class="room-tag tag-logic">推理</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 320">
+        <rect x="30" y="20" width="560" height="260" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Dividing wall -->
+        <line x1="310" y1="20" x2="310" y2="120" stroke="#6a675f" stroke-width="2"/>
+        <line x1="310" y1="170" x2="310" y2="280" stroke="#6a675f" stroke-width="2"/>
+        <!-- Door 1 (dividing wall) -->
+        <rect x="303" y="122" width="14" height="46" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="290" y="150" font-family="JetBrains Mono" font-size="10" fill="#a07d3a" text-anchor="end">D1</text>
+        <!-- Door 2 (exit) -->
+        <rect x="528" y="122" width="14" height="46" rx="2" fill="#e06852" opacity="0.85"/>
+        <text x="516" y="185" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="end">D2 exit</text>
+        <!-- Plate A (left, upper) -->
+        <rect x="140" y="80" width="28" height="28" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="154" y="126" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">A</text>
+        <!-- Plate B (right, lower) -->
+        <rect x="400" y="220" width="28" height="28" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="414" y="265" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">B</text>
+        <!-- Player -->
+        <circle cx="80" cy="145" r="9" fill="#9b7ee8" opacity="0.8"/>
+        <!-- Crossed connections -->
+        <path d="M168 94 Q420 50 536 122" fill="none" stroke="#3dc9a0" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.3"/>
+        <path d="M400 234 Q260 280 310 170" fill="none" stroke="#3dc9a0" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.3"/>
+        <text x="420" y="62" font-family="JetBrains Mono" font-size="9" fill="#6a675f" text-anchor="middle">A → D2</text>
+        <text x="250" y="275" font-family="JetBrains Mono" font-size="9" fill="#6a675f" text-anchor="middle">B → D1</text>
+        <!-- Sequence markers -->
+        <circle cx="154" cy="68" r="8" fill="none" stroke="#9b7ee8" stroke-width="1" opacity="0.5"/>
+        <text x="154" y="72" font-family="JetBrains Mono" font-size="9" fill="#9b7ee8" text-anchor="middle">1</text>
+        <circle cx="310" cy="105" r="8" fill="none" stroke="#9b7ee8" stroke-width="1" opacity="0.5"/>
+        <text x="310" y="109" font-family="JetBrains Mono" font-size="9" fill="#9b7ee8" text-anchor="middle">2</text>
+        <circle cx="414" cy="208" r="8" fill="none" stroke="#9b7ee8" stroke-width="1" opacity="0.5"/>
+        <text x="414" y="212" font-family="JetBrains Mono" font-size="9" fill="#9b7ee8" text-anchor="middle">3</text>
+        <circle cx="536" cy="105" r="8" fill="none" stroke="#9b7ee8" stroke-width="1" opacity="0.5"/>
+        <text x="536" y="109" font-family="JetBrains Mono" font-size="9" fill="#9b7ee8" text-anchor="middle">4</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>关键设计是<strong>交叉连线</strong>——Plate A不是控制旁边的Door 1，而是控制远处的Door 2（出口）；Plate B控制Door 1（隔墙门）。玩家第一反应"踩A开旁边的门"是错的，必须推理出正确序列：<strong>先踩B → Door 1开 → 穿过去踩A → 出口Door 2开 → 跑出去。</strong></p>
+      <div class="room-params">
+        <div class="param">延迟 <span>2s（中等）</span></div>
+        <div class="param">板×门 <span>2×2（交叉）</span></div>
+        <div class="param">核心 <span>序列推理</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 4 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">04</div>
+      <div class="room-title-group">
+        <div class="room-title">视觉剥夺 — "我记得门在哪"</div>
+        <div class="room-subtitle">拿走"看得见"这个信息</div>
+      </div>
+      <div class="room-tag tag-memory">记忆</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 300">
+        <rect x="30" y="20" width="560" height="250" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Z-shape walls -->
+        <line x1="30" y1="150" x2="300" y2="150" stroke="#6a675f" stroke-width="2"/>
+        <!-- Passage gap -->
+        <line x1="215" y1="150" x2="245" y2="150" stroke="#0a0a0f" stroke-width="4"/>
+        <line x1="300" y1="270" x2="300" y2="195" stroke="#6a675f" stroke-width="2"/>
+        <!-- Upper right pocket wall -->
+        <line x1="380" y1="20" x2="380" y2="150" stroke="#6a675f" stroke-width="2"/>
+        <!-- Player -->
+        <circle cx="70" cy="80" r="9" fill="#9b7ee8" opacity="0.8"/>
+        <text x="70" y="108" font-family="JetBrains Mono" font-size="10" fill="#9b7ee8" text-anchor="middle">Start</text>
+        <!-- Plate -->
+        <rect x="160" y="68" width="28" height="28" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="174" y="114" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">Plate</text>
+        <!-- Door (hidden from plate) -->
+        <rect x="460" y="186" width="34" height="14" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="477" y="218" font-family="JetBrains Mono" font-size="10" fill="#a07d3a" text-anchor="middle">Door</text>
+        <!-- No line of sight indicator -->
+        <line x1="190" y1="96" x2="460" y2="193" stroke="#e06852" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.25"/>
+        <text x="360" y="120" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle" opacity="0.5">no line of sight</text>
+        <!-- Phase labels -->
+        <text x="400" y="252" font-family="JetBrains Mono" font-size="9" fill="#6a675f" text-anchor="middle">Phase 1: explore → Phase 2: sprint from memory</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>前三关玩家都能看见门，现在把这个信息拿走。Z形墙壁把板和门的视线完全切断。体验分两阶段：<strong>先探索（找到门在哪），再执行（踩板后凭记忆冲刺）</strong>。前三关玩家始终能看到"因"和"果"的关系，这关第一次把反馈剥掉了。</p>
+      <div class="room-params">
+        <div class="param">延迟 <span>2.5s（刚好够）</span></div>
+        <div class="param">板×门 <span>1×1</span></div>
+        <div class="param">核心 <span>空间记忆</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 5 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">05</div>
+      <div class="room-title-group">
+        <div class="room-title">连锁冲刺 — "一口气跑完"</div>
+        <div class="room-subtitle">三组板+门串联，持续执行</div>
+      </div>
+      <div class="room-tag tag-rhythm">节奏</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 180">
+        <rect x="20" y="20" width="580" height="140" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Walls -->
+        <line x1="170" y1="20" x2="170" y2="72" stroke="#6a675f" stroke-width="2"/>
+        <line x1="170" y1="108" x2="170" y2="160" stroke="#6a675f" stroke-width="2"/>
+        <line x1="320" y1="20" x2="320" y2="72" stroke="#6a675f" stroke-width="2"/>
+        <line x1="320" y1="108" x2="320" y2="160" stroke="#6a675f" stroke-width="2"/>
+        <line x1="470" y1="20" x2="470" y2="72" stroke="#6a675f" stroke-width="2"/>
+        <line x1="470" y1="108" x2="470" y2="160" stroke="#6a675f" stroke-width="2"/>
+        <!-- Doors -->
+        <rect x="163" y="74" width="14" height="32" rx="2" fill="#d4a853" opacity="0.9"/>
+        <rect x="313" y="74" width="14" height="32" rx="2" fill="#d4a853" opacity="0.9"/>
+        <rect x="463" y="74" width="14" height="32" rx="2" fill="#e06852" opacity="0.85"/>
+        <!-- Plates -->
+        <rect x="80" y="76" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="92" y="116" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">A</text>
+        <rect x="228" y="76" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="240" y="116" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">B</text>
+        <rect x="378" y="76" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="390" y="116" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">C</text>
+        <!-- Player -->
+        <circle cx="48" cy="88" r="8" fill="#9b7ee8" opacity="0.8"/>
+        <!-- Exit -->
+        <text x="530" y="93" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle">Exit</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>把关卡2的"单次冲刺"扩展成"持续节奏"。每组延迟都是2秒，玩家必须踩-跑-踩-跑-踩-跑，形成一个不能断的执行链条。一旦某一环慢了，门关了，整个节奏断掉要从头来。体验是<strong>"心流"或"手忙脚乱"</strong>——取决于玩家的执行精度。</p>
+      <div class="room-params">
+        <div class="param">延迟 <span>2s×3（连续）</span></div>
+        <div class="param">板×门 <span>3×3（串联）</span></div>
+        <div class="param">核心 <span>持续节奏</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 6 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">06</div>
+      <div class="room-title-group">
+        <div class="room-title">有去无回 — "门在我身后关上了"</div>
+        <div class="room-subtitle">没有执行难度提升，只有心理冲击</div>
+      </div>
+      <div class="room-tag tag-psychology">心理</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 260">
+        <!-- Three chambers -->
+        <rect x="40" y="30" width="170" height="200" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <rect x="210" y="30" width="200" height="200" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <rect x="410" y="30" width="170" height="200" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Door 1 -->
+        <rect x="203" y="112" width="14" height="38" rx="2" fill="#d4a853" opacity="0.9"/>
+        <!-- Door 2 -->
+        <rect x="403" y="112" width="14" height="38" rx="2" fill="#e06852" opacity="0.85"/>
+        <!-- Plate A -->
+        <rect x="108" y="115" width="26" height="26" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="121" y="158" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">A→D1</text>
+        <!-- Plate B -->
+        <rect x="296" y="115" width="26" height="26" rx="4" fill="#3dc9a0" opacity="0.7"/>
+        <text x="309" y="158" font-family="JetBrains Mono" font-size="10" fill="#2a8d70" text-anchor="middle">B→D2</text>
+        <!-- Player -->
+        <circle cx="80" cy="128" r="9" fill="#9b7ee8" opacity="0.8"/>
+        <!-- Sealed indicator -->
+        <line x1="198" y1="108" x2="222" y2="154" stroke="#e06852" stroke-width="1.5" opacity="0.4"/>
+        <line x1="222" y1="108" x2="198" y2="154" stroke="#e06852" stroke-width="1.5" opacity="0.4"/>
+        <text x="210" y="175" font-family="JetBrains Mono" font-size="9" fill="#e06852" text-anchor="middle" opacity="0.6">sealed behind you</text>
+        <!-- Exit -->
+        <text x="495" y="136" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle">Exit</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>这关的延迟故意给得很宽松——执行上毫无难度。但玩家一辈子学到的经验都是"门关了=我失败了"，突然门在身后关上，第一反应一定是恐慌。然后他发现中间室有Plate B，踩一下出口开了。<strong>难点不是操作，是心理承受能力。</strong>这关教玩家一个新认知：门关了不一定是惩罚，可能是推进。</p>
+      <div class="room-params">
+        <div class="param">延迟 <span>宽松（心理挑战）</span></div>
+        <div class="param">板×门 <span>2×2（序列）</span></div>
+        <div class="param">核心 <span>认知颠覆</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 7 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">07</div>
+      <div class="room-title-group">
+        <div class="room-title">陷阱与答案 — "只有一个是对的"</div>
+        <div class="room-subtitle">三个板，两个死胡同，一个出口</div>
+      </div>
+      <div class="room-tag tag-logic">排除</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 360">
+        <!-- Main hall -->
+        <rect x="80" y="20" width="460" height="120" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Three corridors -->
+        <rect x="80" y="140" width="120" height="160" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <rect x="250" y="140" width="120" height="160" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <rect x="420" y="140" width="120" height="160" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Doors at corridor entries -->
+        <rect x="127" y="132" width="28" height="14" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="141" y="128" font-family="JetBrains Mono" font-size="9" fill="#a07d3a" text-anchor="middle">D1</text>
+        <rect x="296" y="132" width="28" height="14" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="310" y="128" font-family="JetBrains Mono" font-size="9" fill="#a07d3a" text-anchor="middle">D2</text>
+        <rect x="466" y="132" width="28" height="14" rx="2" fill="#e06852" opacity="0.85"/>
+        <text x="480" y="128" font-family="JetBrains Mono" font-size="9" fill="#e06852" text-anchor="middle">D3</text>
+        <!-- Plates in main hall -->
+        <rect x="118" y="60" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="130" y="56" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">A</text>
+        <rect x="298" y="60" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="310" y="56" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">B</text>
+        <rect x="468" y="60" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="480" y="56" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">C</text>
+        <!-- Dead end markers -->
+        <text x="140" y="272" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle" opacity="0.5">dead end</text>
+        <text x="310" y="272" font-family="JetBrains Mono" font-size="10" fill="#e06852" text-anchor="middle" opacity="0.5">dead end</text>
+        <text x="480" y="272" font-family="JetBrains Mono" font-size="10" fill="#3dc9a0" text-anchor="middle" opacity="0.7">real exit</text>
+        <!-- Cross connections -->
+        <path d="M142 72 Q230 110 300 132" fill="none" stroke="#3dc9a0" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.3"/>
+        <path d="M322 72 Q420 110 470 132" fill="none" stroke="#3dc9a0" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.3"/>
+        <path d="M480 84 Q360 130 155 132" fill="none" stroke="#3dc9a0" stroke-width="0.7" stroke-dasharray="3 2" opacity="0.3"/>
+        <text x="200" y="108" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="middle">A→D2</text>
+        <text x="410" y="108" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="middle">B→D3</text>
+        <text x="340" y="340" font-family="JetBrains Mono" font-size="9" fill="#6a675f" text-anchor="middle">spatial assumption "nearest plate = nearest door" — wrong</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>利用玩家的空间直觉——"最近的板控制最近的门"。实际上全部交叉连接。玩家踩A，冲进旁边走廊，发现死胡同。回来踩C，又是死胡同。最后才发现B（中间的板）控制D3（右走廊出口）。<strong>惩罚不是死亡，是时间成本——逼玩家从试错转向系统性排除。</strong></p>
+      <div class="room-params">
+        <div class="param">延迟 <span>宽松</span></div>
+        <div class="param">板×门 <span>3×3（2诱饵+1真）</span></div>
+        <div class="param">核心 <span>排除法推理</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOM 8 -->
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-number">08</div>
+      <div class="room-title-group">
+        <div class="room-title">中庭挑战 — "绕一整圈"</div>
+        <div class="room-subtitle">全要素综合：记忆、推理、执行、心理</div>
+      </div>
+      <div class="room-tag tag-composite">综合</div>
+    </div>
+    <div class="room-map">
+      <svg viewBox="0 0 620 500">
+        <!-- Outer boundary -->
+        <rect x="30" y="30" width="560" height="420" rx="4" fill="none" stroke="#6a675f" stroke-width="2"/>
+        <!-- Central atrium -->
+        <rect x="160" y="140" width="300" height="200" rx="6" fill="#1a1a26" opacity="0.5"/>
+        <text x="310" y="244" font-family="JetBrains Mono" font-size="10" fill="#6a675f" text-anchor="middle" opacity="0.5">Central atrium</text>
+        <text x="310" y="258" font-family="JetBrains Mono" font-size="9" fill="#6a675f" text-anchor="middle" opacity="0.4">(open, full visibility)</text>
+        <!-- Four alcoves (dashed) -->
+        <rect x="30" y="30" width="120" height="110" rx="4" fill="none" stroke="#6a675f" stroke-width="1" stroke-dasharray="5 3" opacity="0.4"/>
+        <rect x="470" y="30" width="120" height="110" rx="4" fill="none" stroke="#6a675f" stroke-width="1" stroke-dasharray="5 3" opacity="0.4"/>
+        <rect x="470" y="340" width="120" height="110" rx="4" fill="none" stroke="#6a675f" stroke-width="1" stroke-dasharray="5 3" opacity="0.4"/>
+        <rect x="30" y="340" width="120" height="110" rx="4" fill="none" stroke="#6a675f" stroke-width="1" stroke-dasharray="5 3" opacity="0.4"/>
+        <!-- Plates -->
+        <rect x="70" y="68" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="82" y="108" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">P1</text>
+        <rect x="516" y="68" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="528" y="108" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">P2</text>
+        <rect x="516" y="378" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="528" y="418" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">P3</text>
+        <rect x="70" y="378" width="24" height="24" rx="3" fill="#3dc9a0" opacity="0.7"/>
+        <text x="82" y="418" font-family="JetBrains Mono" font-size="9" fill="#2a8d70" text-anchor="middle">P4</text>
+        <!-- Doors on atrium walls -->
+        <rect x="298" y="132" width="24" height="14" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="310" y="128" font-family="JetBrains Mono" font-size="9" fill="#a07d3a" text-anchor="middle">D-N</text>
+        <rect x="452" y="228" width="14" height="24" rx="2" fill="#d4a853" opacity="0.9"/>
+        <text x="480" y="244" font-family="JetBrains Mono" font-size="9" fill="#a07d3a" text-anchor="start">D-E</text>
+        <rect x="298" y="334" width="24" height="14" rx="2" fill="#e06852" opacity="0.75"/>
+        <text x="310" y="360" font-family="JetBrains Mono" font-size="9" fill="#e06852" text-anchor="middle">D-S (one-way↓)</text>
+        <rect x="152" y="228" width="14" height="24" rx="2" fill="#e06852" opacity="0.85"/>
+        <text x="140" y="244" font-family="JetBrains Mono" font-size="9" fill="#e06852" text-anchor="end">D-W (exit)</text>
+        <!-- Player -->
+        <circle cx="310" cy="230" r="9" fill="#9b7ee8" opacity="0.8"/>
+        <!-- Entrance -->
+        <text x="310" y="55" font-family="JetBrains Mono" font-size="9" fill="#9b7ee8" text-anchor="middle" opacity="0.5">entrance ↓</text>
+        <!-- Connection labels near plates -->
+        <text x="108" y="82" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="start">→D-E</text>
+        <text x="500" y="82" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="end">→D-S</text>
+        <text x="500" y="392" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="end">→D-W!</text>
+        <text x="108" y="392" font-family="JetBrains Mono" font-size="8" fill="#6a675f" text-anchor="start">→D-N</text>
+        <!-- Exit arrow -->
+        <path d="M152 240 L50 240" fill="none" stroke="#e06852" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.4"/>
+        <text x="88" y="228" font-family="JetBrains Mono" font-size="9" fill="#e06852" text-anchor="middle" opacity="0.5">out</text>
+      </svg>
+    </div>
+    <div class="room-body">
+      <p>中庭开放式设计——玩家站在中央能看到四面墙上所有门的开关状态。四角凹室各一个板，全部交叉连线。D-south是单向门（过了回不来）。</p>
+      <h3 style="font-size:1rem; margin-top:1rem;">完整体验流程</h3>
+      <p><strong>第一阶段：自由探索。</strong>玩家进入中庭，四扇门都关着。NW和NE凹室开放，自然先去踩。踩P1看到D-east开了，踩P2看到D-south开了。建立连线认知。</p>
+      <p><strong>第二阶段：推进。</strong>踩P1 → D-east开 → 冲进SE凹室发现P3。踩P3 → D-west（出口）亮了！但延迟2秒，从右下跑到左墙来不及。门关了。</p>
+      <p><strong>第三阶段：推理。</strong>"我知道P3能开出口，但踩完跑不到。怎么办？"路线规划问题浮现。</p>
+      <p><strong>第四阶段（陷阱）：</strong>如果之前好奇踩了P2，D-south开了走进去——单向门关上，被锁在SW凹室。P4只能开D-north（北面本来就通的），等于没用。关卡6"心理压力"的回响——冷静下来找出路。</p>
+      <p><strong>第五阶段：执行。</strong>正确序列：踩P1 → D-east开 → 冲进SE凹室踩P3 → D-west开 → 沿最短路径冲向出口。两段计时衔接，关卡5"连锁冲刺"的节奏感再次出现。</p>
+      <div class="room-params">
+        <div class="param">延迟 <span>2s（紧张）</span></div>
+        <div class="param">板×门 <span>4×4（全交叉）</span></div>
+        <div class="param">核心 <span>全要素综合</span></div>
+        <div class="param">特殊 <span>D-south单向门</span></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ========== SECTION 5: CURVE ========== -->
+<section id="curve">
+  <div class="section-label">Part 04</div>
+  <h2>体验曲线总结</h2>
+
+  <div class="curve">
+    <div class="curve-track">
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">01</span>认知</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">02</span>执行</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">03</span>推理</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">04</span>记忆</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">05</span>节奏</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">06</span>心理</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">07</span>排除</div>
+      </div>
+      <div class="curve-node">
+        <div class="curve-dot"></div>
+        <div class="curve-label"><span class="curve-num">08</span>综合</div>
+      </div>
+    </div>
+  </div>
+
+  <p>从头到尾只有一个玩法：<strong>板踩了门开，离开了门关。</strong>没有加过一条新规则，没有加过一个新模型。变化的只有空间布局、数量、连接关系、延迟参数、可视性这几个纯关卡设计维度。</p>
+
+  <div class="insight">
+    <div class="insight-label">核心结论</div>
+    <p><strong>规则是原子，机制是结构，目标是点火器——三者齐了才是玩法。</strong>玩法定型之后，剩下的全是用空间去雕刻体验。</p>
+  </div>
+
+  <p style="margin-top: 1.5rem;">今天的讨论还迭代了设计框架本身：原来的链条 <strong>属性 → 规则 → 机制 → 玩法</strong> 中，"机制到玩法"的跃迁条件被明确了。同时，原子化拆分揭示了触发器作为"可复用接口"的设计意义——输入端和输出端的解耦，是扩展性的真正来源。</p>
+</section>
+
+<footer>
+  <p>Level Design Study · 关卡玩法设计 · 2026.03.18</p>
+</footer>
+
+</div>
+
+</body>
+</html>

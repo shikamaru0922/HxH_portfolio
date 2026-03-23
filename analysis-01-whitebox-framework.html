@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关卡白盒设计思路框架 | 韩徐泓</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="analysis-theme.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="top-links reveal">
+    <a class="top-link" href="index.html#analysis">返回设计思考</a>
+    <a class="top-link" href="analysis-02-penacony-level-analysis.html">下一篇</a>
+  </div>
+
+  <header class="hero">
+    <div class="hero-label reveal">Design Thinking · 01</div>
+    <h1 class="reveal"><span>关卡白盒设计思路框架</span></h1>
+    <p class="hero-sub reveal">故事线 × 空间线 × 玩法线，从体验目标到可游玩关卡的完整方法论。</p>
+  </header>
+
+  <nav class="toc reveal-on-scroll">
+    <div class="toc-title">目录 · Contents</div>
+    <ul class="toc-list">
+      <li><a href="#principle"><span class="toc-num">00</span>核心原则</a></li>
+      <li><a href="#brainstorm-stage"><span class="toc-num">01</span>前置阶段：三线脑爆</a></li>
+      <li><a href="#story-line"><span class="toc-num">02</span>故事线流程</a></li>
+      <li><a href="#space-line"><span class="toc-num">03</span>空间线流程</a></li>
+      <li><a href="#gameplay-line"><span class="toc-num">04</span>玩法线流程</a></li>
+      <li><a href="#synergy"><span class="toc-num">05</span>三线协同关系</a></li>
+      <li><a href="#collab-philosophy"><span class="toc-num">06</span>白盒协作哲学</a></li>
+    </ul>
+  </nav>
+
+  <section class="analysis-section reveal-on-scroll" id="article">
+    <div class="section-label">Part 01</div>
+    <article class="analysis-content">
+
+    <blockquote>以终为始，一切从体验出发，严格执行。<br>本文梳理三条设计线各自的内部工作流程，以及它们之间如何相互驱动、协同产出。</blockquote>
+
+    <h2 id="principle">核心原则：任意一条线都可以驱动另外两条</h2>
+    <p>三条线不存在死板的"谁先谁后"。<strong>任何一条线只要产出了足够具体的内容，就可以反过来引导另外两条线做出产出。</strong></p>
+    <ul>
+      <li>故事线先有了标志性时刻，就能驱动空间线规划场景；</li>
+      <li>空间线确定了场景后，就能驱动玩法线放入合适的clips；</li>
+      <li>玩法线设计好了机制，也能反过来要求空间线提供合适的几何条件。</li>
+    </ul>
+    <p>三者是平行且互相喂养的关系。</p>
+
+    <hr>
+
+    <h2 id="brainstorm-stage">前置阶段：三线脑爆（以人的直觉发散素材）</h2>
+    <p>在三条线进入结构化流程之前，建议增加一个固定前置阶段：<strong>三线脑爆（Brainstorm）</strong>。这个阶段不追求完整方案，只追求高密度素材产出。</p>
+
+    <h3>触发时机</h3>
+    <p>当以下两件事已经明确，就可以启动脑爆，不必等待完整剧情和完整白盒：</p>
+    <ol>
+      <li><strong>世界是什么样</strong>（美学方向），例如“空中城寨，中式建筑”。</li>
+      <li><strong>核心玩法动词是什么</strong>，例如“来去自如的飞镖”。</li>
+    </ol>
+
+    <h3>脑爆方法（每条线 20 分钟）</h3>
+    <p>三条线各自独立发散，不串联、不评判，只回答“这个方向还可能有什么”。</p>
+
+    <h4>故事线脑爆：这个世界里会有什么人</h4>
+    <ul>
+      <li>寨主（Boss）</li>
+      <li>寨主家族角色（老爹、老娘、兄弟）</li>
+      <li>寨民/村民等日常 NPC</li>
+      <li>敌对势力与外来角色</li>
+    </ul>
+    <p>此时不处理人物关系和剧情逻辑，只扩充“人物素材池”。</p>
+
+    <h4>空间线脑爆：这个美学下会有什么空间</h4>
+    <ul>
+      <li>主建筑（Boss 宫殿）</li>
+      <li>外围驿站与交通节点</li>
+      <li>家族庭院/园林</li>
+      <li>公子厅、宫字楼、居民区</li>
+    </ul>
+    <p>此时不做动线和布局，只列“空间功能和气质类型”。</p>
+
+    <h4>玩法线脑爆：核心动词还能触发什么</h4>
+    <p>可用一条约束链发散：<strong>飞镖与场景/敌人发生什么互动 → 会引发什么结果</strong>。</p>
+    <ul>
+      <li>飞出去命中物体：切绳、断机关。</li>
+      <li>召回途中命中物体：回程也能触发效果。</li>
+      <li>点 A 扔出、点 B 召回：形成路径几何（V 字、直角、180 度）用于解谜与开门。</li>
+      <li>穿窗打击另一空间对象：跨房间交互。</li>
+      <li>打击敌人弱点：例如背刺机制来自召回路径。</li>
+      <li>击中吊挂物：切断后坠落形成二次杀伤。</li>
+    </ul>
+    <p>此时不考虑实现细节，只先确认“玩法可能性边界”。</p>
+
+    <h3>脑爆本质</h3>
+    <p>脑爆与后续“以人的认知重新理解玩法”是一体两面：都强调<strong>用人的直觉推导</strong>，而不是直接在微观规则表里硬算。微观信息过载时，设计会停滞；直觉视角反而能快速生成可验证方向。</p>
+    <p>脑爆产出不要求立即落地，它们应沉淀为<strong>原始素材库</strong>，在后续三线推进时被持续调取和重组。</p>
+    <p>脑爆后，空间线可以用 AI 生图做风格和体块参考，快速验证空间假设，缩短前期试错成本。</p>
+
+    <hr>
+
+    <h2 id="story-line">一、故事线：从剧情大纲到标志性时刻</h2>
+    <p>故事线是游戏中<strong>角色会发生的故事</strong>。它的工作流程最为简洁。</p>
+    <h3>流程</h3>
+    <ol>
+      <li><strong>拆解故事大纲</strong>：把整体剧情按照顺序梳理出来。</li>
+      <li><strong>确定标志性时刻</strong>：从大纲中提取出那些必须在关卡中被玩家体验到的<strong>关键节点</strong>（标志性时刻、标志性瞬间）。</li>
+      <li><strong>串联</strong>：把这些节点按剧情顺序串成一条线。</li>
+      <li><strong>交棒给空间线</strong>：这些标志性时刻就是空间线的"锚点来源"——每一个标志性时刻都需要一个与之匹配的空间去承载。</li>
+    </ol>
+    <h3>要点</h3>
+    <ul>
+      <li>故事线在这一步只需要确定"发生什么"和"按什么顺序"，不需要操心"在哪里发生"或"玩家怎么操作"。</li>
+      <li>但一旦故事线的节点足够具体，它就自然会对空间和玩法提出要求。</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="space-line">二、空间线：从标志性时刻到可游玩的舞台</h2>
+    <p>空间线是三条线中最复杂的，因为它既要承接故事线的情感需求，又要为玩法线提供物理容器。</p>
+
+    <h4>第一步：定义性场景 (Defining Scene)</h4>
+    <p>从故事线产出的标志性时刻出发，规划<strong>标志性时刻对应的空间点</strong>。每一个标志性时刻都需要一个"定义性场景"——一个符合该重要节点所需体验的场景。</p>
+
+    <h4>第二步：定义性场景空间（扩大空间）</h4>
+    <p>确定好标志性时刻的空间点后，把空间<strong>扩大</strong>，使其成为一个足以容纳玩家实际游玩的空间。这个"扩大"要同时满足三个条件：</p>
+    <ul>
+      <li><strong>容纳行走</strong>：玩家的物理移动需要足够的面积。</li>
+      <li><strong>容纳玩法</strong>：空间的几何形状要能承载对应的玩法clips。</li>
+      <li><strong>传递情绪</strong>：空间的大小、开合、光影要符合故事内容的情绪发展。</li>
+    </ul>
+
+    <h4>第三步：排布空间</h4>
+    <p>关卡策划自行发挥，把多个定义性场景空间进行排布。需要考虑：</p>
+    <ul>
+      <li><strong>3C（角色、控制、镜头）</strong>：空间是否适合当前的角色操控方式。</li>
+      <li><strong>性能与加载</strong>：技术层面的可行性。</li>
+      <li><strong>空间之间的过渡</strong>：从一个空间到下一个空间的衔接是否自然。</li>
+    </ul>
+
+    <h4>第四步：在空间中细化动线</h4>
+    <p>在每个空间内部规划玩家的行走动线。动线不能设置得太过复杂或信息密度太高（比如1分钟内8个九十度拐弯就是过载）。</p>
+
+    <h4>第五步：为了让动线成立，放入合适的玩法clips</h4>
+    <p>动线确定后，在合适的区域放入合适的玩法clips。放入时需要考虑：</p>
+    <ul>
+      <li><strong>空间与玩法的适配</strong>：比如一个"让玩家瞬移"的玩法，就不适合放入狭窄空间。</li>
+      <li><strong>故事线的影响</strong>：该区域在故事线中的情绪定义，决定了应该放什么类型的clips。</li>
+    </ul>
+
+    <h3>空间线的核心任务</h3>
+    <p>空间线最终要定义的不是建筑本身，而是<strong>玩家在这个空间中会涌现出什么属于自己的故事</strong>。这就是"隐性/涌现叙事"——<strong>空间 + 玩法 = 玩家自己的体验</strong>，这个体验是辅助故事线中情感的。</p>
+
+    <p><span class="case-label">案例：《最后生还者2》博物馆</span></p>
+    <p>故事线给出的标志性时刻：<strong>"艾莉和乔尔两人在博物馆有了美好的时光。"</strong></p>
+    <ol>
+      <li><strong>提问</strong>：博物馆有什么能使人感到美好？人会想去做什么来实现这份美好？</li>
+      <li><strong>设计玩法</strong>：照镜子、给恐龙戴帽子——这些都是"让人在博物馆感到美好"的具体行为。</li>
+      <li><strong>反推空间</strong>：有了这份构想，空间才能更加具体——比如要放得下这些恐龙模型，镜子要在合理的位置。</li>
+      <li><strong>编排故事</strong>：在空间中编排让玩家先见到什么、再见到什么，配合什么对话。关卡是舞台，不需要想得非常精确，但得要有数。</li>
+    </ol>
+
+    <blockquote>空间线总结：定义性场景 → 定义性场景空间（扩大） → 排布空间 → 细化动线 → 放入玩法clips</blockquote>
+
+    <hr>
+
+    <h2 id="gameplay-line">三、玩法线：从设计玩法到分类待用</h2>
+
+    <h4>第一步：设计玩法（微观拆分）</h4>
+    <p>一个玩法的微观结构是层层嵌套的：</p>
+    <blockquote>属性 → 规则（IF） → 机制（多个规则组合） → 玩法（一个目标和多个机制组成的整体）</blockquote>
+
+    <p><strong>规则是冷冰冰的物理法则（没有体验）。</strong> 就像"血量归零=死亡"，这是最基础的原子化定义——名词 + 动词 = 规则。就好比现实世界里的"万有引力"，单个规则不会给人带来情绪波动。</p>
+
+    <p><strong>机制是目标的孵化器（体验的起点）。</strong> 当多个规则组合在一起形成机制时，它就不再是静态的法则，而是变成了一个互动系统。多个规则的叠加，<strong>构筑成了有指引的目标（游戏性）</strong>。一旦玩家有了"目标"，体验就瞬间诞生了。</p>
+
+    <p><span class="case-label">案例：《只狼》架势条系统</span></p>
+    <ul>
+      <li><strong>规则A</strong>：玩家攻击，敌人增加架势条。</li>
+      <li><strong>规则B</strong>：停止攻击，敌人架势条衰减。</li>
+      <li><strong>机制形成</strong>：架势条越低，衰减越快；架势条越高，衰减越慢。</li>
+      <li><strong>体验涌现</strong>：玩家的"目标"立刻被指引为——<strong>我必须持续不断地、高压地进攻</strong>。"拼刀的紧张感"和"不能退缩的压迫感"就此形成。</li>
+    </ul>
+
+    <p><strong>容器建好了，往里面装什么颜色的水？</strong> 通过调整基础规则的参数和限制，来定向雕刻体验的具体感受（Game Feel）：</p>
+    <ul>
+      <li><strong>"轻松、割草"</strong>：架势条很短，眩晕时间极长 → 体验 = 爽快释放。</li>
+      <li><strong>"紧张、硬核"</strong>：架势条很长，停攻超2秒即清零 → 体验 = 高压、不能失误。</li>
+    </ul>
+
+    <h4>补充：构造分析法（以“破防眩晕”为例）</h4>
+    <p>在“规则→机制→目标”之外，可用构造分析法做一次反向校验：</p>
+    <ul>
+      <li><strong>提取基础元素（名词）</strong>：玩家、怪物、架势条。</li>
+      <li><strong>组合生成规则（名词 + 动词）</strong>：玩家攻击→增加架势条；架势条满→怪物眩晕。</li>
+      <li><strong>构筑次级目标</strong>：在“击杀怪物”主目标外，形成“先打满架势条”的可执行路径。</li>
+    </ul>
+    <p>当目标被清晰点亮后，玩家体验会从“盲按”切换为“策略执行”。这一步常用于判断机制是否真的具备游戏性。</p>
+
+    <h4>设计顺序建议</h4>
+    <p>初期实践中，建议优先从<strong>玩家直觉可感知的机制与玩法目标</strong>切入，再逐步下钻到规则和属性；而不是从底层参数直接拼装体验。更系统的拆分规范可参考：<a href="关卡玩法设计.html">关卡玩法设计</a>。</p>
+
+    <h4>第二步：以人的认知重新理解玩法（宏观整体）</h4>
+    <p>一旦一个玩法形成了，就应该<strong>把它看作一个有机的整体</strong>，不再以微观视角看——因为微观信息太多，参考因素过载。此时应该切换到<strong>以人的思维去理解玩法，再做推导</strong>。</p>
+
+    <p><span class="case-label">以飞镖为例</span></p>
+    <ul>
+      <li>飞镖会击中物体（切断绳子、敲打铃铛）</li>
+      <li>飞镖飞出去还能召回</li>
+      <li><strong>推导</strong>：召回的过程中也可以击中物体 → "背刺机制"的来源</li>
+    </ul>
+    <p>这种推导是以人的直觉去理解玩法后自然产生的，而不是从规则表里硬算出来的。</p>
+
+    <h4>第三步：推导拆分出玩法clips</h4>
+    <p>从整体玩法中，推导和拆分出具体的<strong>玩法clips（碎片）</strong>。每一个clips都是一个独立的、可以被放入关卡某个位置的玩法片段。</p>
+
+    <h4>第四步：用难度的三大乐趣维度定位每个clips</h4>
+    <table>
+      <thead><tr><th>维度</th><th>含义</th><th>运用举例</th></tr></thead>
+      <tbody>
+        <tr><td><strong>策略</strong></td><td>动脑子，规划和决策</td><td>想让玩家压抑 → 放高策略clips，迫使玩家在压抑空间待更久去思考</td></tr>
+        <tr><td><strong>操作</strong></td><td>拼手速，肌肉记忆</td><td>想让玩家紧张 → 考验玩家操作</td></tr>
+        <tr><td><strong>运气</strong></td><td>随机性，不可控因素</td><td>制造意外感和戏剧性</td></tr>
+      </tbody>
+    </table>
+
+    <h4>第五步：分类待用</h4>
+    <p>把所有clips按照三大维度的定位分类好，准备放入空间。等待空间线和故事线更加具体的时候，选择合适的clips放入合适的位置。</p>
+
+    <blockquote>玩法线总结：设计玩法（属性→规则→机制→玩法） → 以人的认知重新理解 → 推导拆分clips → 三大乐趣维度定位 → 分类待用</blockquote>
+
+    <hr>
+
+    <h2 id="synergy">四、三线协同关系总览</h2>
+    <p>三条线各自有独立的内部流程，但在实际生产中它们是<strong>交替推进、互相喂养</strong>的：</p>
+
+    <table>
+      <thead><tr><th>产出方</th><th>产出内容</th><th>接收方</th><th>接收后做什么</th></tr></thead>
+      <tbody>
+        <tr><td><strong>故事线</strong></td><td>标志性时刻（按顺序）</td><td><strong>空间线</strong></td><td>规划对应的定义性场景和空间</td></tr>
+        <tr><td><strong>空间线</strong></td><td>具体的空间形态和动线</td><td><strong>玩法线</strong></td><td>选择适配的clips放入空间</td></tr>
+        <tr><td><strong>空间线</strong></td><td>空间中需要什么体验</td><td><strong>故事线</strong></td><td>细化该空间中的微观叙事和对话</td></tr>
+        <tr><td><strong>玩法线</strong></td><td>clips的几何需求</td><td><strong>空间线</strong></td><td>调整空间形状以容纳玩法</td></tr>
+        <tr><td><strong>玩法线</strong></td><td>clips的情绪属性</td><td><strong>故事线</strong></td><td>确认该情绪是否符合故事节点</td></tr>
+      </tbody>
+    </table>
+
+    <p>核心原则不变：<strong>任何一条线只要有了足够具体的产出，就可以引导另外两条线做出产出。</strong> 三线不是瀑布式的流水线，而是彼此激发的共振关系。</p>
+
+    <hr>
+
+    <h2 id="collab-philosophy">五、为什么白盒必须做到足够细：关卡策划的协作哲学</h2>
+
+    <h3>“具体”才能激发下游</h3>
+    <p>白盒需要足够具体，不只是为了自我验证，更是为了让协作开始运转。这一点和美术迭代是同一个道理：概念图越具体、画面感越强，下游建模越容易理解意图，也越容易在此基础上提出超预期的补充。</p>
+    <p>白盒同理。你做得越细化、越具体，下游看到后就越容易马上知道“这个东西该怎么做”。协作的效率和质量，很多时候取决于这一步的信息密度。</p>
+    <p>反过来，如果白盒只是空建筑壳子，或只有一句“这里有个玩法”，下游通常无法推进，因为设计意图没有被表达清楚。</p>
+
+    <h3>白盒不是建筑，也不是单一玩法，而是有机融合</h3>
+    <p>白盒不应该停留在以下任一单线状态：</p>
+    <ul>
+      <li><strong>只有建筑</strong>：有空间，没有体验。</li>
+      <li><strong>只有玩法</strong>：有机制，没有情境。</li>
+      <li><strong>只有剧情</strong>：有故事，没有舞台。</li>
+    </ul>
+    <p>关卡策划的目标，是在白盒阶段就把三者融合到可验证的程度：能验证玩法是否成立，能在关卡中讲出故事，能让空间承载情绪。三者缺一不可。</p>
+
+    <h3>关卡策划的核心能力：在空间中讲故事</h3>
+    <p>关卡策划最核心的能力不是“写一段文字”，而是通过空间收放、玩法编排和体验节奏来叙事。当白盒已经能“讲故事”，它就不再是灰盒体块，而是一个有情绪、有表达的舞台。</p>
+
+    <h3>终极目标：让别人主动关心你的设计</h3>
+    <p>当白盒足够具体、足够有机，协作者会从“被动接活”转为“主动参与”。他们会在你的设计里看到可能性，进而把自己的创意接入进来，形成你一个人想不到的方案。</p>
+    <p>这就是高质量协作：<strong>你的设计激发了别人的设计</strong>。不是依赖流程压力推动执行，而是依赖设计本身的清晰度和说服力激活团队创造力。</p>
+    <p>因此，白盒不仅是验证自己想法的工具，更是团队协同创造的沟通语言。做得越具体，这门语言就越清晰，团队越愿意与你“对话”。</p>
+
+    <p style="margin-top:32px;color:var(--text-muted);font-size:13px;font-style:italic;">持续迭代中——后续将补充起承转合与体验生成链路模型。</p>
+  
+    </article>
+  </section>
+
+  <div class="article-nav reveal-on-scroll">
+    <a class="article-link" href="index.html#analysis">← 返回列表</a>
+    <a class="article-link primary" href="analysis-02-penacony-level-analysis.html">阅读下一篇 →</a>
+  </div>
+
+  <footer>
+    <p>Design Thinking · 关卡白盒设计思路框架</p>
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.gsap) return;
+
+  gsap.fromTo('.hero .reveal',
+    { opacity: 0, y: 24 },
+    { opacity: 1, y: 0, duration: 0.75, stagger: 0.12, ease: 'power2.out' }
+  );
+
+  const revealBlocks = document.querySelectorAll('.reveal-on-scroll');
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      gsap.fromTo(entry.target,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }
+      );
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.14 });
+
+  revealBlocks.forEach(el => io.observe(el));
+});
+</script>
+
+</body>
+</html>
