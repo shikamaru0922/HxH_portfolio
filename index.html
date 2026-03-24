@@ -602,12 +602,13 @@ section {
 
 .tag {
   padding: 4px 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
+  background: rgba(0, 212, 170, 0.14);
+  border: 1px solid rgba(0, 212, 170, 0.38);
   border-radius: 6px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: #d6fff5;
   font-family: var(--font-mono);
+  font-weight: 600;
 }
 
 .project-link {
@@ -626,6 +627,67 @@ section {
 .project-link::after {
   content: '→';
   transition: transform 0.3s;
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.project-card-whitebox {
+  display: block;
+}
+
+.project-content-whitebox {
+  padding: 40px;
+}
+
+.project-whitebox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.01);
+}
+
+.project-whitebox-col {
+  padding: 28px 24px;
+}
+
+.project-whitebox-col + .project-whitebox-col {
+  border-left: 1px solid var(--border);
+}
+
+.project-whitebox-col h4 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.project-whitebox-focus {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 500;
+  padding: 10px 14px;
+  background: var(--accent-glow);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+.project-whitebox-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.project-content-whitebox .project-tags {
+  margin-bottom: 16px;
 }
 
 /* ===== AI Section ===== */
@@ -939,6 +1001,11 @@ footer {
   .about-grid { grid-template-columns: 1fr; }
   .project-card { grid-template-columns: 1fr; }
   .project-visual { min-height: 220px; }
+  .project-whitebox-grid { grid-template-columns: 1fr; }
+  .project-whitebox-col + .project-whitebox-col {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
   .ai-grid { grid-template-columns: 1fr; }
   .ai-grid-bottom { grid-template-columns: 1fr; max-width: 100%; }
   .ai-section { padding: 40px 24px; }
@@ -1084,6 +1151,44 @@ footer {
     </div>
   </div>
 
+  <!-- 关卡白盒补充作品 -->
+  <div class="project-card project-card-whitebox">
+    <div class="project-content project-content-whitebox">
+      <div class="project-type">
+        关卡策划 · 3D关卡白盒
+        <span class="project-type-note">在空间中讲好一个故事 · 玩法验证 × 空间叙事 × 设计文档</span>
+      </div>
+      <h3 class="project-name">关卡白盒补充作品（核心项目）</h3>
+      <div class="project-subtitle">左右对照展示：同一方法论下的两种解谜体验</div>
+
+      <div class="project-whitebox-grid">
+        <article class="project-whitebox-col">
+          <h4>博物馆+放大缩小 关卡白模</h4>
+          <p class="project-whitebox-focus">核心体验：在博物馆空间中完成放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
+          <p class="project-whitebox-desc">聚焦博物馆场景里的关卡解谜与Boss战设计，通过空间探索、信息引导与阶段挑战，验证关卡逻辑与体验连贯性。</p>
+          <div class="project-tags">
+            <span class="tag">关卡解谜</span>
+            <span class="tag">博物馆空间</span>
+            <span class="tag">Boss战设计</span>
+          </div>
+          <a href="https://www.bilibili.com/video/BV1RMPnzGEke/" class="project-link" target="_blank">查看项目</a>
+        </article>
+
+        <article class="project-whitebox-col">
+          <h4>天空城寨 Sky Citadel</h4>
+          <p class="project-whitebox-focus">核心体验：以飞镖投掷/召回机制构建Boss战，通过高压对抗与阶段变化形成战斗叙事。</p>
+          <p class="project-whitebox-desc">聚焦以飞镖机制为基础的Boss战设计与三线协同，通过空间编排说明“角色正在发生什么事情”，并持续验证机制与叙事是否共同成立。</p>
+          <div class="project-tags">
+            <span class="tag">飞镖机制</span>
+            <span class="tag">Boss战设计</span>
+            <span class="tag">空间叙事</span>
+          </div>
+          <a href="https://www.kdocs.cn/l/cefplLrSYiQi" class="project-link" target="_blank">查看项目</a>
+        </article>
+      </div>
+    </div>
+  </div>
+
   <!-- Project Q -->
   <div class="project-card">
     <div class="project-visual pv-q">
@@ -1092,7 +1197,6 @@ footer {
     <div class="project-content">
       <div class="project-type">
         关卡策划 · 数据驱动
-        <span class="project-type-note">在空间中讲好一个故事</span>
       </div>
       <h3 class="project-name">Project Q</h3>
       <div class="project-subtitle">2D→3D关卡迭代 · 2023-2025</div>
@@ -1335,13 +1439,13 @@ footer {
     <a class="case-card" href="https://www.bilibili.com/video/BV1RMPnzGEke/" target="_blank">
       <div class="case-emoji">🏛️</div>
       <h3>博物馆+放大缩小 关卡白模</h3>
-      <p>战斗+解密+Boss战</p>
+      <p>博物馆空间解谜 · 放大缩小机制 · Boss战收束</p>
       <div class="case-type">关卡设计</div>
     </a>
     <a class="case-card" href="https://www.kdocs.cn/l/cefplLrSYiQi" target="_blank">
       <div class="case-emoji">🎯</div>
       <h3>天空城寨 Sky Citadel</h3>
-      <p>中式浮空堡垒 · 飞镖投掷与召回 · 三线协同</p>
+      <p>飞镖机制Boss战 · 投掷与召回 · 空间叙事验证</p>
       <div class="case-type">关卡设计 · 进行中</div>
     </a>
     <a class="case-card" href="https://www.taptap.cn/app/779606?os=pc" target="_blank">
