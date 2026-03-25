@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MemeTower 概念文档 | 韩徐泓</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="analysis-theme.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="top-links reveal">
+    <a class="top-link" href="index.html#projects">返回核心项目</a>
+    <a class="top-link" href="https://www.kdocs.cn/l/ct0OB4FhFiOt" target="_blank" rel="noopener noreferrer">查看项目详情</a>
+  </div>
+
+  <header class="hero">
+    <div class="hero-label reveal">Game Concept · MemeTower</div>
+    <h1 class="reveal"><span>MemeTower 概念文档</span></h1>
+    <p class="hero-sub reveal">拼接并重构塔防模块，让能量脉冲穿过 Buff 网络，实时搭建属于玩家自己的动态火力系统。</p>
+  </header>
+
+  <nav class="toc reveal-on-scroll">
+    <div class="toc-title">目录 · Contents</div>
+    <ul class="toc-list">
+      <li><a href="#basic"><span class="toc-num">01</span>基本信息</a></li>
+      <li><a href="#pitch"><span class="toc-num">02</span>电梯演说</a></li>
+      <li><a href="#value"><span class="toc-num">03</span>玩家为什么关心</a></li>
+      <li><a href="#goal"><span class="toc-num">04</span>目标与体验配比</a></li>
+      <li><a href="#loop"><span class="toc-num">05</span>核心玩法循环</a></li>
+    </ul>
+  </nav>
+
+  <section class="analysis-section reveal-on-scroll" id="article">
+    <div class="section-label">Concept Draft</div>
+    <article class="analysis-content">
+
+    <blockquote>这不是“摆好就等”的塔防，而是一个持续被玩家改写的实时战术舞台。</blockquote>
+
+    <h2 id="basic">一、基本信息</h2>
+    <ul>
+      <li><strong>游戏类型</strong>：即时模块构建塔防（Real-time Modular Build TD）</li>
+      <li><strong>一句话概念</strong>：玩家通过拖拽、旋转、拼接塔防模块，主动引导能量脉冲流经 Buff 增幅链路，构筑高自由度的弹幕 Build，抵御持续升级的敌群压力。</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="pitch">二、电梯演说</h2>
+    <p><strong>MemeTower</strong> 是一款打破“静态防线”范式的即时策略塔防。玩家不再只是摆塔等待，而是在战斗进行中持续重构阵地：把模块像电路一样拼起来，让能量脉冲在网络中流动、被强化、被转化，最终形成高度个性化的火力表达。每一局都像一次战术编程，目标是在混乱战场里把灵感变成可运行的输出系统。</p>
+
+    <hr>
+
+    <h2 id="value">三、玩家为什么关心</h2>
+    <h3>1. 阵地是“活”的，战斗中始终有决策空间</h3>
+    <p>传统塔防常在中后期进入“摆完等结果”的被动节奏。MemeTower 允许玩家根据波次压力随时拆装、换向、重排模块，让防线保持流动性，持续参与战场演化。</p>
+
+    <h3>2. 从“操作执行者”变成“战术架构师”</h3>
+    <p>本作不强调极限手速，而强调结构思维。玩家需要理解模块之间的联动关系，把随机资源整理成有逻辑的增幅网络，用策略设计获得掌控感。</p>
+
+    <h3>3. 策略被点燃时，获得强烈可视化反馈</h3>
+    <p>最核心的爽感来自“验证”。当一套看似离谱的构筑在实战中稳定运转，并转化成满屏具有个人风格的弹幕火力时，玩家会直接感受到“我设计的系统正在生效”的成就感。</p>
+
+    <hr>
+
+    <h2 id="goal">四、游戏目标与体验配比</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>体验维度</th>
+          <th>占比</th>
+          <th>设计定位</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>策略规划</td>
+          <td>75%</td>
+          <td>在有限网格内进行布局、路径与增幅关系设计，形成构筑差异。</td>
+        </tr>
+        <tr>
+          <td>随机应变</td>
+          <td>20%</td>
+          <td>围绕随机掉落与波次变化快速调整阵型，保持策略弹性。</td>
+        </tr>
+        <tr>
+          <td>即时操作</td>
+          <td>5%</td>
+          <td>通过旋转、移动、引爆等轻量操作完成关键干预。</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>玩家的最终目标是在有限空间与动态资源约束下，保护“源模块”不被摧毁，并持续迭代出高完成度 Build，体验策略解谜与即时微操交织的成长闭环。</p>
+
+    <hr>
+
+    <h2 id="loop">五、核心玩法循环</h2>
+    <ol>
+      <li><strong>识别战场变量</strong>：观察敌方压力与当前随机资源，判断当下最缺的功能位。</li>
+      <li><strong>构建脉冲网络</strong>：拖拽、旋转并拼接模块，让能量路径经过关键 Buff 节点。</li>
+      <li><strong>点燃并验证 Build</strong>：触发火力输出，验证构筑是否能稳定处理当前波次。</li>
+      <li><strong>复盘并重构</strong>：根据实战结果拆装调整，进入下一轮更高强度对抗。</li>
+    </ol>
+    <p><strong>循环表达</strong>：在动态随机中寻找灵感 → 用策略把灵感编译为自动化火力网络 → 亲手点燃专属“弹幕烟花”并获得正反馈。</p>
+
+    </article>
+  </section>
+
+  <div class="article-nav reveal-on-scroll">
+    <a class="article-link" href="https://www.kdocs.cn/l/ct0OB4FhFiOt" target="_blank" rel="noopener noreferrer">查看项目详情</a>
+    <a class="article-link primary" href="index.html#projects">返回列表</a>
+  </div>
+
+  <footer>
+    <p>Game Concept · MemeTower</p>
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.gsap) return;
+
+  gsap.fromTo('.hero .reveal',
+    { opacity: 0, y: 24 },
+    { opacity: 1, y: 0, duration: 0.75, stagger: 0.12, ease: 'power2.out' }
+  );
+
+  const revealBlocks = document.querySelectorAll('.reveal-on-scroll');
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      gsap.fromTo(entry.target,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }
+      );
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.14 });
+
+  revealBlocks.forEach(el => io.observe(el));
+});
+</script>
+
+</body>
+</html>
