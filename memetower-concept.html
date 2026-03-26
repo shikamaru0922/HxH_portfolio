@@ -6,6 +6,29 @@
 <title>MemeTower 概念文档 | 韩徐泓</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="analysis-theme.css">
+<style>
+.memetower-demo {
+  margin: 0 0 2.2rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0b0d14;
+}
+
+.memetower-demo-video {
+  display: block;
+  width: 100%;
+  max-height: 560px;
+  object-fit: cover;
+  background: #000;
+}
+
+@media (max-width: 768px) {
+  .memetower-demo-video {
+    max-height: 360px;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -21,6 +44,13 @@
     <h1 class="reveal"><span>MemeTower 概念文档</span></h1>
     <p class="hero-sub reveal">拼接并重构塔防模块，让能量脉冲穿过 Buff 网络，实时搭建属于玩家自己的动态火力系统。</p>
   </header>
+
+  <div class="memetower-demo reveal-on-scroll">
+    <video class="memetower-demo-video" controls autoplay muted loop playsinline preload="metadata">
+      <source src="assets/videos/memetower-demo.mp4" type="video/mp4">
+      您的浏览器暂不支持 HTML5 视频播放。
+    </video>
+  </div>
 
   <nav class="toc reveal-on-scroll">
     <div class="toc-title">目录 · Contents</div>
