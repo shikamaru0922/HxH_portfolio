@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>基督教三大流派 · 编年史笔记</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C5A55A;--gold-light:#E8D5A3;--gold-dark:#8B7332;--ink:#1A1611;--parchment:#F5F0E8;--parchment-dark:#E8DFD0;--crimson:#8B2500;--byzantine:#4A2D6B;--gothic:#2D4A3E;--protestant:#3D5A80;--text:#2C2418;--text-light:#6B5D4D;--shadow:rgba(26,22,17,0.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--parchment);color:var(--text);line-height:1.8;overflow-x:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;background:linear-gradient(180deg,#1A1611 0%,#2C2418 40%,#3D3226 70%,var(--parchment) 100%);padding:2rem;overflow:hidden}
+.hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:var(--gold-light);letter-spacing:.15em;margin-bottom:.5rem}
+.hero .subtitle{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2vw,1.3rem);color:rgba(232,213,163,.6);font-style:italic;letter-spacing:.3em;margin-bottom:1.5rem}
+.hero .desc{max-width:650px;color:rgba(232,213,163,.45);font-size:.9rem;line-height:2;margin-bottom:2.5rem}
+.hero-sym{font-size:3rem;color:var(--gold);opacity:.6;margin-bottom:1.2rem;animation:glow 4s ease-in-out infinite alternate}
+@keyframes glow{from{text-shadow:0 0 20px rgba(197,165,90,.3)}to{text-shadow:0 0 40px rgba(197,165,90,.6)}}
+.hero-nav{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+.hero-nav a{padding:.5rem 1.2rem;border:1px solid var(--gold);color:var(--gold-light);text-decoration:none;font-size:.75rem;letter-spacing:.08em;transition:all .3s}
+.hero-nav a:hover{background:var(--gold);color:var(--ink)}
+.scroll-hint{position:absolute;bottom:1.5rem;color:rgba(197,165,90,.4);font-size:.75rem;letter-spacing:.2em;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+nav.sticky{position:sticky;top:0;z-index:100;background:rgba(26,22,17,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,165,90,.2);display:flex;justify-content:center;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav.sticky a{color:rgba(232,213,163,.6);text-decoration:none;padding:.7rem 1rem;font-size:.72rem;letter-spacing:.06em;white-space:nowrap;transition:all .3s;border-bottom:2px solid transparent}
+nav.sticky a:hover{color:var(--gold-light);border-bottom-color:var(--gold)}
+section{max-width:960px;margin:0 auto;padding:3.5rem 1.5rem}
+.sh{text-align:center;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(197,165,90,.3)}
+.sh .era{display:inline-block;font-size:.65rem;letter-spacing:.3em;color:var(--gold-dark);border:1px solid var(--gold-dark);padding:.15rem .8rem;margin-bottom:.8rem}
+.sh h2{font-family:'Noto Serif SC',serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;color:var(--ink);margin-bottom:.4rem}
+.sh .period{font-family:'Playfair Display',serif;font-style:italic;color:var(--text-light);font-size:.95rem}
+.tl{position:relative;padding-left:2.5rem}
+.tl::before{content:'';position:absolute;left:.5rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--gold-dark),transparent)}
+.tl-item{position:relative;margin-bottom:2rem;padding:1.2rem 1.5rem;background:#fff;border-left:3px solid var(--gold);box-shadow:0 2px 10px var(--shadow);transition:transform .3s}
+.tl-item:hover{transform:translateX(3px)}
+.tl-item::before{content:'';position:absolute;left:-2.85rem;top:1.3rem;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--parchment)}
+.tl-item.cat{border-left-color:var(--crimson)}.tl-item.cat::before{background:var(--crimson)}
+.tl-item.byz{border-left-color:var(--byzantine)}.tl-item.byz::before{background:var(--byzantine)}
+.tl-item.got{border-left-color:var(--gothic)}.tl-item.got::before{background:var(--gothic)}
+.tl-item.pro{border-left-color:var(--protestant)}.tl-item.pro::before{background:var(--protestant)}
+.tl-year{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold-dark);margin-bottom:.2rem}
+.tl-title{font-family:'Noto Serif SC',serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
+.tl-body{font-size:.85rem;color:var(--text-light);line-height:1.9}
+.tag{display:inline-block;font-size:.6rem;padding:.12rem .5rem;border-radius:2px;margin-top:.6rem;margin-right:.3rem;letter-spacing:.04em;font-weight:500}
+.tag-a{background:#E8DFD0;color:var(--gothic)}.tag-w{background:#F5E0DC;color:var(--crimson)}.tag-r{background:#E8E0F0;color:var(--byzantine)}.tag-c{background:#D8E8F0;color:var(--protestant)}.tag-d{background:#F0D8D0;color:#8B2500}
+.prose{font-size:.88rem;line-height:2;color:var(--text-light);margin-bottom:1.5rem}
+.prose strong{color:var(--text);font-weight:600}
+.callout{background:rgba(197,165,90,.08);border-left:3px solid var(--gold);padding:1rem 1.2rem;margin:1.2rem 0;font-size:.85rem;line-height:1.9;color:var(--text-light)}
+.callout-t{font-family:'Noto Serif SC',serif;font-weight:700;color:var(--gold-dark);margin-bottom:.3rem;font-size:.88rem}
+.divider{text-align:center;padding:1.5rem 0;color:var(--gold);font-size:1rem;opacity:.4;letter-spacing:1em}
+details{margin:1rem 0;background:#fff;box-shadow:0 2px 10px var(--shadow);overflow:hidden}
+details summary{padding:1rem 1.5rem;cursor:pointer;font-family:'Noto Serif SC',serif;font-weight:700;font-size:.95rem;color:var(--ink);user-select:none;display:flex;align-items:center;gap:.6rem;transition:background .2s}
+details summary:hover{background:rgba(197,165,90,.06)}
+details summary::before{content:'▸';color:var(--gold);font-size:1.1rem;transition:transform .2s;display:inline-block;flex-shrink:0}
+details[open] summary::before{transform:rotate(90deg)}
+details .detail-body{padding:1rem 1.5rem 1.5rem;font-size:.85rem;line-height:1.9;color:var(--text-light);border-top:1px solid var(--parchment-dark)}
+details .detail-body h4{font-family:'Noto Serif SC',serif;font-size:.9rem;font-weight:700;color:var(--text);margin:1rem 0 .4rem}
+details .detail-body strong{color:var(--text)}
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin:1.5rem 0}
+.arch-card{background:#fff;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 2px 10px var(--shadow)}
+.arch-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.arch-card.gc::before{background:var(--gothic)}.arch-card.bc::before{background:var(--byzantine)}.arch-card.pc::before{background:var(--protestant)}.arch-card.bac::before{background:var(--gold)}.arch-card.cc::before{background:var(--crimson)}
+.arch-card h3{font-family:'Noto Serif SC',serif;font-size:1.05rem;margin-bottom:.2rem}
+.arch-card .en{font-family:'Playfair Display',serif;font-style:italic;font-size:.75rem;color:var(--text-light);margin-bottom:.8rem}
+.arch-card .feat{font-size:.82rem;color:var(--text-light);line-height:1.9}
+.kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.8rem}
+.kw span{font-size:.65rem;padding:.15rem .5rem;background:var(--parchment);color:var(--text-light);border-radius:2px}
+table.cmp{width:100%;border-collapse:collapse;font-size:.8rem;margin:1.5rem 0;background:#fff;box-shadow:0 2px 10px var(--shadow)}
+table.cmp th{font-family:'Noto Serif SC',serif;font-weight:700;padding:.8rem;text-align:left;border-bottom:2px solid var(--gold);background:var(--parchment);font-size:.82rem}
+table.cmp td{padding:.7rem .8rem;border-bottom:1px solid var(--parchment-dark);vertical-align:top;line-height:1.7;color:var(--text-light)}
+table.cmp tr:hover td{background:rgba(197,165,90,.05)}
+.res-block{background:#fff;padding:1.5rem;margin-bottom:1.2rem;box-shadow:0 2px 10px var(--shadow)}
+.res-block h3{font-family:'Noto Serif SC',serif;font-size:1rem;margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:1px solid var(--parchment-dark)}
+.res-link{display:block;padding:.6rem .8rem;margin-bottom:.4rem;text-decoration:none;color:var(--text);background:var(--parchment);transition:all .3s;font-size:.82rem;line-height:1.6;border-left:3px solid transparent}
+.res-link:hover{border-left-color:var(--gold);transform:translateX(3px)}
+.res-link .rt{font-size:.6rem;letter-spacing:.08em;color:var(--gold-dark);font-weight:700;display:inline-block;margin-right:.4rem;padding:.08rem .4rem;border:1px solid var(--gold-dark)}
+.res-link .rd{display:block;font-size:.72rem;color:var(--text-light);margin-top:.2rem}
+.diagram-box{background:#fff;padding:1.2rem;margin:1rem 0;box-shadow:0 2px 10px var(--shadow);overflow-x:auto}
+.diagram-box svg{max-width:100%;height:auto}
+.doc-image{margin:1.4rem 0;background:#fff;padding:.6rem;box-shadow:0 2px 10px var(--shadow);border:1px solid rgba(197,165,90,.22)}
+.doc-image img{display:block;width:100%;height:auto;max-height:560px;object-fit:cover}
+.my-thought{background:rgba(74,45,107,.06);border-left:3px solid var(--byzantine);padding:1rem 1.2rem;margin:1rem 0;font-size:.85rem;line-height:1.9;color:var(--text-light)}
+.my-thought .label{font-size:.65rem;letter-spacing:.15em;color:var(--byzantine);font-weight:700;margin-bottom:.3rem}
+footer{background:var(--ink);color:rgba(232,213,163,.4);text-align:center;padding:2.5rem 1.5rem;font-size:.7rem;letter-spacing:.1em;line-height:2}
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}.fade-in.visible{opacity:1;transform:translateY(0)}
+@media(max-width:600px){section{padding:2rem 1rem}.tl{padding-left:2rem}.tl-item::before{left:-2.35rem}.tl::before{left:.3rem}.arch-grid{grid-template-columns:1fr}table.cmp{font-size:.7rem}table.cmp th,table.cmp td{padding:.4rem}details summary{font-size:.85rem;padding:.8rem 1rem}details .detail-body{padding:.8rem 1rem 1rem}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+<div class="hero-sym">✝ ☦ 🕊</div>
+<h1>基督教三大流派</h1>
+<p class="subtitle">A CHRONICLE · 编年史笔记</p>
+<p class="desc">从黎凡特的地下墓穴到罗马帝国的精神征服，从1054年大分裂到1517年宗教改革——两千年信仰演变、权力博弈与建筑空间的史诗。包含我的个人思考与学习记录。</p>
+<div class="hero-nav">
+<a href="#prelude">序章 · 地理</a>
+<a href="#era1">纪元一</a>
+<a href="#era2">纪元二</a>
+<a href="#era3">纪元三</a>
+<a href="#era4">纪元四</a>
+<a href="#comparison">流派对比</a>
+<a href="#architecture">建筑空间</a>
+<a href="#deep">深度专题</a>
+<a href="#resources">学习资源</a>
+</div>
+<div class="scroll-hint">▼ 向下滚动开始探索 ▼</div>
+</div>
+
+<nav class="sticky">
+<a href="#prelude">地理</a>
+<a href="#era1">纪元一</a>
+<a href="#era2">纪元二</a>
+<a href="#era3">纪元三</a>
+<a href="#era4">纪元四</a>
+<a href="#comparison">对比</a>
+<a href="#architecture">建筑</a>
+<a href="#deep">专题</a>
+<a href="#resources">资源</a>
+</nav>
+
+<!-- ===== PRELUDE: GEOGRAPHY ===== -->
+<section id="prelude">
+<div class="sh fade-in"><span class="era">PRELUDE</span><h2>地理认知：忘掉现代国界线</h2><p class="period">肥沃新月 · 黎凡特 · 美索不达米亚</p></div>
+<p class="prose fade-in">今天的"叙利亚""黎巴嫩""以色列""巴勒斯坦""约旦""伊拉克"等国家，绝大多数是1920年代英法在一战后用尺子画出来的。在古代，这片区域应被理解为一个有机的整体——<strong>"肥沃新月"（Fertile Crescent）</strong>。</p>
+<figure class="doc-image fade-in">
+<img src="images/christianity/fertile-crescent-map.png" alt="肥沃新月地区地图">
+</figure>
+
+<details class="fade-in"><summary>古代中东五大地理板块</summary><div class="detail-body">
+<h4>安纳托利亚（今：土耳其）</h4><p>君士坦丁堡（伊斯坦布尔）所在地。东正教的权力中心。扼守欧亚交界的战略咽喉。</p>
+<h4>黎凡特（今：叙利亚、黎巴嫩、以色列、巴勒斯坦、约旦）</h4><p>地中海东岸狭长地带。<strong>三大宗教的诞生地和交汇点</strong>：犹太教和基督教诞生于此，伊斯兰教北上后第一站征服此地。大马士革、耶路撒冷、安提阿全在这条线上。黎凡特是"文化路由器"——接收各方文明，融合后再输出。</p>
+<h4>美索不达米亚（今：伊拉克、叙利亚东部）</h4><p>底格里斯河与幼发拉底河之间。<strong>人类文明的摇篮</strong>：苏美尔、巴比伦、亚述帝国。文字、法律、天文学都从这里发源。《Fate》里的吉尔伽美什（金闪闪）就来自这里最古老的苏美尔文明。</p>
+<h4>阿拉伯半岛（今：沙特阿拉伯）</h4><p>伊斯兰教的诞生地。麦加、麦地那。公元7世纪伊斯兰教崛起后北上征服了黎凡特和美索不达米亚。</p>
+<h4>波斯（今：伊朗）</h4><p>文化和语言上与黎凡特/阿拉伯有本质区别（印欧语系 vs 闪族语系）。有自己独立的宗教传统——琐罗亚斯德教（拜火教）。虽然后来也被伊斯兰化，但始终保留强烈的独立文化身份。</p>
+<h4>核心关系</h4><p>黎凡特是<strong>路由器</strong>，美索不达米亚是<strong>服务器</strong>（文明源头），阿拉伯半岛是后来加入的<strong>新节点</strong>，波斯是隔壁独立运行但共享协议的<strong>另一台服务器</strong>。</p>
+</div></details>
+
+<details class="fade-in"><summary>大马士革：宗教的"文化GitHub"</summary><div class="detail-body">
+<p>大马士革（Damascus）是<strong>叙利亚首都</strong>，位于黎凡特腹地，是人类最古老的持续有人居住的城市之一（公元前8000年）。</p>
+<h4>对基督教：保罗归信之地</h4><p>使徒保罗（原名扫罗）在前往大马士革的路上被天光击倒失明，随后在大马士革归信基督教。"大马士革之路"在西方文化中成了"彻底思想转变"的代名词。至今大马士革保留着直街（Via Recta）、亚拿尼亚故居和圣保罗礼拜堂等遗迹。</p>
+<h4>对伊斯兰教：倭马亚王朝首都</h4><p>公元660-753年，大马士革是倭马亚哈里发王朝首都。倭马亚大清真寺直接建在原来的基督教圣约翰教堂遗址上，而那座教堂又建在更早的罗马朱庇特神庙地基上——同一块地皮先后承载了异教神庙、基督教堂和伊斯兰清真寺。</p>
+<h4>建筑意义</h4><p>大马士革是观察"拜占庭文化如何影响早期伊斯兰建筑"的最佳地点。倭马亚大清真寺的圆顶和马赛克装饰明显继承了拜占庭式建筑的DNA。</p>
+</div></details>
+
+<div class="my-thought fade-in"><div class="label">💭 我的思考</div>黎凡特不仅是被入侵的受害者，更像一个双向路由器。而且如果论"谁先影响谁"，美索不达米亚才是老大哥——文字、法律都从那边先传过来的。腓尼基人在黎凡特简化了楔形文字发明了字母表，这套字母表后来演变成了希腊字母、拉丁字母、阿拉伯字母——几乎所有文字系统都能追溯到黎凡特这个中转站。</div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== ERA 1 ===== -->
+<section id="era1">
+<div class="sh fade-in"><span class="era">EPOCH I</span><h2>星火与地下生存</h2><p class="period">公元 1 世纪 — 3 世纪</p></div>
+<p class="prose fade-in">基督教诞生于罗马帝国统治下的巴勒斯坦（黎凡特）。在长达近三百年的时间里，基督徒遭到罗马帝国残酷迫害，信仰活动被迫转入地下。</p>
+<div class="tl">
+<div class="tl-item fade-in"><div class="tl-year">约公元 30 年</div><div class="tl-title">耶稣受难与复活</div><div class="tl-body">耶稣在耶路撒冷被钉十字架。其追随者相信他从死亡中复活，这一信念成为基督教信仰的核心基石。</div><span class="tag tag-r">宗教起源</span></div>
+<div class="tl-item fade-in"><div class="tl-year">约公元 50-65 年</div><div class="tl-title">使徒保罗"开放全球服务器"</div><div class="tl-body">保罗宣布<strong>非犹太人可以直接信基督</strong>，不需要先变成犹太人——把基督教从"民族宗教"变成了"普世宗教"。他利用罗马帝国的公路网和航线，沿商路从黎凡特传教到小亚细亚、希腊，最终到达罗马。</div><span class="tag tag-r">教义传播</span><span class="tag tag-c">普世化</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">公元 64 年</div><div class="tl-title">尼禄大迫害</div><div class="tl-body">罗马大火后，皇帝尼禄将罪责推给基督徒，开启系统性迫害。彼得和保罗相传在此时殉道。</div><span class="tag tag-w">迫害</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 70 年</div><div class="tl-title">耶路撒冷圣殿被毁</div><div class="tl-body">罗马军队摧毁犹太教第二圣殿，加速基督教与犹太教分离。</div><span class="tag tag-w">战争</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 2-3 世纪</div><div class="tl-title">地下墓穴时代</div><div class="tl-body">基督徒在地下墓道中秘密集会，刻"鱼"符号（ΙΧΘΥΣ）等暗号。</div><span class="tag tag-a">地下墓穴</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">公元 303-311 年</div><div class="tl-title">戴克里先大迫害（最后的迫害）</div><div class="tl-body">罗马帝国最后一次系统性迫害。教堂被拆毁，圣经被焚烧。然而迫害反而使基督教更加团结——<strong>殉道者效应</strong>成了最好的免费广告。</div><span class="tag tag-w">最后迫害</span></div>
+</div>
+
+<details class="fade-in"><summary>为什么基督教能精准击中罗马底层痛点？</summary><div class="detail-body">
+<p>罗马帝国传统多神教本质上是为精英阶层服务的政治工具——<strong>皇帝本人就是最高祭司</strong>，宗教仪式是国家行政的一部分。穷人参与不起神庙祭祀，多神教也不承诺"死后平等"或"来世补偿"。</p>
+<p>基督教直接告诉奴隶、穷人、妇女：<strong>在上帝面前，奴隶和皇帝是平等的</strong>；你现在受苦越多，死后奖赏越大；不需要花一分钱，只需要相信就能得救。而且早期基督教社区互相照顾——生病有人探望，死了有人安葬。在没有社保体系的古代帝国里，这种"社区互助网络"吸引力巨大。</p>
+<p>耶稣说过："骆驼穿过针眼比富人进天国还容易"——这对底层人群简直是一剂强心针。</p>
+</div></details>
+
+<details class="fade-in"><summary>💭 我的思考：底层人民反推了罗马帝国</summary><div class="detail-body">
+<p>罗马的多神教没有独立的"神权"——皇帝 = 政权 + 神权合一。不公平不是宗教层面的，而是社会结构层面的极端不公平（奴隶占30-40%人口，法律上不算人）。</p>
+<p>基督教不是一场武装革命，而是一场<strong>"精神基础设施"的替换</strong>。底层人数压倒性增长 → 皇帝被迫收编 → 收编后教会获得独立权力 → 权力膨胀腐败 → 新教革命。</p>
+</div></details>
+
+<div class="callout fade-in"><div class="callout-t">🏛 空间特征 · 地下墓穴 Catacombs</div>错综复杂、狭窄逼仄的地下通道与墓室。极度缺乏自然光源，墙壁布满隐蔽符号。代表被压迫信仰的生存状态。</div>
+<figure class="doc-image fade-in">
+<img src="images/christianity/catacomb-fresco-good-shepherd.jpg" alt="罗马地下墓穴中的早期基督教壁画">
+</figure>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== ERA 2 ===== -->
+<section id="era2">
+<div class="sh fade-in"><span class="era">EPOCH II</span><h2>终极翻盘 · 帝国国教</h2><p class="period">公元 4 世纪 — 5 世纪</p></div>
+<div class="tl">
+<div class="tl-item fade-in"><div class="tl-year">公元 313 年</div><div class="tl-title">《米兰敕令》· 基督教合法化</div><div class="tl-body">君士坦丁的政治计算：打不过就收编。基督教已经自发建立了覆盖全帝国的组织网络——收编它等于一夜间拥有一套覆盖全帝国的行政系统。</div><span class="tag tag-r">合法化</span><span class="tag tag-c">历史转折</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 325 年</div><div class="tl-title">第一次尼西亚公会议</div><div class="tl-body">确立《尼西亚信经》，统一核心教义。教会组织结构正式化。</div><span class="tag tag-r">教义统一</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 330 年</div><div class="tl-title">君士坦丁堡建都（搬家，不是加首都）</div><div class="tl-body">君士坦丁不是设"副都"，而是直接搬家。原因：① 罗马位置偏西，远离东方富裕省份；② 远离波斯前线；③ 罗马元老院旧势力太强。新都扼守欧亚交界，三面环水，近乎不可攻克。</div><span class="tag tag-c">帝国东移</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 380 年</div><div class="tl-title">基督教成为唯一国教</div><div class="tl-body">狄奥多西一世禁止一切异教活动。基督教完成从地下反叛军到帝国统治者的逆袭。权力结构中新增了独立的"教会层"——这就是日后天主教权力膨胀的根源。</div><span class="tag tag-r">帝国国教</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 395 年</div><div class="tl-title">罗马帝国分裂</div><div class="tl-body">狄奥多西去世，两个儿子一人分一半。原本只是"行政分区"，结果再也没合回来。基督教当时已遍布东西两半——不是从一边传到另一边，而是被帝国的断裂撕成两份。</div><span class="tag tag-w">帝国分裂</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">公元 476 年</div><div class="tl-title">西罗马帝国灭亡</div><div class="tl-body">日耳曼蛮族首领废黜最后一位西罗马皇帝。罗马教会在废墟中接管社会治理，教宗成为西欧精神领袖。东罗马（拜占庭）则靠君士坦丁堡的地理优势又活了1000年。</div><span class="tag tag-w">帝国灭亡</span></div>
+</div>
+
+<details class="fade-in"><summary>"蛮族"是谁？——灭亡西罗马的多米诺骨牌</summary><div class="detail-body">
+<p>"蛮族"是罗马人对帝国边境外所有"未开化"民族的蔑称（类似"蛮夷"）。不是一个民族，而是一大堆日耳曼部落的总称。</p>
+<h4>多米诺效应</h4><p>公元4世纪末，中亚草原的<strong>匈人（Huns）</strong>从东往西碾压。日耳曼各部落被匈人吓坏，集体往西逃，涌入了已经衰弱的西罗马帝国。</p>
+<h4>主要蛮族 → 后来的欧洲各国祖先</h4>
+<p><strong>西哥特人</strong>：410年洗劫罗马城 → 后占领西班牙<br>
+<strong>法兰克人</strong>：后来建立法国（查理曼大帝就是法兰克人）<br>
+<strong>盎格鲁-撒克逊人</strong>：渡海到不列颠 → 建立英格兰<br>
+<strong>汪达尔人</strong>：洗劫北非和罗马（"vandalism"这个英语词就来自他们）<br>
+<strong>东哥特人</strong>：占领意大利<br>
+<strong>勃艮第人</strong>：占领法国东南部</p>
+<h4>为什么东罗马没死？</h4><p>① 钱多——东方省份税收远超西方；② 君士坦丁堡三面环水，城墙坚固，蛮族没有海军打不进去；③ 东罗马经常用黄金贿赂蛮族，让他们转头去打西边。</p>
+</div></details>
+
+<div class="callout fade-in"><div class="callout-t">🏛 空间特征 · 巴西利卡 Basilica</div>借用古罗马"公共集会大厅"形式。长方形平面，宽阔主通道，尽头设半圆形祭坛。从"隐蔽求生"到"公开展示"的根本转变。</div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== ERA 3 ===== -->
+<section id="era3">
+<div class="sh fade-in"><span class="era">EPOCH III</span><h2>渐行渐远 · 东西大分裂</h2><p class="period">公元 5 世纪 — 1054 年</p></div>
+<div class="tl">
+<div class="tl-item fade-in"><div class="tl-year">5-7 世纪</div><div class="tl-title">东西方社会生态分化</div><div class="tl-body"><strong>西方</strong>：蛮族入侵后碎成一地小国，教会被迫接管治理，教宗权力膨胀。<br><strong>东方</strong>：拜占庭帝国繁荣强盛，教会只是皇权下的"宗教事务部门"。</div><span class="tag tag-c">社会分化</span></div>
+<div class="tl-item byz fade-in"><div class="tl-year">公元 537 年</div><div class="tl-title">圣索菲亚大教堂建成</div><div class="tl-body">拜占庭式建筑巅峰之作。巨大中央穹顶——东正教空间美学的原型。后来深刻影响了伊斯兰清真寺建筑。</div><span class="tag tag-a">拜占庭巅峰</span></div>
+<div class="tl-item fade-in"><div class="tl-year">726-843 年</div><div class="tl-title">拜占庭圣像破坏运动</div><div class="tl-body">东方保留平面"圣像画"（Icon），拒绝立体雕塑——与西方大量使用雕像形成鲜明视觉差异。</div><span class="tag tag-r">教义分歧</span></div>
+<div class="tl-item fade-in"><div class="tl-year">公元 800 年</div><div class="tl-title">查理曼加冕</div><div class="tl-body">罗马教宗在西欧封了个"罗马人的皇帝"。东方：正牌皇帝还活着呢！政治裂痕加深。</div><span class="tag tag-c">政治冲突</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">公元 1054 年</div><div class="tl-title">东西教会大分裂 (The Great Schism)</div><div class="tl-body">罗马特使在圣索菲亚大教堂祭坛上拍下"绝罚令"，双方互相开除教籍。<strong>基督教正式裂为天主教与东正教。</strong></div><span class="tag tag-r">正式分裂</span><span class="tag tag-w">互相绝罚</span></div>
+<div class="tl-item fade-in"><div class="tl-year">1095-1291 年</div><div class="tl-title">十字军东征</div><div class="tl-body">1204年第四次东征中，十字军洗劫了基督教兄弟城市君士坦丁堡——东西方仇恨变得无法弥合。</div><span class="tag tag-w">十字军</span></div>
+<div class="tl-item got fade-in"><div class="tl-year">12-16 世纪</div><div class="tl-title">哥特式建筑黄金时代</div><div class="tl-body">巴黎圣母院(1163)、科隆大教堂(1248)、米兰大教堂(1386)。尖顶拱门、飞扶壁、彩绘玫瑰窗。</div><span class="tag tag-a">哥特式</span></div>
+</div>
+
+<figure class="doc-image fade-in">
+<img src="images/christianity/hagia-sophia-interior.jpg" alt="圣索菲亚大教堂内部空间">
+</figure>
+<div class="my-thought fade-in"><div class="label">💭 我的思考</div>分裂不是突然发生的，而是700年的"数值积累"触发了"剧情杀"。语言不通（拉丁语 vs 希腊语）+ 政治环境完全不同 + 最终在"谁是老大"的问题上谈崩。</div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== ERA 4 ===== -->
+<section id="era4">
+<div class="sh fade-in"><span class="era">EPOCH IV</span><h2>天灾、觉醒与宗教改革</h2><p class="period">公元 14 世纪 — 17 世纪</p></div>
+<div class="tl">
+<div class="tl-item cat fade-in"><div class="tl-year">1347-1351 年</div><div class="tl-title">黑死病席卷欧洲</div><div class="tl-body">夺走欧洲约1/3人口。神父死得和农民一样惨——天主教"绝对神圣"权威首次被严重动摇。</div><span class="tag tag-d">天灾</span></div>
+<div class="tl-item fade-in"><div class="tl-year">约 1440 年</div><div class="tl-title">古腾堡发明活字印刷术</div><div class="tl-body">为打破教会知识垄断提供了"黑科技"。</div><span class="tag tag-c">技术革命</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">公元 1453 年</div><div class="tl-title">君士坦丁堡陷落</div><div class="tl-body">奥斯曼土耳其灭拜占庭。学者逃往西欧引爆文艺复兴。东正教权力中心北迁至俄罗斯（莫斯科自称"第三罗马"）。</div><span class="tag tag-w">帝国灭亡</span></div>
+<div class="tl-item pro fade-in"><div class="tl-year">公元 1517 年</div><div class="tl-title">马丁·路德发表《九十五条论纲》</div><div class="tl-body">核心主张：① <strong>因信称义</strong>——得救靠内心信仰；② <strong>信徒皆祭司</strong>——人人可直接与上帝沟通；③ <strong>唯独圣经</strong>——翻译为平民看得懂的语言。借助印刷术传遍欧洲，<strong>新教诞生</strong>。</div><span class="tag tag-r">宗教改革</span></div>
+<div class="tl-item pro fade-in"><div class="tl-year">公元 1534 年</div><div class="tl-title">英国国教成立</div><div class="tl-body">亨利八世因离婚问题与罗马决裂。宗教改革也是世俗权力摆脱罗马控制的政治工具。</div><span class="tag tag-r">英国国教</span></div>
+<div class="tl-item cat fade-in"><div class="tl-year">1618-1648 年</div><div class="tl-title">三十年战争 → 威斯特伐利亚和约</div><div class="tl-body">新教与天主教的血腥绞肉机。1648年和约确立"教随国定"原则，天主教一统天下的梦想彻底破灭。</div><span class="tag tag-w">宗教战争</span></div>
+</div>
+
+<figure class="doc-image fade-in">
+<img src="images/christianity/luther-95-theses.jpg" alt="马丁路德九十五条论纲影印本">
+</figure>
+<details class="fade-in"><summary>印刷术：中国 vs 古腾堡——两条独立的科技树</summary><div class="detail-body">
+<p>中国绝对是世界上最早发明印刷术的国家（雕版印刷9世纪，毕昇活字11世纪）。但古腾堡的金属机械印刷机是基于欧洲本土技术的<strong>独立研发</strong>。</p>
+<p><strong>中国的限制</strong>：汉字数量庞大（几万个），每个字都要刻一个活字块，成本极高，活字印刷在中国反而不如雕版经济。<br>
+<strong>古腾堡的优势</strong>：拉丁字母只有26个，配合金属铸字模具和螺旋压力机（借鉴了葡萄酒榨汁机），可以极低成本大规模印刷。</p>
+<p>所以是"硬件虽然中国先发明，但操作系统（字母语言）让西方的版本在传播效率上碾压"。</p>
+</div></details>
+
+<details class="fade-in"><summary>北欧维京人的基督教化：雷神索尔的雕像被砸碎</summary><div class="detail-body">
+<p>这是100%真实的历史。北欧维京人原本信仰以奥丁、索尔（Thor）为首的日耳曼多神教。基督教化过程历时约300年（公元900-1200年），是一场充满权力算计和血腥暴力的史诗。</p>
+<p><strong>为什么国王们要改信？</strong>基督教有一个对国王极其诱人的"隐藏功能"——一个集中的、金字塔式的权力结构（教宗→主教→神父）。维京的旧信仰是去中心化的，每个部落首领都可以自己搞祭祀，国王管不了。改信基督教后，国王可以通过教会网络实现中央集权。</p>
+<p>瑞典的乌普萨拉神庙（Temple at Uppsala）是北欧多神教最神圣的圣殿，里面有雷神索尔、奥丁和弗雷的宏伟雕像。约在公元1087年，这座神庙被基督教徒拆毁，原址上建起了一座基督教教堂。</p>
+</div></details>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== COMPARISON ===== -->
+<section id="comparison">
+<div class="sh fade-in"><span class="era">COMPARISON</span><h2>三大流派对比</h2><p class="period">天主教 · 东正教 · 新教</p></div>
+<div style="overflow-x:auto">
+<table class="cmp fade-in">
+<thead><tr><th style="width:14%">维度</th><th style="width:28%;border-top:3px solid var(--gothic)">天主教 ⛪</th><th style="width:28%;border-top:3px solid var(--byzantine)">东正教 ☦</th><th style="width:28%;border-top:3px solid var(--protestant)">新教 🕊</th></tr></thead>
+<tbody>
+<tr><td><strong>分裂</strong></td><td>1054年（原始主体）</td><td>1054年分出</td><td>1517年从天主教分出</td></tr>
+<tr><td><strong>领袖</strong></td><td>教宗(Pope)，唯一最高领袖</td><td>无唯一领袖，各地牧首平等</td><td>无统一领袖，各教会自治</td></tr>
+<tr><td><strong>教义</strong></td><td>七大圣礼，教宗无误性，炼狱，圣母崇拜</td><td>七大圣礼，圣灵仅出于圣父，强调"神化"</td><td>因信称义，信徒皆祭司，唯独圣经</td></tr>
+<tr><td><strong>建筑</strong></td><td>哥特式/巴洛克——极致高耸，尖拱飞扶壁</td><td>拜占庭式——巨大圆顶，金色马赛克</td><td>朴素实用——低矮扁平，讲道台为中心</td></tr>
+<tr><td><strong>动线</strong></td><td>线性纵深：入口→中殿→祭坛（直线三段式）</td><td>向心回环：入口→前厅→圣像壁→圣所（多区域回绕，视线遮挡）</td><td>网状自由：无等级隔离的开放空间</td></tr>
+<tr><td><strong>圣像</strong></td><td>大量雕塑和绘画</td><td>平面圣像画(Icon)，拒绝雕塑</td><td>排斥圣像，极度朴素</td></tr>
+<tr><td><strong>修道院</strong></td><td>极其重要（本笃会、方济各会等）</td><td>极其重要（阿索斯山等）</td><td>几乎消失（马丁·路德认为不需要隐修）</td></tr>
+<tr><td><strong>分布</strong></td><td>西欧、南欧、拉丁美洲</td><td>东欧、俄罗斯、希腊</td><td>北欧、英国、德国、北美</td></tr>
+<tr><td><strong>信徒</strong></td><td>约13亿</td><td>约2.2亿</td><td>约9亿</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="my-thought fade-in"><div class="label">💭 我的思考</div>整个分裂树：早期基督教（大一统）→ 1054年裂为天主教 + 东正教 → 1517年天主教内部又裂出新教。不是基督教分裂出三个，而是基督教先裂成两个，其中一个（天主教）又裂出第三个（新教）。</div>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section id="architecture">
+<div class="sh fade-in"><span class="era">ARCHITECTURE</span><h2>建筑空间特征</h2><p class="period">从地下墓穴到哥特式大教堂</p></div>
+<div class="arch-grid">
+<div class="arch-card cc fade-in"><h3>地下墓穴</h3><div class="en">Catacombs · 1-3世纪</div><div class="feat">错综复杂地下通道，零光源，隐蔽符号。被压迫信仰的生存空间。</div><div class="kw"><span>迷宫通道</span><span>零光源</span><span>隐蔽符号</span></div></div>
+<div class="arch-card bac fade-in"><h3>巴西利卡</h3><div class="en">Basilica · 4-5世纪</div><div class="feat">长方形平面，宽阔主通道，半圆形祭坛。从隐蔽到公开的转变。</div><div class="kw"><span>长方形</span><span>开阔明亮</span><span>单向轴线</span></div></div>
+<div class="arch-card bc fade-in"><h3>拜占庭式</h3><div class="en">Byzantine · 5-15世纪 · 东正教</div><div class="feat">希腊十字平面，巨大中央穹顶。圆顶"底层技术"来自古罗马（万神殿），但东方完成了终极进化——用穹隅（Pendentive）将方形平面与圆顶完美过渡。深刻影响了伊斯兰清真寺。</div><div class="kw"><span>大圆顶</span><span>向心放射</span><span>马赛克</span><span>包裹感</span></div></div>
+<div class="arch-card gc fade-in"><h3>哥特式</h3><div class="en">Gothic · 12-16世纪 · 天主教</div><div class="feat">拉丁十字平面。四大特征：尖顶拱门、飞扶壁（外骨骼）、花窗玻璃/玫瑰窗、高耸尖塔。追求极致垂直拔高，制造渺小与压迫感。</div><div class="kw"><span>尖顶拱门</span><span>飞扶壁</span><span>玫瑰窗</span><span>线性纵深</span></div></div>
+<div class="arch-card pc fade-in"><h3>新教建筑</h3><div class="en">Protestant · 16世纪至今</div><div class="feat">空间"去神圣化"。摒弃高耸结构与装饰，以讲道台为中心，强调实用性。</div><div class="kw"><span>扁平朴素</span><span>讲道台中心</span><span>无圣像</span><span>平等空间</span></div></div>
+</div>
+
+<figure class="doc-image fade-in">
+<img src="images/christianity/cologne-cathedral-facade.jpg" alt="哥特式建筑代表：科隆大教堂立面">
+</figure>
+<details class="fade-in"><summary>圆顶进化史：罗马发明硬件，拜占庭开发操作系统</summary><div class="detail-body">
+<p>大圆顶最初是古罗马的发明——罗马万神殿（Pantheon，公元126年）是一个纯圆形建筑，直接在圆形墙壁上盖了个半球壳。但问题是：如果建筑平面不是圆形，而是方形，那圆顶怎么架上去？</p>
+<p>拜占庭工程师发明了<strong>"穹隅"（Pendentive）</strong>——一个球面三角形结构，像四个"衔接楔子"一样嵌在方形墙壁的四个角上，把方形平面平滑地过渡为圆形底座。这个发明让圆顶可以架在任何形状的建筑上，被称为"人类建筑史上最伟大的发明之一"。</p>
+<p>圣索菲亚大教堂（537年）就是这项技术的巅峰——它的巨大穹顶仿佛悬浮在空中，内部空间的震撼力直接影响了后来的伊斯兰清真寺设计。</p>
+</div></details>
+
+<details class="fade-in"><summary>💭 我的设计灵感：莲花圆顶——东正教 × 东方美学融合</summary><div class="detail-body">
+<p>东正教圆顶（放射对称）和莲花（花瓣由中心向外展开）在几何逻辑上高度统一。如果把莲花瓣作为圆顶的结构支撑（代替传统肋骨），花瓣间隙让光线形成放射状"上帝之光"——既有东正教的权力骨架，又有东方审美的温润灵魂。</p>
+<p>反派基地：莲花瓣尖锐，层数极多，被"利齿"包裹的错觉。<br>安全区Hub：花瓣圆润，光线柔和，"母体"般的保护感。</p>
+</div></details>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== DEEP TOPICS ===== -->
+<section id="deep">
+<div class="sh fade-in"><span class="era">DEEP DIVE</span><h2>深度专题</h2><p class="period">关键概念与个人思考</p></div>
+
+<details class="fade-in"><summary>赎罪券：自下而上的资源掠夺</summary><div class="detail-body">
+<p>教会利用<strong>心理恐惧和道德绑架</strong>敛财。对底层农民说："你母亲在炼狱受苦，买赎罪券金币一响，灵魂就能升天。"农民砸锅卖铁。</p>
+<p>这是一套<strong>"阶梯式定价"的精准收割</strong>：穷人掏铜板，富人买"家族永久赦免套餐"。自上而下的权力分配（上帝→教宗→主教→神父→信徒）确保了最高层的绝对控制力。</p>
+<p>马丁·路德的改革本质是"去中心化"——让每个终端（信徒）直接连接服务器（上帝），不需要路由器（神职人员）。</p>
+</div></details>
+
+<details class="fade-in"><summary>弥撒（Mass）到底是什么？</summary><div class="detail-body">
+<p><strong>弥撒不是入教仪式！</strong>入教仪式叫<strong>洗礼（Baptism）</strong>——头上洒水或全身浸水，一生只做一次。</p>
+<p>弥撒是天主教<strong>最核心的日常集体礼拜</strong>。信徒每周日聚集，核心环节是"圣餐"——吃面饼、喝葡萄酒，象征性地"重现"最后的晚餐。天主教相信面饼和酒在仪式中会<strong>真正变成</strong>耶稣的身体和血液（"变质说"），这是天主教与新教最深层的分歧之一。</p>
+</div></details>
+
+<details class="fade-in"><summary>最后的晚餐：耶稣为什么要"慷慨赴死"？</summary><div class="detail-body">
+<p>在被捕前一晚，耶稣与12门徒共进晚餐，他已经知道门徒犹大会出卖他。他对门徒说"这是我的身体""这是我的血"——建立了圣餐仪式。</p>
+<h4>为什么不跑？</h4>
+<p>基督教的核心逻辑是<strong>"替代性救赎"</strong>：根据犹太教传统，人类因亚当夏娃的"原罪"而与上帝隔绝。要弥合这个裂痕，需要一个完美的、无罪的祭品。耶稣自认为就是这个祭品——他的死不是"被害"，而是<strong>主动献祭</strong>。如果他跑了，人类就永远无法得救。</p>
+<p>所以他的逻辑是：我死了 → 人类的罪被"买单" → 人类与上帝重新连接。这就是"因信称义"的底层代码。</p>
+</div></details>
+
+<details class="fade-in"><summary>犹太人 ≠ 基督徒（人种 vs 宗教）</summary><div class="detail-body">
+<p><strong>传统犹太人绝对不信基督教。</strong>他们有自己专属的犹太教（Judaism）。犹太教认为弥赛亚还没来，而基督教认为耶稣就是弥赛亚——这是两教的根本分歧。</p>
+<h4>欧洲各民族的宗教归属</h4>
+<p><strong>英国人</strong>：盎格鲁-撒克逊血统（日耳曼蛮族），原信日耳曼多神教，后被基督教化，1534年脱离天主教成立英国国教。<br>
+<strong>北欧人（瑞典、挪威等）</strong>：维京人血统，原信奥丁/索尔为首的北欧多神教，约10-12世纪被基督教化，后加入新教。<br>
+<strong>犹太人</strong>：中东闪族血统，始终信犹太教，是基督教的"母教"但绝不是同一个教。</p>
+<p>核心区分：<strong>人种是血统决定的，宗教是信仰选择的</strong>。</p>
+</div></details>
+
+<details class="fade-in"><summary>古希腊/古罗马与基督教：时间线对不上</summary><div class="detail-body">
+<p>在古希腊文明最辉煌时（公元前8-2世纪），基督教连影子都没有——耶稣还要等几百年才出生。他们信的是宙斯、雅典娜为首的奥林匹斯多神教。</p>
+<p>古罗马征服古希腊后，"像素级抄袭"了希腊的神，改了个名字（宙斯→朱庇特，雅典娜→密涅瓦）。所以罗马帝国在基督教化之前信的也是多神教。</p>
+<p>但古罗马不仅仅是"抄袭者"——他们在<strong>工程、法律、行政和军事</strong>上远超古希腊。正如贺拉斯说的："被征服的希腊，反过来征服了野蛮的征服者"——希腊赢了文化，罗马赢了一切实操领域。</p>
+</div></details>
+
+<details class="fade-in"><summary>吉尔伽美什（金闪闪）：比巴比伦还古老的苏美尔</summary><div class="detail-body">
+<p>《Fate》里的吉尔伽美什（Gilgamesh）在真实历史上来自<strong>苏美尔文明</strong>——比古巴比伦还要古老得多。他是乌鲁克城（位于今伊拉克南部）的传说国王，约公元前2700年。</p>
+<p>《吉尔伽美什史诗》是人类历史上最早的文学作品之一，比《圣经》的创世纪早了至少1000年。其中的洪水故事（乌特纳匹什提姆的大洪水）很可能是后来《圣经》中诺亚方舟故事的原型。</p>
+</div></details>
+
+<details class="fade-in"><summary>游戏中的天主教 vs 东正教空间（LD视角）</summary><div class="detail-body">
+<h4>天主教LD典范：《血源诅咒》代理人阿梅利亚Boss战</h4>
+<p>大教堂空间完美复刻哥特式"直线三段式"：极长的主通道（中殿），高耸尖拱制造压迫感，走廊尽头一览无余地看到Boss在祭坛处祈祷——<strong>明牌处刑台</strong>。视觉信息量100%暴露，心理压力拉满。</p>
+<h4>东正教LD典范：《艾尔登法环》满月女王蕾娜菈Boss战</h4>
+<p>雷亚卢卡利亚大书库一阶段完美复刻拜占庭"向心回环"：巨大的圆形空间（圆顶），Boss在中央但被小怪环绕遮挡（相当于"圣像壁"的功能），玩家必须围绕空间巡游、逐步清理视线遮挡才能接触核心——<strong>视线遮挡 + 环形巡游 = 仪式解密</strong>。</p>
+<h4>核心区别</h4>
+<p>天主教空间：线性纵深，一览无余，压迫感来自"你已经看到了终点但走不到"。<br>东正教空间：向心回环，视线被遮挡，压迫感来自"你知道有什么在里面但看不到"。</p>
+</div></details>
+
+<details class="fade-in"><summary>修道院：天主教和东正教的灵魂，新教的弃子</summary><div class="detail-body">
+<p>修道院不是天主教专属——天主教和东正教都极度重视修道院，但新教几乎完全取消了它。</p>
+<p><strong>天主教</strong>：拥有本笃会、方济各会、多明我会等严格等级制修道系统。修道院是知识保存中心（中世纪手抄圣经都在修道院完成）。<br>
+<strong>东正教</strong>：希腊阿索斯山（Mount Athos）至今是纯男性修道共和国，女性禁止入内。修道传统更强调个人静修和神秘主义体验。<br>
+<strong>新教</strong>：马丁·路德认为人人都是祭司，不需要通过隐修来接近上帝，所以新教几乎没有修道院传统。</p>
+<p>《奇异博士》中的卡玛泰姬（Kamar-Taj）原型不是基督教修道院，而是<strong>藏传佛教/印度教的静修院（Ashram）</strong>。但它们共享"隐世修行所"的空间叙事逻辑。</p>
+</div></details>
+</section>
+
+<div class="divider">· · ·</div>
+
+<!-- ===== RESOURCES ===== -->
+<section id="resources">
+<div class="sh fade-in"><span class="era">RESOURCES</span><h2>学习资源推荐</h2><p class="period">视频 · 文章 · 百科</p></div>
+
+<div class="res-block fade-in"><h3>📖 基础入门</h3>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Christianity" target="_blank"><span class="rt">百科</span>Wikipedia — Christianity<span class="rd">基督教总览：起源、教义、分裂历史</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/East%E2%80%93West_Schism" target="_blank"><span class="rt">百科</span>Wikipedia — East–West Schism（1054大分裂）<span class="rd">分裂的详细背景、过程和影响</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Reformation" target="_blank"><span class="rt">百科</span>Wikipedia — Protestant Reformation<span class="rd">宗教改革完整历史</span></a>
+<a class="res-link" href="https://history-maps.com/zh/story/History-of-Christianity" target="_blank"><span class="rt">互动</span>History Maps — 基督教历史（交互式）<span class="rd">带地图和时间线的交互式历史</span></a>
+</div>
+
+<div class="res-block fade-in"><h3>🎬 视频资源</h3>
+<a class="res-link" href="https://www.youtube.com/watch?v=TG55ErfdaeY" target="_blank"><span class="rt">视频</span>CrashCourse — Christianity from Judaism to Constantine<span class="rd">基督教如何从犹太教中诞生并成为罗马国教</span></a>
+<a class="res-link" href="https://www.youtube.com/watch?v=E1ZZeCDGHJE" target="_blank"><span class="rt">视频</span>OverSimplified — The Reformation<span class="rd">幽默动画讲解宗教改革</span></a>
+<a class="res-link" href="https://www.youtube.com/watch?v=NjlK-sCcTJo" target="_blank"><span class="rt">视频</span>ReligionForBreakfast — Catholic vs Orthodox vs Protestant<span class="rd">宗教学博士讲解三大流派区别</span></a>
+<a class="res-link" href="https://www.youtube.com/watch?v=wCWB2MKvnME" target="_blank"><span class="rt">视频</span>Real Engineering — Gothic Cathedrals<span class="rd">工程学角度讲解哥特式结构原理</span></a>
+</div>
+
+<div class="res-block fade-in"><h3>🏛 建筑空间</h3>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Gothic_architecture" target="_blank"><span class="rt">百科</span>Wikipedia — Gothic Architecture<span class="rd">哥特式建筑全面百科</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Byzantine_architecture" target="_blank"><span class="rt">百科</span>Wikipedia — Byzantine Architecture<span class="rd">拜占庭式建筑：穹顶技术与伊斯兰影响</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Hagia_Sophia" target="_blank"><span class="rt">百科</span>Wikipedia — Hagia Sophia<span class="rd">拜占庭巅峰之作完整历史</span></a>
+<a class="res-link" href="https://www.britannica.com/art/Western-architecture/The-Christian-East" target="_blank"><span class="rt">文章</span>Britannica — Western Architecture<span class="rd">拜占庭到哥特式的技术演变</span></a>
+</div>
+
+<div class="res-block fade-in"><h3>🔬 关键事件</h3>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Fall_of_Constantinople" target="_blank"><span class="rt">百科</span>君士坦丁堡陷落 (1453)</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Black_Death" target="_blank"><span class="rt">百科</span>黑死病</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Martin_Luther" target="_blank"><span class="rt">百科</span>马丁·路德</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Indulgence" target="_blank"><span class="rt">百科</span>赎罪券</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Thirty_Years%27_War" target="_blank"><span class="rt">百科</span>三十年战争</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Fertile_Crescent" target="_blank"><span class="rt">百科</span>肥沃新月</a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Damascus" target="_blank"><span class="rt">百科</span>大马士革</a>
+</div>
+
+<div class="res-block fade-in"><h3>🔍 推荐搜索关键词</h3>
+<div class="kw" style="margin-top:.5rem">
+<span>拜占庭式建筑 vs 哥特式建筑</span><span>欧洲教堂建筑演变</span><span>Gothic architecture explained</span><span>Great Schism 1054</span><span>Hagia Sophia interior</span><span>Flying buttress engineering</span><span>Fertile Crescent map</span><span>Levant ancient history</span><span>基督教 天主教 东正教 新教 区别</span><span>Dark Souls gothic architecture</span><span>Catacombs of Rome</span><span>Christianization of Scandinavia</span><span>Epic of Gilgamesh</span><span>Pendentive architecture</span>
+</div></div>
+</section>
+
+<footer>
+<p>基督教三大流派 · 编年史笔记 ✝ ☦ 🕊</p>
+<p>Shikamaru 的宗教与建筑空间学习记录 · 2026</p>
+<p>包含 Gemini 对话记录 + Claude 讨论笔记 + 个人思考</p>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
+
+
