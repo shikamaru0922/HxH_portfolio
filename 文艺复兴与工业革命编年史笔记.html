@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文艺复兴与工业革命 · 编年史笔记</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C5A55A;--gold-light:#E8D5A3;--gold-dark:#8B7332;--ink:#1A1611;--parchment:#F5F0E8;--parchment-dark:#E8DFD0;--crimson:#8B2500;--byzantine:#4A2D6B;--gothic:#2D4A3E;--protestant:#3D5A80;--text:#2C2418;--text-light:#6B5D4D;--shadow:rgba(26,22,17,0.15);--medieval:#5C3D2E;--renaissance:#2E5C4A;--siege:#6B3A3A;--language:#3A4E6B;--science:#2B4570;--enlighten:#6B4226;--industry:#4A4A4A;--revolution:#8B1A1A}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--parchment);color:var(--text);line-height:1.8;overflow-x:hidden}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;background:linear-gradient(180deg,#1A1611 0%,#2C2418 40%,#3D3226 70%,var(--parchment) 100%);padding:2rem;overflow:hidden}
+.hero h1{font-family:'Noto Serif SC',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:var(--gold-light);letter-spacing:.15em;margin-bottom:.5rem}
+.hero .subtitle{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2vw,1.3rem);color:rgba(232,213,163,.6);font-style:italic;letter-spacing:.3em;margin-bottom:1.5rem}
+.hero .desc{max-width:650px;color:rgba(232,213,163,.45);font-size:.9rem;line-height:2;margin-bottom:2.5rem}
+.hero-sym{font-size:3rem;color:var(--gold);opacity:.6;margin-bottom:1.2rem;animation:glow 4s ease-in-out infinite alternate}
+@keyframes glow{from{text-shadow:0 0 20px rgba(197,165,90,.3)}to{text-shadow:0 0 40px rgba(197,165,90,.6)}}
+.hero-nav{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+.hero-nav a{padding:.5rem 1.2rem;border:1px solid var(--gold);color:var(--gold-light);text-decoration:none;font-size:.75rem;letter-spacing:.08em;transition:all .3s}
+.hero-nav a:hover{background:var(--gold);color:var(--ink)}
+.scroll-hint{position:absolute;bottom:1.5rem;color:rgba(197,165,90,.4);font-size:.75rem;letter-spacing:.2em;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+nav.sticky{position:sticky;top:0;z-index:100;background:rgba(26,22,17,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,165,90,.2);display:flex;justify-content:center;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav.sticky a{color:rgba(232,213,163,.6);text-decoration:none;padding:.7rem 1rem;font-size:.72rem;letter-spacing:.06em;white-space:nowrap;transition:all .3s;border-bottom:2px solid transparent}
+nav.sticky a:hover{color:var(--gold-light);border-bottom-color:var(--gold)}
+section{max-width:960px;margin:0 auto;padding:3.5rem 1.5rem}
+.sh{text-align:center;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(197,165,90,.3)}
+.sh .era{display:inline-block;font-size:.65rem;letter-spacing:.3em;color:var(--gold-dark);border:1px solid var(--gold-dark);padding:.15rem .8rem;margin-bottom:.8rem}
+.sh h2{font-family:'Noto Serif SC',serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;color:var(--ink);margin-bottom:.4rem}
+.sh .period{font-family:'Playfair Display',serif;font-style:italic;color:var(--text-light);font-size:.95rem}
+.tl{position:relative;padding-left:2.5rem}
+.tl::before{content:'';position:absolute;left:.5rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--gold-dark),transparent)}
+.tl-item{position:relative;margin-bottom:2rem;padding:1.2rem 1.5rem;background:#fff;border-left:3px solid var(--gold);box-shadow:0 2px 10px var(--shadow);transition:transform .3s}
+.tl-item:hover{transform:translateX(3px)}
+.tl-item::before{content:'';position:absolute;left:-2.85rem;top:1.3rem;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--parchment)}
+.tl-item.med{border-left-color:var(--medieval)}.tl-item.med::before{background:var(--medieval)}
+.tl-item.ren{border-left-color:var(--renaissance)}.tl-item.ren::before{background:var(--renaissance)}
+.tl-item.war{border-left-color:var(--siege)}.tl-item.war::before{background:var(--siege)}
+.tl-item.lang{border-left-color:var(--language)}.tl-item.lang::before{background:var(--language)}
+.tl-item.sci{border-left-color:var(--science)}.tl-item.sci::before{background:var(--science)}
+.tl-item.enl{border-left-color:var(--enlighten)}.tl-item.enl::before{background:var(--enlighten)}
+.tl-item.ind{border-left-color:var(--industry)}.tl-item.ind::before{background:var(--industry)}
+.tl-item.rev{border-left-color:var(--revolution)}.tl-item.rev::before{background:var(--revolution)}
+.tl-year{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--gold-dark);margin-bottom:.2rem}
+.tl-title{font-family:'Noto Serif SC',serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
+.tl-body{font-size:.85rem;color:var(--text-light);line-height:1.9}
+.tag{display:inline-block;font-size:.6rem;padding:.12rem .5rem;border-radius:2px;margin-top:.6rem;margin-right:.3rem;letter-spacing:.04em;font-weight:500}
+.tag-m{background:#E8DFD0;color:var(--medieval)}.tag-r{background:#D8E8E0;color:var(--renaissance)}.tag-w{background:#F5E0DC;color:var(--siege)}.tag-l{background:#D8E0F0;color:var(--language)}.tag-c{background:#E8E0F0;color:var(--byzantine)}.tag-d{background:#F0D8D0;color:#8B2500}
+.tag-s{background:#D8E0F0;color:var(--science)}.tag-e{background:#F0E0D0;color:var(--enlighten)}.tag-i{background:#E0E0E0;color:var(--industry)}.tag-rev{background:#F0D0D0;color:var(--revolution)}
+.prose{font-size:.88rem;line-height:2;color:var(--text-light);margin-bottom:1.5rem}
+.prose strong{color:var(--text);font-weight:600}
+.callout{background:rgba(197,165,90,.08);border-left:3px solid var(--gold);padding:1rem 1.2rem;margin:1.2rem 0;font-size:.85rem;line-height:1.9;color:var(--text-light)}
+.callout-t{font-family:'Noto Serif SC',serif;font-weight:700;color:var(--gold-dark);margin-bottom:.3rem;font-size:.88rem}
+.divider{text-align:center;padding:1.5rem 0;color:var(--gold);font-size:1rem;opacity:.4;letter-spacing:1em}
+details{margin:1rem 0;background:#fff;box-shadow:0 2px 10px var(--shadow);overflow:hidden}
+details summary{padding:1rem 1.5rem;cursor:pointer;font-family:'Noto Serif SC',serif;font-weight:700;font-size:.95rem;color:var(--ink);user-select:none;display:flex;align-items:center;gap:.6rem;transition:background .2s}
+details summary:hover{background:rgba(197,165,90,.06)}
+details summary::before{content:'▸';color:var(--gold);font-size:1.1rem;transition:transform .2s;display:inline-block;flex-shrink:0}
+details[open] summary::before{transform:rotate(90deg)}
+details .detail-body{padding:1rem 1.5rem 1.5rem;font-size:.85rem;line-height:1.9;color:var(--text-light);border-top:1px solid var(--parchment-dark)}
+details .detail-body h4{font-family:'Noto Serif SC',serif;font-size:.9rem;font-weight:700;color:var(--text);margin:1rem 0 .4rem}
+details .detail-body strong{color:var(--text)}
+.my-thought{background:rgba(74,45,107,.06);border-left:3px solid var(--byzantine);padding:1rem 1.2rem;margin:1rem 0;font-size:.85rem;line-height:1.9;color:var(--text-light)}
+.my-thought .label{font-size:.65rem;letter-spacing:.15em;color:var(--byzantine);font-weight:700;margin-bottom:.3rem}
+.cross-link{display:inline-block;font-size:.75rem;padding:.3rem .7rem;margin-top:.6rem;background:rgba(197,165,90,.12);border:1px solid rgba(197,165,90,.3);color:var(--gold-dark);text-decoration:none;transition:all .3s}
+.cross-link:hover{background:rgba(197,165,90,.25);transform:translateX(3px)}
+table.cmp{width:100%;border-collapse:collapse;font-size:.8rem;margin:1.5rem 0;background:#fff;box-shadow:0 2px 10px var(--shadow)}
+table.cmp th{font-family:'Noto Serif SC',serif;font-weight:700;padding:.8rem;text-align:left;border-bottom:2px solid var(--gold);background:var(--parchment);font-size:.82rem}
+table.cmp td{padding:.7rem .8rem;border-bottom:1px solid var(--parchment-dark);vertical-align:top;line-height:1.7;color:var(--text-light)}
+table.cmp tr:hover td{background:rgba(197,165,90,.05)}
+.nation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin:1.5rem 0}
+.nation-card{background:#fff;padding:1.5rem;position:relative;overflow:hidden;box-shadow:0 2px 10px var(--shadow)}
+.nation-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.nation-card.fc::before{background:var(--renaissance)}.nation-card.as::before{background:var(--language)}.nation-card.de::before{background:var(--medieval)}.nation-card.nm::before{background:var(--siege)}
+.nation-card h3{font-family:'Noto Serif SC',serif;font-size:1.05rem;margin-bottom:.2rem}
+.nation-card .en{font-family:'Playfair Display',serif;font-style:italic;font-size:.75rem;color:var(--text-light);margin-bottom:.8rem}
+.nation-card .feat{font-size:.82rem;color:var(--text-light);line-height:1.9}
+.kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.8rem}
+.kw span{font-size:.65rem;padding:.15rem .5rem;background:var(--parchment);color:var(--text-light);border-radius:2px}
+.res-block{background:#fff;padding:1.5rem;margin-bottom:1.2rem;box-shadow:0 2px 10px var(--shadow)}
+.res-block h3{font-family:'Noto Serif SC',serif;font-size:1rem;margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:1px solid var(--parchment-dark)}
+.res-link{display:block;padding:.6rem .8rem;margin-bottom:.4rem;text-decoration:none;color:var(--text);background:var(--parchment);transition:all .3s;font-size:.82rem;line-height:1.6;border-left:3px solid transparent}
+.res-link:hover{border-left-color:var(--gold);transform:translateX(3px)}
+.res-link .rt{font-size:.6rem;letter-spacing:.08em;color:var(--gold-dark);font-weight:700;display:inline-block;margin-right:.4rem;padding:.08rem .4rem;border:1px solid var(--gold-dark)}
+.res-link .rd{display:block;font-size:.72rem;color:var(--text-light);margin-top:.2rem}
+footer{background:var(--ink);color:rgba(232,213,163,.4);text-align:center;padding:2.5rem 1.5rem;font-size:.7rem;letter-spacing:.1em;line-height:2}
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}.fade-in.visible{opacity:1;transform:translateY(0)}
+@media(max-width:600px){section{padding:2rem 1rem}.tl{padding-left:2rem}.tl-item::before{left:-2.35rem}.tl::before{left:.3rem}.nation-grid{grid-template-columns:1fr}table.cmp{font-size:.7rem}table.cmp th,table.cmp td{padding:.4rem}details summary{font-size:.85rem;padding:.8rem 1rem}details .detail-body{padding:.8rem 1rem 1rem}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+<div class="hero-sym">⚗ 🔭 🏭</div>
+<h1>文艺复兴与工业革命</h1>
+<p class="subtitle">A CHRONICLE · 编年史笔记</p>
+<p class="desc">从文艺复兴的理性觉醒到科学革命的宇宙祛魅，从启蒙运动的社会格式化到法国大革命的断头台，从英国的蒸汽机到全球工业化的传播——理性如何从解放人类走向奴役人类的三百年史诗。包含我的个人思考与学习记录。</p>
+<div class="hero-nav">
+<a href="#prelude">序章</a>
+<a href="#era1">纪元一</a>
+<a href="#era2">纪元二</a>
+<a href="#era3">纪元三</a>
+<a href="#era4">纪元四</a>
+<a href="#era5">纪元五</a>
+<a href="#era6">纪元六</a>
+<a href="#deep">深度专题</a>
+<a href="#resources">学习资源</a>
+</div>
+<div class="scroll-hint">▼ 向下滚动开始探索 ▼</div>
+</div>
+
+<nav class="sticky">
+<a href="#prelude">序章</a>
+<a href="#era1">纪元一</a>
+<a href="#era2">纪元二</a>
+<a href="#era3">纪元三</a>
+<a href="#era4">纪元四</a>
+<a href="#era5">纪元五</a>
+<a href="#era6">纪元六</a>
+<a href="#deep">专题</a>
+<a href="#resources">资源</a>
+</nav>
+
+<!-- ===== PRELUDE ===== -->
+<section id="prelude">
+<div class="sh fade-in"><span class="era">PRELUDE</span><h2>文艺复兴与工业革命的关系</h2><p class="period">因果递进与最终异化</p></div>
+
+<p class="prose fade-in">文艺复兴和工业革命在时间线上虽隔了两三百年，画风截然不同——一个充满阳光与大理石，一个灰暗逼仄的钢铁迷宫——但从底层逻辑看，它们之间是严密的<strong>"因果递进与最终异化"</strong>。</p>
+
+<div class="callout fade-in">
+<div class="callout-t">理论源码的暴力变现</div>
+文艺复兴解锁了"底层代码"——古希腊几何学、数学，确立了"理性"的地位。达·芬奇对物理世界的观察和机械手稿打破了神学滤镜。这股理性思潮孕育了科学革命（牛顿经典力学、波义耳热力学）。工业革命本质上就是把羊皮纸上的<strong>"理性公式"极其粗暴地转化为由煤炭驱动的蒸汽机、齿轮和杠杆</strong>。
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">衡量空间的尺度：从"人类"到"机器"</div>
+文艺复兴的核心是《维特鲁威人》——"人是万物的尺度"。空间层高、走廊宽度、广场透视，全为让人感到视觉舒适。到了工业革命，<strong>"机器取代了人，成为衡量空间的唯一尺度"</strong>。厂房之所以建得高，是为了塞下锅炉；走道之所以狭窄，是因为空间让给了蒸汽管道；环境充满高温和噪音，因为机器需要这些，人的感受变得毫不重要。
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">权力与阶级的重构：从"平面透视"到"垂直折叠"</div>
+文艺复兴的统治者在平面上摊开城市地图，用笔直大道和几何广场辐射权力——横向的视觉控制。工业时代，城市开始疯狂向天空和地下生长。上层统治者居住在远离地表的高处，享受过滤后的空气和阳光；底层劳工被按死在暗无天日、充满蒸汽泄露的工厂底部。
+</div>
+
+<div class="my-thought fade-in">
+<div class="label">MY THOUGHT</div>
+这是一个"屠龙少年长出龙鳞"的故事。文艺复兴最初是为了"赞美人性、解放肉体"而开启的，但它引发的理性链路，在几百年推演后，最终在工业革命的钢铁厂房里，用轰鸣的齿轮把"人"重新降级成了"机器的肉体零件"。
+</div>
+
+<a href="中世纪到文艺复兴编年史笔记.html#era5" class="cross-link">📎 前置：中世纪笔记 · 纪元五 · 文艺复兴的黄金时代</a>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 1 ===== -->
+<section id="era1">
+<div class="sh fade-in"><span class="era">ERA I</span><h2>科学革命 · 给宇宙祛魅</h2><p class="period">16 — 17 世纪</p></div>
+
+<p class="prose fade-in">科学革命极其冷酷地将自然界所有"神性"剥离了。世界不再是上帝随心所欲捏造的神秘花园，而是一台遵循严密数学定律、咬合精准的巨大<strong>"机械钟表"</strong>。</p>
+
+<div class="tl">
+<div class="tl-item sci fade-in"><div class="tl-year">1543 年</div><div class="tl-title">哥白尼《天体运行论》</div><div class="tl-body">拔掉人类的"宇宙C位"。哥白尼本人是天主教教士，初衷非常单纯：地心说（托勒密体系）的数学计算太臃肿了，算历法总是对不上。他只是试着做了一个数学模型的假设——"如果把太阳放在中间，地球绕着转，这个算出来的公式是不是就简单、完美多了？"结果，这个为了<strong>"让算历法和导航更方便"而搞出来的数学模型</strong>，因为太过精准，最终演变成了砸碎天主教会宇宙观的重锤。<br><br>推翻地心说，不是一个简单的天文观测问题，而是极其致命的<strong>"空间政治与权力越界"</strong>——如果地球只是绕着太阳转的一颗普通小石头，那人类就不再是宇宙中心，上帝为了人类派耶稣下凡救赎的故事在物理空间上就显得很荒谬。日心说就是一次<strong>"为解决实际问题而引发的意外翻车"</strong>。</div><span class="tag tag-s">科学革命</span></div>
+
+<div class="tl-item sci fade-in"><div class="tl-year">1610 年代</div><div class="tl-title">伽利略与宗教裁判所</div><div class="tl-body">伽利略用望远镜亲眼观测到木星的卫星和月球的坑洞，为日心说提供了铁证。1633年被天主教宗教裁判所审判，被迫跪下承认日心说是"荒谬的异端邪说"，终身软禁。<br><br><strong>伽利略的"推销"：</strong>伽利略发明（改进）望远镜后，他做的第一件事不是看月亮，而是跑到威尼斯的总督面前，把望远镜卖给了威尼斯海军——"有了这个，你们就能比敌人早两个小时发现海面上的战舰！"<br><br><strong>天主教 vs 新教：</strong>动用宗教裁判所、火刑柱烧死布鲁诺、终身软禁伽利略的，绝对是罗马天主教会。但新教最初也反感日心说——马丁·路德公开嘲笑哥白尼是"想把整个天文学颠倒过来的傻瓜"。关键区别：天主教是跨国集权组织，有统一裁判所，跨国抓捕异端非常高效；新教是碎裂的，没有一个跨国的"新教裁判所"。当科学家在天主教国家待不下去时，可以跑到信仰新教的荷兰去避难出书。</div><span class="tag tag-s">科学革命</span><span class="tag tag-w">宗教迫害</span>
+<br><a href="基督教三大流派编年史笔记.html#era4" class="cross-link">📎 相关：基督教编年史 · 纪元四 · 宗教改革</a></div>
+
+<div class="tl-item sci fade-in"><div class="tl-year">1687 年</div><div class="tl-title">牛顿《自然哲学的数学原理》</div><div class="tl-body">用三大定律和万有引力，把天上星星的转动和地上苹果的掉落用同一个公式统一。向全人类证明：上帝就算存在，不过是个<strong>"钟表匠"</strong>，造好世界上好发条就不管了。<br><br><strong>牛顿的阶级背景：</strong>牛顿其实不算大富大贵，出生在一个相对富裕的自耕农（Yeoman）家庭，甚至是个遗腹子。他刚进剑桥大学时，身份是<strong>"减费生（Sizar）"</strong>——得给那些真正的贵族少爷端茶倒水、打扫房间，来换取免交学费的资格。但哪怕是"半工半读"，他依然是那个时代极少数能接触到大学和知识的特权阶层，剩下95%的平民连字都不认识。<br><br><strong>旷世巨著用拉丁语写成：</strong>英语当时没有法语或拉丁语高尚，牛顿直接绕开了英语这个地方方言，用欧洲学术界的"底层通讯协议"——拉丁语——加上全世界通用的数学公式发布了他的大一统理论。</div><span class="tag tag-s">科学革命</span></div>
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">审判异教徒的是天主教还是新教？</div>
+动用宗教裁判所、火刑柱烧死布鲁诺、终身软禁伽利略的，绝对是罗马天主教会。但新教最初也反感日心说——马丁·路德公开嘲笑哥白尼。关键区别：天主教是跨国集权组织，有统一裁判所；新教是碎裂的，当科学家在天主教国家待不下去，可以跑到新教的荷兰避难出书。
+</div>
+
+<details class="fade-in"><summary>科学研究的"门票"：富人的游戏</summary><div class="detail-body">
+<p>在那个时代，搞科学（当时叫"自然哲学"）被称为<strong>"绅士的爱好（Gentlemanly Pursuit）"</strong>。</p>
+<p><strong>物理屏障：</strong>做实验需要极其昂贵的定制仪器（高纯度玻璃透镜、黄铜星盘、早期的真空泵）。普通人根本买不起。</p>
+<p><strong>时间屏障（最致命的阶级隔离）：</strong>平民每天劳作14个小时只为一口面包，哪有时间去观察一窝蚂蚁的社会结构或者计算星星的轨道？科学是建立在<strong>"不需要为生存发愁"的绝对特权</strong>之上的。</p>
+<h4>权贵的资金灌注：不为了"真理"，为了"霸权"</h4>
+<p>统治阶级极其现实。他们给科学家砸钱（赞助人制度 Patronage），求的绝对不是什么浪漫的真理：</p>
+<p>· <strong>弹道学与火炮：</strong>为什么国王们拼命资助物理学家研究抛物线和重力？因为谁算得准，谁的大炮就能更精准地轰碎敌人的城墙。</p>
+<p>· <strong>天文学与大航海：</strong>海上航行没有GPS，只能靠极其精确的星图来定位。谁掌握了天文学，谁就掌握了全球贸易航线和殖民地。</p>
+<p>· <strong>天主教会是最大天文学赞助商：</strong>两个硬需求——①大航海导航刚需（海上定位靠星图）；②历法统治刚需（复活节的日子算不准教会就丢脸）。到了16世纪，旧历法（儒略历）的误差已经让现实的春分和历法上的春分差了十几天，教皇不得不花重金聘请大量天文学家去死死盯着太阳和星星的运行轨迹——这就是今天我们用的公历/格里高利历的由来。</p>
+</div></details>
+
+<details class="fade-in"><summary>天文学与大航海的利益链</summary><div class="detail-body">
+<p>天主教会是全欧最大的天文学赞助商！两个硬需求：①<strong>大航海导航刚需</strong>——海上定位靠星图；②<strong>历法统治刚需</strong>——复活节的日子算不准教会就丢脸。</p>
+<p>哥白尼本人是天主教教士，初衷只是让算历法更方便。日心说是<strong>"为解决实际问题而引发的意外翻车"</strong>。</p>
+</div></details>
+
+<div class="my-thought fade-in">
+<div class="label">MY THOUGHT</div>
+科学家观测天体、研究物理，最初就是为了算弹道、造历法、开船搞远洋贸易。"孤高学者为纯粹真理仰望星空"的浪漫画面，多半是后人加的滤镜。"人类理性的极度自信"是一把双刃剑——它带来了光，也催生了工业革命最极致的阶级压迫。
+</div>
+
+<details class="fade-in"><summary>耶稣会：打不过就吃掉你</summary><div class="detail-body">
+<p>随着望远镜的普及和航海的发展，教会发现纯靠暴力已经压不住了。于是教会内部出现了一批极度聪明的"妥协派"——<strong>耶稣会（Jesuits）</strong>。他们是当时全欧洲受过最好教育的人，自己也造天文台、算弹道、研究数学。</p>
+<h4>从"神迹神学"到"公式神学"的合并</h4>
+<p><strong>旧版本（中世纪）：</strong>怎么证明上帝存在？靠"不讲理的神迹"——摩西劈开红海、水变成酒。这是直接违反物理常识的。</p>
+<p><strong>新版本（耶稣会的合并）：</strong>承认规律！但是，<strong>"是谁写下了这些完美的公式？"</strong>科学越发达，越证明了上帝是一个拥有极高智商的<strong>"终极程序员"和"伟大几何学家"</strong>。科学家每发现一个定律，就等同于破解了一行上帝的代码。</p>
+<h4>"钟表匠理论"（The Watchmaker Analogy）</h4>
+<p>如果你在荒野里走，地上踢到一块石头，你觉得它一直在那里，这很正常。但如果你在地上捡到一块<strong>极其精密的机械怀表</strong>，打开后盖看到里面几百个齿轮严丝合缝地咬合运转——你绝对不会认为这块表是"大自然随机凑出来的"，你一定会断定：在某个地方，一定存在一位极其聪明的"钟表匠"制造了它。推论：宇宙（被科学证明）就像这块怀表一样极其精密和有规律，所以必然存在一位"宇宙钟表匠"，那就是上帝。</p>
+<p><strong>连牛顿本人</strong>，在晚年也陷入了神学研究中。他真的认为自己只是"发现了上帝的蓝图"，而不是推翻了上帝。当他的力学体系遇到无法解释的摩擦力损耗时，他甚至提出"上帝会时不时出手微调一下宇宙的轨道"。</p>
+<p>教会在面对科学狂潮时，最厉害的武器不是火刑柱，而是这种<strong>"用真理的材料，去重新构筑神权大厦"的终极合并能力</strong>。</p>
+</div></details>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 2 ===== -->
+<section id="era2">
+<div class="sh fade-in"><span class="era">ERA II</span><h2>启蒙运动 · 用理性重写社会</h2><p class="period">18 世纪</p></div>
+
+<p class="prose fade-in">科学革命搞定了"自然界"，启蒙先驱们一看：既然大自然遵循完美的理性规律，那人类社会凭什么还要听从迷信和专制君主？<strong>"理性"成为绝对信仰</strong>。</p>
+
+<div class="tl">
+<div class="tl-item enl fade-in"><div class="tl-year">17 — 18 世纪</div><div class="tl-title">"文人共和国"与知识传播的空间转移</div><div class="tl-body">分散在英法德的科学家通过频繁信件交流。法国的"沙龙"——贵族妇人客厅成为新思想孵化器。英国的<strong>"便士大学"（咖啡馆）</strong>——花一便士买咖啡就能听报纸讨论科学。知识从修道院和宫廷走向了公共领域。</div><span class="tag tag-e">启蒙运动</span></div>
+
+<div class="tl-item enl fade-in"><div class="tl-year">1751 — 1772 年</div><div class="tl-title">狄德罗《百科全书》</div><div class="tl-body"><strong>商业起源：</strong>最初只是一个精明出版商（勒布雷东）看到英国人写的《钱伯斯百科全书》卖得好，想搞个"法文汉化版"赚钱。找来了当时急需养家的穷作家狄德罗做翻译和主编——一开始纯粹是为了拿死工资混口饭吃。<br><br><strong>"特洛伊木马"：</strong>狄德罗发现这是绝佳机会，硬生生把这个商业项目改成了思想夺权战。他有一句极其直白的名言："这部书的目的就是<strong>改变人们通常的思维方式</strong>。"他把国王特权和铁匠打铁放同一本书里用同样的"理性客观"口吻解释，甚至通过词条的"参见（Cross-reference）"功能，把"食人族"和教会的"圣餐礼"偷偷关联起来。<br><br><strong>资本的保护伞：</strong>为什么教皇和法国国王好几次下令封杀这本书，它却依然能偷偷出版？因为出版商背后有庞大的利益网络——连国王的情妇（蓬帕杜夫人）和朝廷高官都是付费VIP读者和暗中保护伞。<br><br><strong>终极套现：</strong>到了晚年狄德罗非常缺钱，甚至没钱给女儿办嫁妆。最后是俄国女皇叶卡捷琳娜二世花重金买下了他的私人图书馆，还给他开出终身高额年薪。</div><span class="tag tag-e">启蒙运动</span></div>
+
+<div class="tl-item enl fade-in"><div class="tl-year">18 世纪</div><div class="tl-title">全景敞视监狱（Panopticon）</div><div class="tl-body">边沁提出的极致理性空间：中心瞭望塔，四周透光单人牢房。狱警看见所有囚犯，囚犯看不见狱警。通过完美几何和视线控制实现最高效监督。后来被复刻到济贫院、工厂和办公楼。</div><span class="tag tag-e">启蒙运动</span></div>
+
+<div class="tl-item enl fade-in"><div class="tl-year">18 世纪</div><div class="tl-title">法语取代拉丁语成为欧洲"通用语"</div><div class="tl-body">连俄国沙皇和普鲁士国王都必须说流利法语。狄德罗的书不需要翻译全欧洲知识分子就能直接读。法国文化辐射力达到顶峰。</div><span class="tag tag-e">启蒙运动</span>
+<br><a href="中世纪到文艺复兴编年史笔记.html#era3" class="cross-link">📎 前置：中世纪笔记 · 纪元三 · 拉丁语帝国</a></div>
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">欧洲中心从意大利转移到法国</div>
+<h4>意大利的"被迫掉线"</h4>
+<p>· <strong>地理维度（大西洋时代的到来）：</strong>大航海时代开启后，全欧洲的财富密码从"地中海贸易"瞬间转移到了"大西洋航线"。意大利原本是连接欧亚的"十字路口"，现在一夜之间变成了航运地图上的"死胡同"。美第奇家族这样的超级银行家失去了滚滚而来的财富。</p>
+<p>· <strong>人文维度（物理闭麦）：</strong>面对北方新教的扩张，罗马天主教会在意大利搞起了极其严酷的"反宗教改革"——建立《禁书目录》，重启异端裁判所（布鲁诺被烧死，伽利略被终身软禁）。聪明的头脑只能选择闭嘴或向北逃亡。</p>
+<p>· <strong>政治维度：</strong>意大利由分散的小城邦组成，没有统一的中央集权国家。当已经完成集权的法国和西班牙崛起后，意大利就彻底沦为了大国博弈的"角斗场"。</p>
+<h4>法国的"强势篡位"</h4>
+<p>· <strong>"举国体制"的氪金虹吸：</strong>路易十四成立法兰西科学院、法兰西学术院，用极其丰厚的国家津贴，把全欧洲最顶尖的科学家和学者（如惠更斯、卡西尼）直接高薪"挖"到巴黎。国家机器的财力碾压了意大利私人银行家的小打小闹。</p>
+<p>· <strong>大西洋红利：</strong>海外殖民地的糖、烟草和奴隶贸易，让法国国内迅速崛起了一个极其富裕的资产阶级（Bourgeoisie）——正是他们构成了后来购买《百科全书》、资助启蒙思想家的绝对主力。</p>
+<p>· <strong>法语取代拉丁语：</strong>连俄国沙皇和普鲁士国王都必须说流利法语。狄德罗的书不需要翻译全欧洲知识分子就能直接读。</p>
+</div>
+
+<div class="my-thought fade-in">
+<div class="label">MY THOUGHT</div>
+从天文学家看星星是为了导航搞钱，到狄德罗写百科全书是夹杂商业预售的思想夺权战。历史从来不是在真空里靠"真理"两个字驱动的，它永远是由利益、权力、生存和野心交织而成的。
+</div>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 3 ===== -->
+<section id="era3">
+<div class="sh fade-in"><span class="era">ERA III</span><h2>法国大革命 · 理念的暴力变现</h2><p class="period">1789 年</p></div>
+
+<p class="prose fade-in">当巴士底狱的城墙倒塌，它代表着欧洲维持了一千多年的<strong>"游戏规则"被彻底掀翻</strong>。</p>
+
+<div class="tl">
+<div class="tl-item rev fade-in"><div class="tl-year">1789 年 7 月 14 日</div><div class="tl-title">攻占巴士底狱</div><div class="tl-body">在18世纪那个讲究对称、透视和理性的巴黎市区里，巴士底狱却是一座高耸、阴暗的<strong>中世纪巨型石头堡垒</strong>——法国历代国王专门用来关押政治犯的地方（伏尔泰就被关过里面）。<br><br><strong>物理需求：</strong>巴黎市民已经暴动并抢夺了火枪，但没有火药。巴士底狱的地下室里刚好囤积了全城最多的火药储备。<br><br><strong>空间权力的象征：</strong>这座高墙耸立在城市中，就是绝对的封建皇权和专制压迫的视觉图腾。愤怒的市民冲进去杀死了典狱长，甚至在随后的几个月里，直接把这座庞大的中世纪堡垒<strong>一块石头一块石头地用手给拆成了平地</strong>。<br><br><strong>空间隐喻：人民亲手砸碎了旧时代的物理边界。</strong>7月14日至今是法国国庆日。</div><span class="tag tag-rev">法国大革命</span></div>
+
+<div class="tl-item rev fade-in"><div class="tl-year">1789 年 8 月</div><div class="tl-title">《人权与公民权宣言》</div><div class="tl-body">狄德罗、卢梭在书里写的"人生而平等、主权在民"，原本只是知识分子沙龙里的理论。《人权宣言》直接把这些理论写成了<strong>国家的最高法律</strong>。它强行规定：阶级不再由血统决定，任何人只要出生，就拥有自由、财产和安全的权利。<br><br>这是人类社会操作系统的<strong>强制大版本更新</strong>。从"臣民（Subject）"到"公民（Citizen）"的身份跃迁——国家不再是属于国王某个家族的私有财产，而是属于全体法国人的共同体。人们第一次意识到："我们在为我们自己的国家打仗，而不是为某个领主打仗。"现代意义上的<strong>民族主义和爱国主义</strong>由此催生。</div><span class="tag tag-rev">法国大革命</span></div>
+
+<div class="tl-item rev fade-in"><div class="tl-year">1793 — 1794 年</div><div class="tl-title">恐怖统治（Reign of Terror）</div><div class="tl-body">革命者为了追求"极致的理性"，试图用理性格式化一切——废除旧日历，强行规定每个月有三周、每周有10天（为了凑整数的十进制）；把教堂改成"理性神庙"；甚至连巴黎圣母院都被改成了祭祀"理性女神"的场所。<br><br><strong>断头台（Guillotine）</strong>——被认为是<strong>"启蒙理性的完美结晶"</strong>：极度高效、没有痛苦、人人平等（国王的头和平民的头被同一台机器砍下）。在雅各宾派的恐怖统治时期，每天都有无数人在这种冰冷的"理性计算"下被推上断头台。<br><br>这是"极度自信"的理性走向失控和暴力的最高潮——当你发现社会中有些人不符合你设想的"完美理性蓝图"时，你选择的不是宽容，而是<strong>物理消除</strong>。</div><span class="tag tag-rev">法国大革命</span><span class="tag tag-w">恐怖统治</span></div>
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">双元革命（The Dual Revolution）：法国大革命与工业革命同时发生</div>
+<p>这是一个极其经典的"历史视觉错觉"——工业革命并没有乖乖排在法国大革命后面等它结束，它们是<strong>同时发生的</strong>，甚至工业革命的起步还要更早！著名历史学家艾瑞克·霍布斯鲍姆把这大概半个世纪的时间段，称之为人类历史上的"双元革命"。</p>
+<p><strong>时间线的重叠：</strong>1760年代英国的珍妮纺纱机已经转起来，1776年瓦特蒸汽机商业化。当1789年巴黎人在街垒后面对抗国王的军队时，海峡对岸的英国不仅没有流血革命，反而正忙着把成千上万的破产农民塞进新建的纺织厂和煤矿里。</p>
+<p><strong>两场革命的对比：</strong>法国大革命改写"社会政治操作系统"——横向的、广场式的，人们推倒高墙，在开阔的公共空间集会，用暴动强行抹平阶级差异。工业革命改写"物理能量底层引擎"——垂直的、压抑的，机器的物理排布重新制造了最残酷的"阶级折叠"。</p>
+<p><strong>殊途同归：</strong>法国大革命把欧洲的"封建思想"炸了个粉碎，扫清了资本主义发展的政治障碍；工业革命则提供了前所未有的"生产力与钢铁"，让资产阶级拥有了彻底碾压旧贵族的物理力量。两者一结合，我们今天熟悉的这个由资本、工厂、城市网格和现代国家组成的现代世界，就彻底成型了。</p>
+</div>
+
+<div class="my-thought fade-in">
+<div class="label">MY THOUGHT</div>
+"极度自信"的理性引发了三个维度的灾难：①对自然的傲慢——森林只剩"木材立方数"，催生工业时代生态浩劫；②对社会的强行格式化——法国大革命的断头台是"理性计算"的冰冷产物；③对"人"本身的异化——资本家精确计算童工每天需要多少卡路里的劣质土豆就能工作16小时而不至于饿死。
+</div>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 4 ===== -->
+<section id="era4">
+<div class="sh fade-in"><span class="era">ERA IV</span><h2>工业革命的诞生 · 英国</h2><p class="period">18 世纪中后期</p></div>
+
+<p class="prose fade-in">工业革命的地理起点100%诞生于英国。虽然法国在启蒙和革命中抢尽风头，但点燃钢铁巨兽时法国完全慢了半拍。</p>
+
+<div class="tl">
+<div class="tl-item ind fade-in"><div class="tl-year">1760 年代</div><div class="tl-title">珍妮纺纱机</div><div class="tl-body"><strong>"机器取代人手"的开端。</strong>原本一次纺一根线，珍妮机一次纺几十根。人沦为"伺候机器的辅助工具"。</div><span class="tag tag-i">工业革命</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">1776 年</div><div class="tl-title">瓦特改良蒸汽机商业化</div><div class="tl-body">加了"分离式冷凝器"让效率指数级飞跃。<strong>空间解放</strong>：之前工厂必须建在偏僻河流旁，蒸汽机出现后工厂终于可以建在城市正中心。</div><span class="tag tag-i">工业革命</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">18 — 19 世纪</div><div class="tl-title">圈地运动</div><div class="tl-body">贵族发现"养羊比种地赚钱"，用法律强行圈占公用土地。失去土地的农民只能涌入城市成为产业工人。<strong>从物理上完成了劳动力的强制位移</strong>——把平原上的农业人口高密度塞进城市厂房。</div><span class="tag tag-i">工业革命</span><span class="tag tag-w">阶级压迫</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">1858 年</div><div class="tl-title">"大恶臭"事件</div><div class="tl-body">高温把泰晤士河"煮沸"，全城弥漫窒息恶臭。迫使伦敦开启史上最庞大的下水道工程，凿穿城市底部形成庞大地下世界。催生了<strong>"搜拾者(Toshers)"</strong>——在有毒污水中寻找上层冲入下水道的硬币。</div><span class="tag tag-i">工业革命</span></div>
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">为什么是英国不是法国？</div>
+①<strong>浅层煤炭极易开采</strong>；②水运网完美——没有任何地方距海岸超120公里；③孤岛安全感——英吉利海峡让本土毫发无损；④光荣革命(1688)确立专利法保护发明。法国政治失控(大革命)、缺煤、农民有了自己的小块土地不愿进厂。
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">垂直阶级隔离 · 维多利亚时代伦敦</div>
+<h4>一、地理维度：风向、海拔与"呼吸权"的剥夺</h4>
+<p><strong>高地与上风口的特权：</strong>盛行风将工厂区排出的浓密煤烟全部吹向东边。富有的工厂主和贵族不仅占据了西区（West End），更是纷纷搬向海拔较高的汉普斯特德荒野（Hampstead Heath），地势高、通风好、享受充足的阳光和相对清凉的环境。</p>
+<p><strong>低地的重工业炼狱：</strong>劳工阶层被死死限制在低海拔、靠近泰晤士河泥沼的东区（East End）。终年被有毒的黄色"豌豆汤"浓雾笼罩，聚集了所有炼铁厂、燃煤锅炉和印染厂。</p>
+<h4>二、人文维度：物理肉体的异化与"两个物种"</h4>
+<p><strong>环境对肉体的重塑：</strong>底层工人（特别是童工）常年在缺乏光照、高温炙烤和粉尘密布的矿井或锅炉房劳作，普遍患有佝偻病（骨骼畸形）、黑肺病，身材极为矮小且视力退化。上层阶级则因营养丰富而身材高大。</p>
+<p><strong>《时间机器》的终极隐喻：</strong>H.G.威尔斯将这种极度阶级焦虑写进了科幻小说《时间机器》——未来的人类因为长期的垂直隔离，彻底分化成了两个物种：生活在地表、娇生惯养但毫无生存能力的"埃洛伊人（Eloi）"，以及生活在炽热的地下机器房中、畏惧强光、如同野兽般操控庞大机械的<strong>"莫洛克人（Morlocks）"</strong>。</p>
+</div>
+
+<details class="fade-in"><summary>英国的"边缘逆袭"（The Advantage of Backwardness）</summary><div class="detail-body">
+<p>英国在欧洲的文化和政治"鄙视链"中处于边缘——贵族说法语装门面，文化最高峰只有在木头戏院里演话剧（莎士比亚）。正是因为没有深陷高雅文化内卷，英国人走出了一条完全不同的<strong>实用主义（Empiricism）</strong>硬核路线。</p>
+<h4>鄙视链带来的"务实精神"</h4>
+<p>法国贵族以出入凡尔赛宫、在沙龙里用极其华丽的法语谈论文学和哲学为荣，搞机械、做实验、满手油污是"下等人干的脏活"。而英国成立的<strong>皇家学会（Royal Society）</strong>，核心宗旨不是辩论神学或哲学，而是"做实验"。校训是 <em>Nullius in verba</em>（<strong>"不盲从任何人的权威"</strong>）。只看实验数据、不看身份地位的硬核文化，是诞生科学巨匠的绝对土壤。</p>
+<h4>跨越阶级的握手：最致命武器</h4>
+<p>在法国，懂数学的科学家和打铁的工匠是两个绝对隔离的阶级，老死不相往来。但在英国，阶级壁垒因为商业的发展变得相对模糊。像牛顿、玻意耳这样的顶尖科学家，会经常和造钟表的、磨镜片的、打铁的工匠混在一起交流。</p>
+<p>工业革命中发明和改良蒸汽机的纽科门、瓦特，<strong>根本不是什么大学里的理论科学家，而是纯粹的仪表修理工和铁匠</strong>！英国的学术大脑加上了工匠的粗糙双手，才把图纸真正变成了喷吐蒸汽的钢铁巨兽。</p>
+<h4>政治的提前重构（光荣革命）</h4>
+<p>在法国还在为了国王的权力互相砍头时，英国人在1688年就已经通过"光荣革命"搞定了政治问题。确立了极其严格的《专利法》——只要你发明了新机器，国家用法律保护你靠它赚大钱。这极大地刺激了全英国人的"搞钱欲望"。</p>
+</div></details>
+
+<a href="中世纪到文艺复兴编年史笔记.html#era9" class="cross-link">📎 前置：中世纪笔记 · 纪元九 · 宗教改革与巴洛克</a>
+
+<div class="my-thought fade-in">
+<div class="label">MY THOUGHT</div>
+英国之所以能爆发工业革命，恰恰因为它没有深陷欧洲大陆那种对"高贵血统、纯粹哲学和华丽辞藻"的内卷。它孤悬海外，把所有精力点在了"如何用机械和贸易搞钱"这条极其冷酷但高效的科技树上。
+</div>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 5 ===== -->
+<section id="era5">
+<div class="sh fade-in"><span class="era">ERA V</span><h2>工业革命的传播 · 从比利时到世界</h2><p class="period">19 世纪</p></div>
+
+<p class="prose fade-in">英国一开始根本不想传播——严禁机器图纸出口、严禁技工出国。但在巨额利润诱惑下技术锁不住。工业革命的传播严格遵循<strong>地下煤炭矿脉和铁矿石分布</strong>。</p>
+
+<div class="tl">
+<div class="tl-item ind fade-in"><div class="tl-year">1799 年</div><div class="tl-title">第一站：比利时</div><div class="tl-body"><strong>为什么是比利时？</strong>英国的那条蕴含着极大能量的浅层煤矿带，穿过英吉利海峡的海底，在欧洲大陆露出的第一个头，刚好就在比利时的<strong>瓦隆地区（Wallonia）</strong>。<br><br><strong>工业间谍：</strong>英国机械师威廉·科克里尔偷偷把纺织机图纸记在脑子里走私到比利时。列日（Liège）地区早在中世纪就是全欧洲最著名的<strong>冷兵器和火枪制造中心</strong>，漫山遍野都是极其熟练的铁匠，地下全是优质的浅层煤炭。科克里尔一到这里，发现当地的"硬件配套设施"简直完美——他只需要把脑子里的"软件图纸"拿出来，当地的工匠立刻就能把机器敲出来。<br><br><strong>历史的黑色幽默：</strong>科克里尔是1799年跑到比利时那个地方的，而当时那块地盘已经被拿破仑的法国强行吞并了。所以他接的其实是"法国"本地纺织老板的订单。只不过这块有着丰富煤炭的地盘，后来在拿破仑战败后被强行从法国版图里抠了出去。</div><span class="tag tag-i">工业革命</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">1815 年后</div><div class="tl-title">法国：浪漫与现实的拧巴</div><div class="tl-body">大革命和拿破仑战争结束才开始抄英国作业。致命伤是缺煤，工厂依赖水力分散在乡下。发挥传统艺能——做高端奢侈品、丝绸，不搞粗犷重工业。</div><span class="tag tag-i">工业革命</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">1840 年代后</div><div class="tl-title">德国：后发制人的终极怪物</div><div class="tl-body">直接跳过轻工业，全部国力砸向重工业。<strong>鲁尔区(Ruhr Valley)</strong>是全欧最顶级煤铁复合产区。英国靠工匠在车间"敲"出来，德国靠大学实验室"算"出来。19世纪末在钢铁、电气和化学领域碾压英国。</div><span class="tag tag-i">工业革命</span></div>
+
+<div class="tl-item war fade-in"><div class="tl-year">19 世纪</div><div class="tl-title">被抛弃的弃子</div><div class="tl-body"><strong>意大利、西班牙、葡萄牙</strong>——地中海沿岸几乎没有煤炭，蒸汽时代等于没有动力。<strong>奥斯曼帝国</strong>完全错过科学革命和启蒙运动，沦为"欧洲病夫"。</div><span class="tag tag-w">被淘汰</span></div>
+</div>
+
+<div class="callout fade-in">
+<div class="callout-t">比利时为什么能成为独立国家？</div>
+英国绝对不允许法国占领比利时海岸线！安特卫普被拿破仑称为<strong>"对准英国心脏的手枪"</strong>。1815年维也纳会议后大国在法国北部边境人造"缓冲国"。比利时的存在不是民族认同，而是英法德互相牵制谁也吃不掉谁的结果。
+</div>
+
+<details class="fade-in"><summary>比利时：面板极高但存在感为零</summary><div class="detail-body">
+<p>比利时明明是欧洲第一个完成工业革命的怪物，人均GDP常年位居欧洲前列，连欧盟总部和北约总部都设在它的首都布鲁塞尔，为什么在历史书里几乎听不到它的"传说"？</p>
+<h4>永远的"比赛场馆"，从来不是"参赛选手"</h4>
+<p>拿破仑的终局之战"滑铁卢战役"在比利时，一战最惨烈的堑壕战（伊普尔战役）在比利时，二战的"阿登战役"（《兄弟连》里的雪地血战）也在比利时。但历史记住的永远是别国将领。<strong>比利时永远只是"关卡地图"，而不是"通关主角"。</strong></p>
+<h4>没有统一的"国家神话"</h4>
+<p>一个国家要有故事，首先得有统一的民族叙事（法国的圣女贞德、英国的亚瑟王）。但比利时是被大国强行在地图上画出来的人造国家——南部说法语，北部说荷兰语，两边互相看不顺眼。曾经创下过<strong>近600天没有中央政府</strong>的世界纪录。</p>
+<h4>顶级文化IP被法国"强制吸血"</h4>
+<p>· <strong>丁丁历险记（Tintin）：</strong>全球最著名的漫画之一，作者埃尔热是比利时人，但大家都以为丁丁是法国记者。</p>
+<p>· <strong>蓝精灵（The Smurfs）：</strong>也是比利时漫画家的作品，同样被当成了法国文化。</p>
+<p>· <strong>大侦探波洛（Hercule Poirot）：</strong>阿加莎·克里斯蒂笔下的波洛在小说里无数次愤怒地纠正别人："我不是法国人，我是比利时人！"但全世界读者依然觉得他充满"法式风情"。</p>
+<p>· 甚至连<strong>薯条（French Fries）</strong>也是比利时人发明的，硬生生被叫成了"法国炸薯条"。</p>
+</div></details>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== ERA 6 ===== -->
+<section id="era6">
+<div class="sh fade-in"><span class="era">ERA VI</span><h2>空间的迭代 · 从文艺复兴到工业革命的建筑演变</h2><p class="period">15 — 19 世纪</p></div>
+
+<p class="prose fade-in">从文艺复兴到工业革命，人类的物理空间经历了从<strong>"静态的完美"到"动态的炫技"再到"效率的暴力"</strong>的三次剧变。每一次迭代都不是审美变化，而是被军事防御、政治权力和生产力硬生生逼出来的。</p>
+
+<div class="tl">
+<div class="tl-item ren fade-in"><div class="tl-year">文艺复兴</div><div class="tl-title">静态的数学美</div><div class="tl-body">正圆形和正方形，绝对对称、平静、比例。帕尔马诺瓦(Palmanova)——九角星型理想城市。街道极宽阔笔直（火炮视线）。室内是没有走廊的"套间"。</div><span class="tag tag-r">文艺复兴</span></div>
+
+<div class="tl-item ren fade-in"><div class="tl-year">巴洛克 / 科学革命</div><div class="tl-title">动态的物理炫技</div><div class="tl-body">随着开普勒证明行星轨道是<strong>椭圆形</strong>的，再加上微积分带来了"运动"的概念，建筑师开始疯狂使用椭圆形、波浪形墙面和扭曲柱子。<br><br><strong>教堂的视觉特效巅峰：</strong>①<strong>打破天花板（Trompe-l'œil 错视画法）</strong>——在平面天花板上画出"无限向上延伸的柱子和云彩"，视觉错觉像是教堂屋顶被直接掀开，直通天堂。②<strong>隐藏光源</strong>——建筑师（如贝尼尼）把窗户隐藏在雕塑的视觉死角，光线像聚光灯一样打在金色雕塑上，平民会以为那是真正的"神迹降临"。<br><br><strong>贵族室内：</strong>出现了"惊奇房间（Wunderkammer）"，里面塞满地球仪、星盘、显微镜、美洲的鳄鱼标本和复杂的机械钟表。科学仪器本身成为最高级的空间装饰物和权力象征。<br><br><strong>凡尔赛宫镜厅：</strong>一侧是巨大的落地窗，另一侧是等大的水银镜面。不仅在物理上让空间看起来大了一倍，更利用光线的无限反射，营造出极其奢靡、没有边界的膨胀感。<br><br><strong>城市的两种直线：</strong>放射状大道（凡尔赛/巴黎）消失点指向皇宫——"独裁者的视觉引导线"，剥夺你的自由视点。 vs 阿姆斯特丹运河网格——没有一个绝对的中心，直线是为了把土地切割成标准地块高价卖给商人——<strong>"资本家的物流白盒"</strong>。同样画直线，一个是集权的政治几何学，另一个是平权的商业几何学。</div><span class="tag tag-r">文艺复兴</span></div>
+
+<div class="tl-item ind fade-in"><div class="tl-year">工业革命</div><div class="tl-title">效率的暴力解放</div><div class="tl-body"><strong>细铁柱取代粗石柱：</strong>铸铁的承重力是石头几十倍，几根极细的铁柱就能撑起一片巨大的厂房，把宝贵的地面空间全部留给机器。<br><br><strong>锯齿形屋顶(Sawtooth Roof)：</strong>玻璃面必须绝对朝向正北——引进漫反射光，均匀柔和无刺眼阴影。齿尖聚拢热空气从高处百叶排出，底部形成负压自动抽入冷空气——<strong>不需要任何动力的巨大抽风机</strong>。<br><br><strong>走廊（Corridor）的诞生：</strong>这是一个极其关键的室内动线变化。中世纪到文艺复兴时期的贵族宫殿<strong>是没有走廊的</strong>——所有房间门连着门（套间/Enfilade），去最里面的卧室必须穿过前面所有房间。随着启蒙运动和资本主义的发展，个人"隐私"的概念诞生了，走廊完美地实现了<strong>"物理距离很近，但阶级绝对隔离"</strong>的空间划分。<br><br>红砖长条纺织厂+直插云霄的排烟烟囱取代了大理石圆顶。这种建筑完全抛弃了什么"神圣美感"或"数学比例"，<strong>唯一的指标就是：用最低的成本，换取最极致的生产效率。</strong></div><span class="tag tag-i">工业革命</span></div>
+</div>
+
+<table class="cmp fade-in">
+<tr><th>维度</th><th>中世纪</th><th>文艺复兴/巴洛克</th><th>工业革命</th></tr>
+<tr><td><strong>街道</strong></td><td>极窄弯曲（巷战防御）</td><td>极宽笔直（火炮射界+权力辐射）</td><td>分化：主干道宽（军队调动）/工人区极窄</td></tr>
+<tr><td><strong>室内动线</strong></td><td>套间式穿堂（无走廊）</td><td>套间式（权力炫耀）</td><td>走廊诞生（隐私+阶级隔离）</td></tr>
+<tr><td><strong>屋顶</strong></td><td>飞扶壁+尖拱（卸载墙壁承重让光进来）</td><td>巨型穹顶（数学算力+暗藏铁链）</td><td>锯齿形（自然光+热力学排风）</td></tr>
+<tr><td><strong>柱子</strong></td><td>石柱（粗大，哥特肋骨）</td><td>古典立柱（装饰+承重）</td><td>铸铁柱（极细，最大化地面空间）</td></tr>
+<tr><td><strong>驱动力</strong></td><td>宗教（让光=上帝降临）</td><td>科学+权力（数学炫技+视觉征服）</td><td>效率（最低成本换最极致生产力）</td></tr>
+</table>
+
+<details class="fade-in"><summary>锯齿形屋顶：工业革命的光学和热力学引擎</summary><div class="detail-body">
+<p>玻璃面必须绝对朝向正北——引进漫反射光，均匀柔和无刺眼阴影。齿尖聚拢热空气从高处百叶排出，底部形成负压自动抽入冷空气——<strong>不需要任何动力的巨大抽风机</strong>。</p>
+</div></details>
+
+<details class="fade-in"><summary>帕尔马诺瓦与 Re:Zero 水门都市</summary><div class="detail-body">
+<h4>帕尔马诺瓦（Palmanova）——纸面上的完美城市</h4>
+<p>位于意大利东北部，由威尼斯共和国在1593年开始建造，是现实中最完美的文艺复兴"理想城市"——九角星形，六条放射状街道从中心的六角形广场（Piazza Grande）直通城墙。</p>
+<p><strong>防御逻辑：</strong>每一个伸出的"星尖"（棱堡）都可以覆盖相邻星尖的视觉死角。任何试图靠近城墙的敌人，都会被至少两个方向的交叉火力覆盖。</p>
+<p><strong>全知视点：</strong>站在市中心的广场上，理论上可以一眼望穿六条大街的尽头。任何骚乱都能从中心迅速感知，没有任何阴影角落可以躲藏。</p>
+<p><strong>尴尬的现实：</strong>由于空间太过规整、压抑且缺乏自然发展的多样性，帕尔马诺瓦在建成初期几乎是一座鬼城。威尼斯政府最后不得不颁布法令，<strong>赦免一部分罪犯，强迫他们住进去</strong>。过于完美的数学逻辑，往往会由于剥夺了空间的"混乱感"而失去生命力。</p>
+<h4>Re:Zero 水门都市普利斯特拉</h4>
+<p>《从零开始的异世界生活》里的水门都市普利斯特拉，在空间结构上精准捕捉了文艺复兴"理想城市"的神韵。它是<strong>"威尼斯的材质+帕尔马诺瓦的骨架+阿姆斯特丹的网格"</strong>。贡多拉和水道给了它"水之都"的浪漫外壳，而整齐划一的运河分区则是把威尼斯的杂乱水路进行了一次"文艺复兴式的强行规范化"。城市天生自带"区域锁定"功能——通过控制不同层级的水门升降，可以改变城市的物理通行状态。</p>
+</div></details>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== DEEP DIVE ===== -->
+<section id="deep">
+<div class="sh fade-in"><span class="era">DEEP DIVE</span><h2>深度专题</h2><p class="period">跨时代的关联与延伸</p></div>
+
+<details class="fade-in"><summary>被折叠的200年：从文艺复兴到工业革命的三大桥梁</summary><div class="detail-body">
+<p>从文艺复兴结束（约16世纪末）到工业革命真正爆发（18世纪中后期），中间足足隔了<strong>将近200年</strong>！这200年绝对不是"垃圾时间"，而是为工业机器准备燃料、图纸和三观的"三大前置补丁"：</p>
+<p><strong>① 地理大发现（大航海时代，15-17世纪）= 燃料与原材料的原始积累：</strong>欧洲财富中心从地中海（意大利）彻底转移到大西洋沿岸（英国、荷兰）。没有哥伦布发现新大陆、没有全球贸易航线的打通，英国根本凑不齐开动庞大机器的资源。</p>
+<p><strong>② 科学革命（16-17世纪）= 机器的"图纸"：</strong>文艺复兴讲究"感性的美"和"人的比例"，科学革命把宇宙变成了"可以被计算的机械钟表"。只有当微积分、经典力学和早期热力学被发明出来后，人们才懂得如何计算齿轮的咬合和气缸的压力。</p>
+<p><strong>③ 启蒙运动（18世纪）= 社会许可：</strong>伏尔泰、卢梭等人提出，不光是自然界，连人类社会都应该像机器一样被"理性"精确管理。这种思想直接为后来资本家毫无感情地剥削工人提供了心理基础——"我是按照经济规律办事"。</p>
+<h4>文艺复兴的落幕标志</h4>
+<p><strong>1527年"罗马之劫"（Sack of Rome）：</strong>神圣罗马帝国的几万名哗变士兵（大部分是新教徒雇佣兵）冲进了文艺复兴的心脏——罗马城。烧杀抢掠整整八天，无数珍贵艺术品被毁，大量艺术家被杀或逃亡。紧接着欧洲陷入长达百年的宗教战争，人们绝望地发现：文艺复兴吹嘘的"人类有多么高尚、理性、完美"，在残酷的战争和屠杀面前简直是个笑话。</p>
+<h4>工业革命的开端标志</h4>
+<p><strong>1776年瓦特蒸汽机商业化</strong>——动力源彻底脱离了肌肉、风和水，变成了化石能源。之前所有工厂（水力纺纱厂）都必须建在偏僻的山谷河流旁，蒸汽机出现后工厂终于可以建在城市正中心。</p>
+</div></details>
+
+<details class="fade-in"><summary>三大教派在工业革命中的角色</summary><div class="detail-body">
+<p>如果在中世纪，宗教是控制社会的"绝对操作系统"，那么到了工业革命时期，面对轰鸣的蒸汽机和资本的崛起，三大教派分别演变成了"加速引擎"、"缓冲器"和"刹车片"。</p>
+
+<h4>新教 = 精神引擎与资本催化剂</h4>
+<p>德国社会学家马克斯·韦伯在《新教伦理与资本主义精神》中揭示了这个秘密。中世纪天主教认为"赚钱太多是有罪的"，但新教提出了<strong>"天职观（Calling）"——努力工作、拼命赚钱不仅没罪，反而是上帝赐福你的证明</strong>。同时提倡"世俗禁欲主义"，赚了钱不能拿去挥霍享乐，必须重新投入生产（扩大工厂、购买机器）。这就完美形成了工业革命最需要的<strong>资本积累</strong>。</p>
+<p><strong>地理印证：</strong>英国（工业革命发源地）、荷兰、德国北部、北美——清一色是新教的绝对控制区，也是最早完成工业化的区域。</p>
+<p><strong>"时间崇拜"：</strong>新教极其厌恶"虚度光阴"。早期工厂里的钟表不仅是管理工具，更带有宗教神圣感。迟到、怠工不仅是被扣工资，在文化上更被视为"堕落"。工厂在某种意义上，变成了新教徒的"世俗修道院"。</p>
+
+<h4>天主教 = 传统锚点与"阶级缓冲剂"</h4>
+<p><strong>地理印证：</strong>法国、意大利、西班牙、德国南部——这些天主教国家的工业化进程，普遍比英国和德国北部（新教区）晚了半个世纪甚至更多。</p>
+<p>天主教的底层逻辑强调社会等级的有机稳定、社区互助和农业传统的温情，对新教那种"利润至上、把人当做机器零件"的资本主义做派抱有天然的警惕和厌恶。</p>
+<p><strong>《新事》通谕（Rerum Novarum, 1891年）：</strong>面对维多利亚时代极端残酷的底层剥削（童工、每天劳作16小时），教皇利奥十三世发表了这份文件。一方面反对马克思主义的阶级斗争，另一方面<strong>强烈谴责了不受限制的资本主义剥削</strong>。教会出面支持工人建立基督教工会，要求资本家支付"能够维持家庭尊严的合理工资"，并要求周日必须休息。在残酷的工业废土上，天主教堂成了底层工人为数不多的避风港和福利救济站。</p>
+
+<h4>东正教 = 挂机状态与"自上而下的补丁"</h4>
+<p><strong>地理维度：</strong>俄罗斯帝国、东欧、巴尔干半岛。</p>
+<p>东正教高度依附于皇权（沙皇），核心教义带有强烈的神秘主义、苦修色彩，教导底层农民要顺从命运、忍受现世的苦难。完全没有新教那种"靠个人奋斗和积累财富来证明自己"的土壤。</p>
+<p><strong>错失工业革命：</strong>当英国的火车已经满地跑、伦敦建成地下铁时，俄罗斯在东正教和沙皇的维稳下，依然维持着落后的<strong>农奴制</strong>。直到克里米亚战争（1853-1856年）中被英法的坚船利炮打醒，才由沙皇政府自上而下强制推行工业化（如修建西伯利亚铁路）。东正教会的作用仅仅是充当统治者的传声筒，安抚那些被强行拉进工厂的农民不要造反。</p>
+
+<p><strong>空间映射：</strong>如果把三个教派放在工业时代的城市地图上——<strong>新教</strong>拆掉了华丽的教堂，把最高的烟囱变成了城市的新地标；<strong>天主教</strong>在烟囱的缝隙里艰难地维持着华丽的教堂，试图给被机器碾压的工人提供一点温情；而<strong>东正教</strong>的洋葱头穹顶下，依然是无边无际的落后农田，那些突兀出现的工厂更像是国家强行插进去的军事要塞。</p>
+<a href="基督教三大流派编年史笔记.html#comparison" class="cross-link">📎 相关：基督教编年史 · 三大流派对比</a>
+</div></details>
+
+<details class="fade-in"><summary>超级天灾：地球的"版本补丁"</summary><div class="detail-body">
+<p>当人类正忙着"系统升级"（搞科学、搞启蒙、搞工业）的时候，地球这个"物理服务器"也没闲着——每一场超级天灾就像地球强行介入的"版本补丁"，直接甚至<strong>加速了</strong>科学、哲学和工业的走向。</p>
+
+<h4>① 1755年里斯本大地震 · 震碎了上帝的滤镜（8.5-9.0级）</h4>
+<p>这不仅仅是一场物理上的地震，这是整个启蒙运动时期最著名的一场<strong>"哲学大地震"</strong>。</p>
+<p><strong>末日景象：</strong>1755年11月1日，葡萄牙首都里斯本发生估计为里氏8.5到9.0级的超级大地震。紧接着是高达20米的巨型海啸，最后是全城倒塌的火炉引发的连烧数天大火。几十分钟内，这座当时欧洲最繁华的城市之一被彻底从地图上抹去，数万人丧生。</p>
+<p><strong>精准的"黑色幽默"：</strong>灾难发生的那天，刚好是天主教的<strong>"万圣节"</strong>。绝大多数虔诚市民都在教堂里做礼拜，结果宏伟的石头教堂穹顶砸下来，<strong>把最虔诚的信徒全砸死了</strong>；反而是红灯区因为地势较高、建筑较轻，幸存了下来。</p>
+<p><strong>对启蒙运动的"神助攻"：</strong>伏尔泰等启蒙思想家指着废墟大骂教会："如果上帝是全善全能的，为什么祂要在万圣节摧毁最虔诚的里斯本，却留下了充满罪恶的巴黎？"这场大地震彻底摧毁了"神意裁决"的说法，让人类开始用科学的眼光去审视灾难——<strong>现代地震学就诞生于对这次地震的调查中</strong>。</p>
+
+<h4>② 1815年坦博拉火山大爆发 · 没有夏天的年份（VEI-7）</h4>
+<p>如果没有这场超级火山爆发，工业革命的进程和人类的文化版图可能都会不一样。</p>
+<p><strong>物理参数：</strong>1815年，印度尼西亚的坦博拉火山爆发——人类有记录以来最大规模的火山爆发之一（VEI-7级）。它喷出了遮天蔽日的巨量火山灰，随着大气环流笼罩了全球。</p>
+<p><strong>1816年"无夏之年"：</strong>第二年，整个北半球气候崩溃。欧洲和北美在6、7、8月份狂降暴雪，河流结冰，农作物大面积绝收，引发了席卷欧美的超级大饥荒。</p>
+<p><strong>逼出来的"工业与科幻"：</strong></p>
+<p>· <strong>自行车的诞生：</strong>因为粮食绝收，买不到燕麦，大批拉车的马匹被饿死或被杀掉吃肉。德国发明家为了解决"没有马怎么出行"的交通瘫痪问题，发明了人类历史上第一辆<strong>无踏板自行车（Draisine）</strong>。</p>
+<p>· <strong>《科学怪人》的诞生：</strong>因为那个夏天阴暗湿冷、终日不见阳光，几个英国文人（包括玛丽·雪莱）被困在瑞士的别墅里无法出门。为了打发那种犹如世界末日般的压抑时光，玛丽·雪莱写出了人类历史上第一部科幻小说——<strong>《弗兰肯斯坦》（Frankenstein）</strong>。这部小说恰恰是对"工业和科学理性失控"的最深刻的反思。</p>
+
+<h4>③ 1665年伦敦大瘟疫 · 科学革命的"催化剂"（腺鼠疫）</h4>
+<p><strong>灾难：</strong>这场黑死病的余波卷走了伦敦五分之一的人口，城市变成了死城。</p>
+<p><strong>神奇的蝴蝶效应：</strong>因为瘟疫，剑桥大学被迫停课。一个叫<strong>艾萨克·牛顿</strong>的20多岁穷学生被迫逃回了乡下老家隔离。在乡下躲避瘟疫的这18个月里，牛顿因为太无聊，每天在苹果树下发呆、玩三棱镜，<strong>直接把微积分、万有引力定律和光学的基础全给搞出来了</strong>。</p>
+<p>这被称为牛顿的<strong>"奇迹之年（Year of Wonders）"</strong>。可以说，是一场超级病毒把科学革命推向了最高潮。</p>
+
+<h4>④ 19世纪霍乱大流行 · 工业革命的"寄生虫"</h4>
+<p><strong>灾难：</strong>当工业革命把数以百万计的农民塞进拥挤、肮脏、没有任何排污设施的城市贫民窟时，霍乱这种通过粪口途径传播的致命肠道传染病，就成了维多利亚时代最恐怖的"死神"。它多次席卷欧洲，杀死了数百万人。</p>
+<p><strong>倒逼城市空间重构：</strong>英国医生<strong>约翰·斯诺（John Snow）</strong>通过科学的数据统计和地图绘制，首次证明了霍乱是通过水源（被粪便污染的压水井）而不是空气传播的。这直接促使伦敦耗资巨大，修建了现代地下下水道系统。</p>
+<p><strong>总结：</strong>里斯本大地震砸碎了上帝的权威，给启蒙运动递了刀子；坦博拉火山冰封了北半球，催生了早期的代步机械和科幻文学；大瘟疫把牛顿逼回了乡下写出了宇宙公式，而霍乱则逼迫工业社会在地下凿出了庞大的排污管网。<strong>每一次天灾降临，都像是在考验人类刚刚建立起来的"理性与科学系统"，并在灾后逼迫人类点出新的科技树分支。</strong></p>
+</div></details>
+
+<details class="fade-in"><summary>薯条的真实起源：比利时的"被盗IP"</summary><div class="detail-body">
+<h4>冰封河流逼出来的"假鱼"</h4>
+<p>薯条诞生于<strong>17世纪末（1680年代左右）</strong>——科学革命时期，比工业革命早得多。比利时南部马斯河（Meuse River）谷地的底层穷人，日常最喜欢把河里的小鱼捞上来油炸着吃。结果1680年代某个严冬，气候极其寒冷（刚好处于地球的"小冰河期"），马斯河彻底结冰了！穷人砸不开冰面、抓不到鱼，于是突发奇想，把当时刚传入欧洲的<strong>马铃薯切成小鱼形状扔进油锅里炸</strong>——人类历史上第一批"薯条"在冰天雪地中诞生了。</p>
+<h4>为什么被叫成 "French Fries"？</h4>
+<p>一战时美国大兵被派到了欧洲战场，很多驻扎在比利时。他们在那里吃到了这种惊为天人的炸土豆条，但因为当时比利时军队里的官方语言和上层交流语言是<strong>法语</strong>，这帮搞不清地理的美国大兵，就理所当然地以为自己吃的是"法国人的做法"，叫成了"French Fries"。战后随着美国快餐业向全球扩张，这个名字就被彻底定型了。</p>
+<h4>比利时人的硬核执念</h4>
+<p>如果你去比利时，千万不要当着当地人的面叫它"French Fries"，他们会非常严肃地纠正你：那是<strong>"Belgian Frites"</strong>！真正传统的比利时薯条必须切得足够粗（1厘米以上），必须用纯正的<strong>牛油（Beef tallow）</strong>而不是植物油，必须在不同温度下<strong>炸两次</strong>，配上极其浓郁的比利时蛋黄酱或炖牛肉汁。</p>
+</div></details>
+
+<div class="divider">· · ·</div>
+</section>
+
+<!-- ===== RESOURCES ===== -->
+<section id="resources">
+<div class="sh fade-in"><span class="era">RESOURCES</span><h2>学习资源</h2></div>
+
+<div class="res-block fade-in"><h3>📎 关联笔记</h3>
+<a class="res-link" href="中世纪到文艺复兴编年史笔记.html"><span class="rt">笔记</span>中世纪到文艺复兴 · 编年史笔记<span class="rd">从罗马废墟到文艺复兴觉醒——中世纪一千年的空间秩序</span></a>
+<a class="res-link" href="基督教三大流派编年史笔记.html"><span class="rt">笔记</span>基督教三大流派 · 编年史笔记<span class="rd">从黎凡特墓穴到宗教改革——两千年信仰演变与建筑空间</span></a>
+</div>
+
+<div class="res-block fade-in"><h3>📚 Wikipedia 参考</h3>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Scientific_revolution"><span class="rt">Wiki</span>Scientific Revolution<span class="rd">科学革命 · 16-17世纪自然哲学的范式转换</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Age_of_Enlightenment"><span class="rt">Wiki</span>Age of Enlightenment<span class="rd">启蒙运动 · 18世纪的理性与自由思潮</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/French_Revolution"><span class="rt">Wiki</span>French Revolution<span class="rd">法国大革命 · 1789年旧制度的终结</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Industrial_Revolution"><span class="rt">Wiki</span>Industrial Revolution<span class="rd">工业革命 · 从手工到机械的生产力变革</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Palmanova"><span class="rt">Wiki</span>Palmanova<span class="rd">帕尔马诺瓦 · 文艺复兴星形理想城市</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Sawtooth_roof"><span class="rt">Wiki</span>Sawtooth Roof<span class="rd">锯齿形屋顶 · 工业建筑的光学与通风设计</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Panopticon"><span class="rt">Wiki</span>Panopticon<span class="rd">全景敞视监狱 · 边沁的理性监控空间设计</span></a>
+<a class="res-link" href="https://en.wikipedia.org/wiki/Great_Stink"><span class="rt">Wiki</span>Great Stink<span class="rd">大恶臭事件 · 1858年伦敦卫生危机</span></a>
+</div>
+</section>
+
+<footer>
+<p>文艺复兴与工业革命 · 编年史笔记 ⚗ 🔭 🏭</p>
+<p>Shikamaru 的历史与空间学习记录 · 2026</p>
+<p>包含 Gemini 对话记录 + Claude 整理笔记 + 个人思考</p>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

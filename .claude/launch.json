@@ -4,7 +4,7 @@
     {
       "name": "notes-preview",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{const fs=require('fs'),p=require('path'),f=p.join('.',q.url==='/'?'/中世纪到文艺复兴编年史笔记.html':q.url),m={'.html':'text/html;charset=utf-8','.css':'text/css','.js':'application/javascript'};fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end('Not found')}else{r.writeHead(200,{'Content-Type':m[p.extname(f)]||'application/octet-stream'});r.end(d)}})}).listen(3000)"],
+      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{const fs=require('fs'),p=require('path'),u=decodeURIComponent(q.url),f=p.join('.',u==='/'?'/中世纪到文艺复兴编年史笔记.html':u),m={'.html':'text/html;charset=utf-8','.css':'text/css','.js':'application/javascript'};fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);r.end('Not found')}else{r.writeHead(200,{'Content-Type':m[p.extname(f)]||'application/octet-stream'});r.end(d)}})}).listen(3000)"],
       "port": 3000
     }
   ]
