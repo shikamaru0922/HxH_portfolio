@@ -429,6 +429,7 @@ footer{background:var(--ink);color:rgba(232,213,163,.4);text-align:center;paddin
 const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
 </script>
+<script src="nav-boost.js" defer></script>
 </body>
 </html>
 
