@@ -703,6 +703,67 @@ body.lightbox-open {
   font-weight: 700;
 }
 
+.digital-ticket-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(280px, 420px);
+  gap: clamp(24px, 5vw, 54px);
+  align-items: center;
+  margin-top: 38px;
+}
+
+.digital-ticket-card {
+  position: relative;
+  width: min(420px, 100%);
+  justify-self: center;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background:
+    linear-gradient(135deg, rgba(200,16,46,0.14), transparent 32%),
+    #090909;
+  color: inherit;
+  font: inherit;
+  cursor: zoom-in;
+  appearance: none;
+  box-shadow: 0 24px 72px rgba(0,0,0,0.46);
+}
+
+.digital-ticket-card::before,
+.digital-ticket-card::after {
+  content: "";
+  position: absolute;
+  width: 74px;
+  height: 34px;
+  pointer-events: none;
+}
+
+.digital-ticket-card::before {
+  top: 22px;
+  left: 22px;
+  border-top: 1px solid var(--neu-red-soft);
+  border-left: 1px solid var(--neu-red-soft);
+}
+
+.digital-ticket-card::after {
+  right: 22px;
+  bottom: 22px;
+  border-right: 1px solid var(--neu-red-soft);
+  border-bottom: 1px solid var(--neu-red-soft);
+}
+
+.digital-ticket-card img {
+  width: 100%;
+  display: block;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.ticket-note {
+  margin-top: 20px;
+  color: rgba(255,255,255,0.58);
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
 footer {
   padding: 46px 24px 54px;
   text-align: center;
@@ -765,6 +826,10 @@ footer {
 
   .message-band p {
     font-size: 1.25rem;
+  }
+
+  .digital-ticket-layout {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -862,6 +927,10 @@ footer {
 
   .message-band p {
     font-size: 1.1rem;
+  }
+
+  .digital-ticket-card {
+    padding: 9px;
   }
 }
 
@@ -1055,6 +1124,27 @@ footer {
         </p>
       </div>
     </section>
+
+    <section class="section" id="digital-ticket">
+      <p class="section-kicker reveal">Digital Ticket</p>
+      <h2 class="section-title reveal">A Ticket From The Day</h2>
+      <div class="digital-ticket-layout">
+        <div>
+          <p class="section-copy reveal">
+            这是毕业典礼当天的数字版门票。它和实体纪念门票形成呼应：一个是当天入场的凭证，一个是之后可以扫码打开回忆的纪念入口。
+          </p>
+          <p class="ticket-note reveal">
+            点击门票图片可以放大查看；再次点击图片或背景即可收起。
+          </p>
+        </div>
+        <button class="digital-ticket-card reveal" type="button"
+          data-full="assets/graduation/digital-ticket.png"
+          data-title="Digital Ticket"
+          data-caption="毕业典礼当天保留下来的数字版门票截图。">
+          <img src="assets/graduation/digital-ticket.png" alt="Digital ticket screenshot for the commencement ceremony" loading="lazy">
+        </button>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -1218,7 +1308,7 @@ const closeLightbox = () => {
   }, 320);
 };
 
-document.querySelectorAll('.photo-card').forEach((card) => {
+document.querySelectorAll('.photo-card, .digital-ticket-card').forEach((card) => {
   card.addEventListener('click', () => openLightbox(card));
 });
 
