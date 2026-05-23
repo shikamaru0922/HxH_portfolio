@@ -532,6 +532,42 @@ section {
   background: linear-gradient(135deg, #1a1520, #201828, #282030);
 }
 
+.pv-dislocation {
+  background:
+    linear-gradient(135deg, rgba(10,10,20,0.9), rgba(33,18,34,0.82)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(0deg, rgba(0,212,170,0.08) 0 1px, transparent 1px 34px);
+}
+
+.pv-dislocation .project-visual-inner {
+  position: relative;
+  opacity: 1;
+  color: rgba(255,255,255,0.78);
+  font-family: var(--font-cn);
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-shadow:
+    10px 0 0 rgba(255, 79, 139, 0.2),
+    -10px 0 0 rgba(0, 212, 170, 0.18);
+}
+
+.pv-dislocation .project-visual-inner::before,
+.pv-dislocation .project-visual-inner::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 220px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  transform: translate(-50%, -50%) rotate(-18deg);
+}
+
+.pv-dislocation .project-visual-inner::after {
+  transform: translate(-50%, -50%) rotate(18deg);
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+
 .project-award {
   position: absolute;
   top: 16px;
@@ -820,7 +856,7 @@ section {
 /* ===== Cases Grid ===== */
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
@@ -868,10 +904,49 @@ section {
 }
 
 /* ===== Analysis ===== */
+.analysis-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.analysis-category {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.015);
+  overflow: hidden;
+}
+
+.analysis-category-head {
+  padding: 24px 28px 8px;
+}
+
+.analysis-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent2);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.analysis-category-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.analysis-category-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 .analysis-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  padding: 16px;
 }
 
 .analysis-item {
@@ -1041,6 +1116,7 @@ footer {
   <ul class="nav-links">
     <li><a href="#about">关于</a></li>
     <li><a href="#projects">核心项目</a></li>
+    <li><a href="#whitebox">白盒练习</a></li>
     <li><a href="#analysis">设计思考</a></li>
     <li><a href="#ai">AI工作流</a></li>
     <li><a href="#cases">更多案例</a></li>
@@ -1106,7 +1182,7 @@ footer {
     <div>
       <div class="about-stats">
         <div class="stat-card">
-          <div class="stat-number">3+</div>
+          <div class="stat-number">4+</div>
           <div class="stat-label">完整项目</div>
         </div>
         <div class="stat-card">
@@ -1170,41 +1246,28 @@ footer {
     </div>
   </div>
 
-  <!-- 关卡白盒补充作品 -->
-  <div class="project-card project-card-whitebox">
-    <div class="project-content project-content-whitebox">
-      <div class="project-type">
-        关卡策划 · 3D关卡白盒
-        <span class="project-type-note">在空间中讲好一个故事 · 玩法验证 × 空间叙事 × 设计文档</span>
+  <!-- 错位 -->
+  <div class="project-card">
+    <div class="project-visual pv-dislocation">
+      <div class="project-award">TapTap 聚光灯 GameJam</div>
+      <div class="project-visual-inner">错位</div>
+    </div>
+    <div class="project-content">
+      <div class="project-type">系统策划 · 关卡策划 · 叙事策划</div>
+      <h3 class="project-name">《错位》</h3>
+      <div class="project-subtitle">第一人称文字解谜游戏 · GameJam · 2025</div>
+      <div class="project-experience">核心体验：在无法逃离的房间中，通过调查、行动点规划与道具文本推断，在认知障碍、记忆缺失和感官失调造成的“错位”体验里还原真相。</div>
+      <p class="project-desc">
+        TapTap 聚光灯 GameJam 21 天限时创作项目。作为策划参与核心体验拆解、道具解谜流程、行动点限制与阶段节奏设计，
+        将“你确定这是BUG？”的主题转化为文字线索、房间探索和玩家认知偏差之间的推理体验。
+      </p>
+      <div class="project-tags">
+        <span class="tag">文字解谜</span>
+        <span class="tag">行动点规划</span>
+        <span class="tag">道具推理</span>
+        <span class="tag">GameJam</span>
       </div>
-      <h3 class="project-name">关卡白盒补充作品（核心项目）</h3>
-      <div class="project-subtitle">左右对照展示：同一方法论下的两种解谜体验</div>
-
-      <div class="project-whitebox-grid">
-        <article class="project-whitebox-col">
-          <h4>博物馆+放大缩小 关卡白模</h4>
-          <p class="project-whitebox-focus">核心体验：在博物馆空间中完成放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
-          <p class="project-whitebox-desc">聚焦博物馆场景里的关卡解谜与Boss战设计，通过空间探索、信息引导与阶段挑战，验证关卡逻辑与体验连贯性。</p>
-          <div class="project-tags">
-            <span class="tag">关卡解谜</span>
-            <span class="tag">博物馆空间</span>
-            <span class="tag">Boss战设计</span>
-          </div>
-          <a href="https://www.bilibili.com/video/BV1RMPnzGEke/" class="project-link" target="_blank">查看项目</a>
-        </article>
-
-        <article class="project-whitebox-col">
-          <h4>天空城寨 Sky Citadel</h4>
-          <p class="project-whitebox-focus">核心体验：以飞镖投掷/召回机制构建Boss战，通过高压对抗与阶段变化形成战斗叙事。</p>
-          <p class="project-whitebox-desc">聚焦以飞镖机制为基础的Boss战设计与三线协同，通过空间编排说明“角色正在发生什么事情”，并持续验证机制与叙事是否共同成立。</p>
-          <div class="project-tags">
-            <span class="tag">飞镖机制</span>
-            <span class="tag">Boss战设计</span>
-            <span class="tag">空间叙事</span>
-          </div>
-          <a href="https://www.kdocs.cn/l/cefplLrSYiQi" class="project-link" target="_blank">查看项目</a>
-        </article>
-      </div>
+      <a href="https://www.taptap.cn/app/779606?os=pc" class="project-link" target="_blank" rel="noopener noreferrer">查看TapTap页面</a>
     </div>
   </div>
 
@@ -1261,171 +1324,227 @@ footer {
   </div>
 </section>
 
+<!-- Whitebox Practice -->
+<section id="whitebox">
+  <div class="section-label">// 白盒练习</div>
+  <div class="section-title">关卡白盒与设计验证</div>
+  <div class="section-desc">偏向观察、拆解与实践应用的关卡练习：用白盒快速验证空间叙事、机制节奏和体验目标是否成立。</div>
+
+  <div class="project-card project-card-whitebox">
+    <div class="project-content project-content-whitebox">
+      <div class="project-type">
+        关卡策划 · 3D关卡白盒
+        <span class="project-type-note">设计观察 × 空间实践 × 玩法验证</span>
+      </div>
+      <h3 class="project-name">关卡白盒补充作品</h3>
+      <div class="project-subtitle">左右对照展示：同一方法论下的两种解谜与Boss战验证</div>
+
+      <div class="project-whitebox-grid">
+        <article class="project-whitebox-col">
+          <h4>博物馆+放大缩小 关卡白模</h4>
+          <p class="project-whitebox-focus">核心体验：在博物馆空间中完成放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
+          <p class="project-whitebox-desc">聚焦博物馆场景里的关卡解谜与Boss战设计，通过空间探索、信息引导与阶段挑战，验证关卡逻辑与体验连贯性。</p>
+          <div class="project-tags">
+            <span class="tag">关卡解谜</span>
+            <span class="tag">博物馆空间</span>
+            <span class="tag">Boss战设计</span>
+          </div>
+          <a href="https://www.bilibili.com/video/BV1RMPnzGEke/" class="project-link" target="_blank" rel="noopener noreferrer">查看项目</a>
+        </article>
+
+        <article class="project-whitebox-col">
+          <h4>天空城寨 Sky Citadel</h4>
+          <p class="project-whitebox-focus">核心体验：以飞镖投掷/召回机制构建Boss战，通过高压对抗与阶段变化形成战斗叙事。</p>
+          <p class="project-whitebox-desc">聚焦以飞镖机制为基础的Boss战设计与三线协同，通过空间编排说明“角色正在发生什么事情”，并持续验证机制与叙事是否共同成立。</p>
+          <div class="project-tags">
+            <span class="tag">飞镖机制</span>
+            <span class="tag">Boss战设计</span>
+            <span class="tag">空间叙事</span>
+          </div>
+          <a href="https://www.kdocs.cn/l/cefplLrSYiQi" class="project-link" target="_blank" rel="noopener noreferrer">查看项目</a>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Design Analysis -->
 <section id="analysis">
   <div class="section-label">// 设计思考</div>
   <div class="section-title">游戏分析与研究</div>
   <div class="section-desc">持续进行中的游戏设计解构，累计30+篇深度分析。</div>
 
-  <div class="analysis-list">
-
-    <!-- 三线协同产出法 - now a dedicated page -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="analysis-01-whitebox-framework.html">
-        <div class="analysis-num">01</div>
-        <div class="analysis-info">
-          <h3>关卡白盒设计思路框架</h3>
-          <p>故事线 × 空间线 × 玩法线——从体验目标到可游玩关卡的完整方法论</p>
+  <div class="analysis-groups">
+    <div class="analysis-category">
+      <div class="analysis-category-head">
+        <div class="analysis-kicker">Design Methodology</div>
+        <div class="analysis-category-title">设计方法论与策划框架</div>
+        <p class="analysis-category-desc">偏向“我如何做设计”的系统性思考：关卡、叙事、玩法系统和策划职责的抽象方法。</p>
+      </div>
+      <div class="analysis-list">
+        <div class="analysis-item">
+          <a class="analysis-header" href="analysis-01-whitebox-framework.html">
+            <div class="analysis-num">M01</div>
+            <div class="analysis-info">
+              <h3>关卡白盒设计思路框架</h3>
+              <p>故事线 × 空间线 × 玩法线——从体验目标到可游玩关卡的完整方法论</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
         </div>
-        <div class="analysis-external">→</div>
-      </a>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="analysis-03-screenwriter-eye.html">
+            <div class="analysis-num">M02</div>
+            <div class="analysis-info">
+              <h3>编剧之眼：游戏叙事结构笔记</h3>
+              <p>从叙事价值、三幕式到角色弧光，梳理文案与剧本如何持续支撑玩家体验</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="关卡玩法设计.html">
+            <div class="analysis-num">M03</div>
+            <div class="analysis-info">
+              <h3>关卡玩法设计</h3>
+              <p>同一玩法、零新资产，通过空间与参数雕刻八种体验的完整拆解</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="analysis-04-what-is-game-design-planning.html">
+            <div class="analysis-num">M04</div>
+            <div class="analysis-info">
+              <h3>什么是策划：打造体验的方法论</h3>
+              <p>从核心职责、流程、分工到成长路径，系统梳理游戏策划如何把体验落地</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="analysis-05-driver-framework.html">
+            <div class="analysis-num">M05</div>
+            <div class="analysis-info">
+              <h3>玩法系统设计的驱动层评判与思路</h3>
+              <p>Needs 驱动 Wants，Quality 评判 Wants——从玩家深层动机反推玩法系统设计</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- 崩铁 - now a dedicated page -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="analysis-02-penacony-level-analysis.html">
-        <div class="analysis-num">02</div>
-        <div class="analysis-info">
-          <h3>崩坏：星穹铁道 · 匹诺康尼关卡设计分析</h3>
-          <p>10篇碎片化关卡观察——空间演出、解谜难度控制、探索引导与涌现叙事</p>
+    <div class="analysis-category">
+      <div class="analysis-category-head">
+        <div class="analysis-kicker">Game Case Studies</div>
+        <div class="analysis-category-title">具体作品拆解与观察</div>
+        <p class="analysis-category-desc">偏向“我如何理解别人的作品”：从已有游戏中提炼空间、系统、节奏和玩家体验的设计规律。</p>
+      </div>
+      <div class="analysis-list">
+        <div class="analysis-item">
+          <a class="analysis-header" href="analysis-02-penacony-level-analysis.html">
+            <div class="analysis-num">C01</div>
+            <div class="analysis-info">
+              <h3>崩坏：星穹铁道 · 匹诺康尼关卡设计分析</h3>
+              <p>10篇碎片化关卡观察——空间演出、解谜难度控制、探索引导与涌现叙事</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
         </div>
-        <div class="analysis-external">→</div>
-      </a>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="https://zhuanlan.zhihu.com/p/1981353607728211430" target="_blank" rel="noopener noreferrer">
+            <div class="analysis-num">C02</div>
+            <div class="analysis-info">
+              <h3>《神秘海域4》序章：精心设计的教学与情感体验</h3>
+              <p>拆解顽皮狗如何用空间叙事与节奏控制打造完美的开场体验</p>
+            </div>
+            <div class="analysis-external">↗</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="https://www.kdocs.cn/l/ceWI7t5tEDkh" target="_blank" rel="noopener noreferrer">
+            <div class="analysis-num">C03</div>
+            <div class="analysis-info">
+              <h3>部落冲突衰落痛点分析与解决方案</h3>
+              <p>从社交系统、经济循环到玩家流失的系统性分析</p>
+            </div>
+            <div class="analysis-external">↗</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="https://kdocs.cn/l/cgSuld67OJNV" target="_blank" rel="noopener noreferrer">
+            <div class="analysis-num">C04</div>
+            <div class="analysis-info">
+              <h3>《CS1.6》经典地图 冰原（Ice World）地图解析</h3>
+              <p>经典FPS地图的空间布局与战斗动线拆解</p>
+            </div>
+            <div class="analysis-external">↗</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="https://kdocs.cn/l/cqon1Gy8m5P9" target="_blank" rel="noopener noreferrer">
+            <div class="analysis-num">C05</div>
+            <div class="analysis-info">
+              <h3>怪物猎人世界 怪物AI解析与拆解方案</h3>
+              <p>怪物行为树、攻击模式与战斗节奏的设计拆解</p>
+            </div>
+            <div class="analysis-external">↗</div>
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- 编剧之眼 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="analysis-03-screenwriter-eye.html">
-        <div class="analysis-num">03</div>
-        <div class="analysis-info">
-          <h3>编剧之眼：游戏叙事结构笔记</h3>
-          <p>从叙事价值、三幕式到角色弧光，梳理文案与剧本如何持续支撑玩家体验</p>
+    <div class="analysis-category">
+      <div class="analysis-category-head">
+        <div class="analysis-kicker">Culture & History Notes</div>
+        <div class="analysis-category-title">历史文化与空间参考笔记</div>
+        <p class="analysis-category-desc">偏向“我如何积累题材与空间语汇”：把历史、宗教、建筑与时代变化转化为可供设计调用的素材库。</p>
+      </div>
+      <div class="analysis-list">
+        <div class="analysis-item">
+          <a class="analysis-header" href="基督教三大流派编年史笔记.html">
+            <div class="analysis-num">N01</div>
+            <div class="analysis-info">
+              <h3>基督教三大流派编年史笔记</h3>
+              <p>从地理起源到宗教改革的历史脉络，附建筑空间与流派差异整理</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
         </div>
-        <div class="analysis-external">→</div>
-      </a>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="中世纪到文艺复兴编年史笔记.html">
+            <div class="analysis-num">N02</div>
+            <div class="analysis-info">
+              <h3>中世纪到文艺复兴编年史笔记</h3>
+              <p>从罗马废墟到文艺复兴黄金时代——封建秩序、语言演变、空间语言与人文觉醒的千年史诗</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+
+        <div class="analysis-item">
+          <a class="analysis-header" href="文艺复兴与工业革命编年史笔记.html">
+            <div class="analysis-num">N03</div>
+            <div class="analysis-info">
+              <h3>文艺复兴与工业革命编年史笔记</h3>
+              <p>从科学革命到工业革命——启蒙思想、法国大革命、蒸汽机与建筑演变的三百年巨变</p>
+            </div>
+            <div class="analysis-external">→</div>
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- 关卡玩法设计 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="关卡玩法设计.html">
-        <div class="analysis-num">04</div>
-        <div class="analysis-info">
-          <h3>关卡玩法设计</h3>
-          <p>同一玩法、零新资产，通过空间与参数雕刻八种体验的完整拆解</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- 什么是策划 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="analysis-04-what-is-game-design-planning.html">
-        <div class="analysis-num">05</div>
-        <div class="analysis-info">
-          <h3>什么是策划：打造体验的方法论</h3>
-          <p>从核心职责、流程、分工到成长路径，系统梳理游戏策划如何把体验落地</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- 玩法系统驱动层框架 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="analysis-05-driver-framework.html">
-        <div class="analysis-num">06</div>
-        <div class="analysis-info">
-          <h3>玩法系统设计的驱动层评判与思路</h3>
-          <p>Needs 驱动 Wants，Quality 评判 Wants——从玩家深层动机反推玩法系统设计</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- 神秘海域4 - external link -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="https://zhuanlan.zhihu.com/p/1981353607728211430" target="_blank">
-        <div class="analysis-num">07</div>
-        <div class="analysis-info">
-          <h3>《神秘海域4》序章：精心设计的教学与情感体验</h3>
-          <p>拆解顽皮狗如何用空间叙事与节奏控制打造完美的开场体验</p>
-        </div>
-        <div class="analysis-external">↗</div>
-      </a>
-    </div>
-
-    <!-- 部落冲突 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="https://www.kdocs.cn/l/ceWI7t5tEDkh" target="_blank">
-        <div class="analysis-num">08</div>
-        <div class="analysis-info">
-          <h3>部落冲突衰落痛点分析与解决方案</h3>
-          <p>从社交系统、经济循环到玩家流失的系统性分析</p>
-        </div>
-        <div class="analysis-external">↗</div>
-      </a>
-    </div>
-
-    <!-- CS1.6 冰原 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="https://kdocs.cn/l/cgSuld67OJNV" target="_blank">
-        <div class="analysis-num">09</div>
-        <div class="analysis-info">
-          <h3>《CS1.6》经典地图 冰原（Ice World）地图解析</h3>
-          <p>经典FPS地图的空间布局与战斗动线拆解</p>
-        </div>
-        <div class="analysis-external">↗</div>
-      </a>
-    </div>
-
-    <!-- 怪物猎人 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="https://kdocs.cn/l/cqon1Gy8m5P9" target="_blank">
-        <div class="analysis-num">10</div>
-        <div class="analysis-info">
-          <h3>怪物猎人世界 怪物AI解析与拆解方案</h3>
-          <p>怪物行为树、攻击模式与战斗节奏的设计拆解</p>
-        </div>
-        <div class="analysis-external">↗</div>
-      </a>
-    </div>
-
-    <!-- 基督教三大流派编年史 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="基督教三大流派编年史笔记.html">
-        <div class="analysis-num">11</div>
-        <div class="analysis-info">
-          <h3>基督教三大流派编年史笔记</h3>
-          <p>从地理起源到宗教改革的历史脉络，附建筑空间与流派差异整理</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- 中世纪到文艺复兴编年史 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="中世纪到文艺复兴编年史笔记.html">
-        <div class="analysis-num">12</div>
-        <div class="analysis-info">
-          <h3>中世纪到文艺复兴编年史笔记</h3>
-          <p>从罗马废墟到文艺复兴黄金时代——封建秩序、语言演变、空间语言与人文觉醒的千年史诗</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- 文艺复兴与工业革命编年史 -->
-    <div class="analysis-item">
-      <a class="analysis-header" href="文艺复兴与工业革命编年史笔记.html">
-        <div class="analysis-num">13</div>
-        <div class="analysis-info">
-          <h3>文艺复兴与工业革命编年史笔记</h3>
-          <p>从科学革命到工业革命——启蒙思想、法国大革命、蒸汽机与建筑演变的三百年巨变</p>
-        </div>
-        <div class="analysis-external">→</div>
-      </a>
-    </div>
-
-    <!-- More coming -->
     <div class="analysis-item">
       <div class="analysis-header" style="cursor:default; opacity:0.6">
         <div class="analysis-num">···</div>
@@ -1435,7 +1554,6 @@ footer {
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -1499,29 +1617,11 @@ footer {
 <!-- Additional Cases -->
 <section id="cases">
   <div class="section-label">// 更多案例</div>
-  <div class="section-title">补充作品</div>
-  <div class="section-desc">持续的设计实践与系统性思考。</div>
+  <div class="section-title">早期作品与归档</div>
+  <div class="section-desc">早期项目合集与更完整的作品记录，作为当前核心项目之外的补充材料。</div>
 
   <div class="cases-grid">
-    <a class="case-card" href="https://www.bilibili.com/video/BV1RMPnzGEke/" target="_blank">
-      <div class="case-emoji">🏛️</div>
-      <h3>博物馆+放大缩小 关卡白模</h3>
-      <p>博物馆空间解谜 · 放大缩小机制 · Boss战收束</p>
-      <div class="case-type">关卡设计</div>
-    </a>
-    <a class="case-card" href="https://www.kdocs.cn/l/cefplLrSYiQi" target="_blank">
-      <div class="case-emoji">🎯</div>
-      <h3>天空城寨 Sky Citadel</h3>
-      <p>飞镖机制Boss战 · 投掷与召回 · 空间叙事验证</p>
-      <div class="case-type">关卡设计 · 进行中</div>
-    </a>
-    <a class="case-card" href="https://www.taptap.cn/app/779606?os=pc" target="_blank">
-      <div class="case-emoji">🧩</div>
-      <h3>《错位》</h3>
-      <p>TapTap聚光灯GameJam · 剧情解密</p>
-      <div class="case-type">GameJam</div>
-    </a>
-    <a class="case-card" href="https://www.kdocs.cn/l/cgz7rU9AJdNC" target="_blank">
+    <a class="case-card" href="https://www.kdocs.cn/l/cgz7rU9AJdNC" target="_blank" rel="noopener noreferrer">
       <div class="case-emoji">📁</div>
       <h3>早期作品集</h3>
       <p>早期游戏设计与开发作品合集</p>
