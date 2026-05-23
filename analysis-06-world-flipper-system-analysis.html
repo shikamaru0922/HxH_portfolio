@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《世界弹射物语》系统拆解 V2 · 驱动层框架分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d12;
+  --bg-card: #15151c;
+  --bg-card-2: #1a1a23;
+  --border: #2a2a36;
+  --border-strong: #3a3a48;
+  --text: #e8e6dd;
+  --text-dim: #9a988e;
+  --text-faint: #5a584f;
+  --accent: #d4a373;
+  --accent-hot: #f5a623;
+
+  /* Needs 五色 */
+  --n-lust: #e85a8a;
+  --n-violence: #d9534f;
+  --n-conquest: #f5b85a;
+  --n-curiosity: #5ab8d9;
+  --n-gamble: #b884d9;
+
+  /* Quality 冷色 */
+  --q-autonomy: #6a92c4;
+  --q-competence: #82c490;
+  --q-relatedness: #c490a4;
+  --q-meaning: #8e9ec4;
+
+  /* 三线色 - 核心体验基础 */
+  --line-gameplay: #ff5c5c;
+  --line-gameplay-bg: rgba(255, 92, 92, 0.08);
+  --line-art: #c084fc;
+  --line-art-bg: rgba(192, 132, 252, 0.08);
+  --line-story: #6db4ce;
+  --line-story-bg: rgba(109, 180, 206, 0.08);
+
+  /* 评分点色 */
+  --dot-0: #2a2a36;
+  --dot-1: #3a3a48;
+  --dot-2: #6b5440;
+  --dot-3: #a07a52;
+  --dot-4: #c89968;
+  --dot-5: #f5b85a;
+
+  --bad: #e85555;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212, 163, 115, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 0% 50%, rgba(232, 90, 138, 0.04), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 80%, rgba(106, 146, 196, 0.04), transparent);
+  min-height: 100vh;
+}
+
+.portfolio-back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--border-strong);
+  background: rgba(13, 13, 18, 0.84);
+  color: var(--text-dim);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.portfolio-back:hover {
+  border-color: var(--accent);
+  background: rgba(13, 13, 18, 0.96);
+  color: var(--accent);
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 80px 48px 120px;
+}
+
+/* === HERO === */
+.hero {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 56px;
+  margin-bottom: 64px;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 60px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.eyebrow {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--accent), transparent);
+  max-width: 120px;
+}
+
+.hero h1 {
+  font-family: "Noto Serif SC", serif;
+  font-size: 50px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.hero h1 .en {
+  display: block;
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 24px;
+  color: var(--text-dim);
+  margin-top: 14px;
+  letter-spacing: 0;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  margin-top: 28px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex-wrap: wrap;
+}
+
+.hero-meta span strong {
+  color: var(--text-dim);
+  margin-right: 8px;
+}
+
+/* === FRAMEWORK QUICK REFERENCE === */
+.framework-ref {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 28px 36px;
+  margin-bottom: 56px;
+}
+
+.framework-ref .label {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.framework-ref .body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.framework-ref .body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* === CORE EXPERIENCE === */
+.core-experience {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 32px 40px;
+  margin-bottom: 64px;
+}
+
+.core-experience .label {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.core-experience .definition {
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.core-experience .definition strong {
+  color: var(--accent);
+}
+
+/* === SECTION HEADERS === */
+.section-header {
+  margin: 88px 0 36px;
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+}
+
+.section-header .num {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 44px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.section-header h2 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-header .en {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-faint);
+  margin-left: auto;
+}
+
+/* === SYSTEM CARD === */
+.system-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.system-header {
+  padding: 26px 36px;
+  background: var(--bg-card-2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.system-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.system-header h3 .idx {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+  margin-right: 14px;
+  font-size: 20px;
+}
+
+.system-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border-strong);
+}
+
+/* 系统主要 Wants 行为 - 顶部说明 */
+.system-wants {
+  padding: 22px 36px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(212, 163, 115, 0.03);
+}
+
+.system-wants .wants-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.system-wants .wants-body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+/* 三线服务 - 核心体验基础 */
+.three-lines {
+  padding: 28px 36px;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  gap: 14px;
+}
+
+.three-lines-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.three-lines-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.three-lines-label strong {
+  color: var(--accent);
+}
+
+.line-item {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.line-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  text-align: center;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.line-label.gameplay {
+  color: var(--line-gameplay);
+  background: var(--line-gameplay-bg);
+  border-left: 2px solid var(--line-gameplay);
+}
+
+.line-label.art {
+  color: var(--line-art);
+  background: var(--line-art-bg);
+  border-left: 2px solid var(--line-art);
+}
+
+.line-label.story {
+  color: var(--line-story);
+  background: var(--line-story-bg);
+  border-left: 2px solid var(--line-story);
+}
+
+.line-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+/* 子区块 */
+.subblock {
+  padding: 28px 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.subblock:last-child { border-bottom: none; }
+
+.subblock-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.subblock-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.subblock-title strong {
+  color: var(--accent);
+}
+
+/* === 评分行 === */
+.score-row {
+  display: grid;
+  grid-template-columns: 110px 130px 1fr;
+  gap: 20px;
+  padding: 13px 0;
+  border-bottom: 1px dashed var(--border);
+  align-items: center;
+}
+
+.score-row:last-child { border-bottom: none; }
+
+.score-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Needs 名字配色 */
+.score-row.need-lust .score-name { color: var(--n-lust); }
+.score-row.need-violence .score-name { color: var(--n-violence); }
+.score-row.need-conquest .score-name { color: var(--n-conquest); }
+.score-row.need-curiosity .score-name { color: var(--n-curiosity); }
+.score-row.need-gamble .score-name { color: var(--n-gamble); }
+
+/* Quality 名字配色 */
+.score-row.q-autonomy .score-name { color: var(--q-autonomy); }
+.score-row.q-competence .score-name { color: var(--q-competence); }
+.score-row.q-relatedness .score-name { color: var(--q-relatedness); }
+.score-row.q-meaning .score-name { color: var(--q-meaning); }
+
+.score-dots {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot-1);
+}
+
+.score-0 .dot.on { background: var(--dot-0); }
+.score-1 .dot.on { background: var(--dot-1); }
+.score-2 .dot.on { background: var(--dot-2); }
+.score-3 .dot.on { background: var(--dot-3); }
+.score-4 .dot.on { background: var(--dot-4); }
+.score-5 .dot.on { background: var(--dot-5); box-shadow: 0 0 8px rgba(245, 184, 90, 0.4); }
+
+.score-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.score-num strong {
+  color: var(--text);
+  margin-right: 4px;
+}
+
+.score-reason {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+/* 系统判定结论 */
+.system-verdict {
+  padding: 22px 36px;
+  background: rgba(232, 85, 85, 0.04);
+  border-left: 3px solid var(--bad);
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-dim);
+}
+
+.system-verdict.good {
+  background: rgba(130, 196, 144, 0.04);
+  border-left-color: var(--q-competence);
+}
+
+.system-verdict .v-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bad);
+  margin-bottom: 8px;
+}
+
+.system-verdict.good .v-label {
+  color: var(--q-competence);
+}
+
+.system-verdict strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* === SUMMARY MATRIX === */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.summary-table th:last-child,
+.summary-table td:last-child { border-right: none; }
+.summary-table tr:last-child td { border-bottom: none; }
+
+.summary-table th {
+  background: var(--bg-card-2);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.summary-table th:first-child,
+.summary-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.summary-table td.cell {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.summary-table tr.total td {
+  background: var(--bg-card-2);
+  color: var(--accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  border-top: 2px solid var(--accent);
+}
+
+.cell-0 { color: var(--dot-0); }
+.cell-1 { color: var(--dot-1); }
+.cell-2 { color: var(--dot-2); }
+.cell-3 { color: var(--dot-3); }
+.cell-4 { color: var(--dot-4); }
+.cell-5 { color: var(--dot-5); text-shadow: 0 0 10px rgba(245, 184, 90, 0.25); }
+
+.summary-section-label {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 32px 0 14px;
+}
+
+/* === INSIGHTS === */
+.insight {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 28px 36px;
+  margin-bottom: 20px;
+}
+
+.insight-num {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.insight-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  letter-spacing: -0.005em;
+}
+
+.insight-body {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-dim);
+}
+
+.insight-body strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.insight-body em {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* === FOOTER === */
+.footer {
+  margin-top: 96px;
+  padding-top: 36px;
+  border-top: 1px solid var(--border);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer .sig {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* === CORE LOOP DIAGRAM === */
+.loop-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  margin-bottom: 64px;
+  overflow: hidden;
+}
+
+.loop-header {
+  padding: 26px 36px;
+  background: var(--bg-card-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.loop-header .loop-tag {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.loop-header .loop-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.loop-header .loop-sub {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.loop-svg-wrap {
+  padding: 36px 24px;
+  background: #f8f3e8;
+  overflow-x: auto;
+}
+
+.loop-svg-wrap svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.loop-legend {
+  padding: 24px 36px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card-2);
+}
+
+.loop-legend-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+
+.loop-legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 28px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.legend-line {
+  width: 28px;
+  height: 0;
+  flex-shrink: 0;
+}
+
+.legend-line.solid { border-top: 2px solid #2a2a2a; }
+.legend-line.dashed { border-top: 2px dashed #2a2a2a; }
+.legend-line.thick { border-top: 3px solid #d4a373; }
+
+.legend-box {
+  width: 18px; height: 14px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.2);
+}
+.legend-box.combat { background: #f5b8b8; }
+.legend-box.character { background: #fae8a8; }
+.legend-box.gacha { background: #cfb8e0; }
+.legend-box.shop { background: #d4d4d4; }
+.legend-box.charge { background: #f5b85a; }
+
+.loop-flow-text {
+  padding: 32px 36px;
+  border-top: 1px solid var(--border);
+}
+
+.loop-flow-text h4 {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.flow-list {
+  list-style: none;
+  counter-reset: flow;
+}
+
+.flow-list li {
+  counter-increment: flow;
+  position: relative;
+  padding: 12px 0 12px 44px;
+  border-bottom: 1px dashed var(--border);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+.flow-list li:last-child { border-bottom: none; }
+
+.flow-list li::before {
+  content: counter(flow, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 14px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.flow-list li strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.flow-list li em {
+  font-style: normal;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  padding: 1px 6px;
+  background: rgba(212, 163, 115, 0.12);
+  color: var(--accent);
+  margin: 0 2px;
+  border-radius: 2px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .portfolio-back {
+    position: static;
+    margin: 18px 18px 0;
+  }
+
+  .container { padding: 48px 22px 80px; }
+  .hero h1 { font-size: 34px; }
+  .hero h1 .en { font-size: 18px; }
+  .section-header { gap: 14px; margin: 60px 0 28px; }
+  .section-header .num { font-size: 34px; }
+  .section-header h2 { font-size: 22px; }
+  .section-header .en { display: none; }
+  .system-header, .system-wants, .subblock, .system-verdict {
+    padding-left: 22px; padding-right: 22px;
+  }
+  .system-header h3 { font-size: 20px; }
+  .score-row { grid-template-columns: 80px 1fr; gap: 12px; }
+  .score-dots { grid-column: 2; }
+  .score-reason { grid-column: 1 / -1; padding-left: 80px; }
+  .summary-table { font-size: 11px; }
+  .summary-table th, .summary-table td { padding: 8px 5px; }
+  .insight { padding: 22px 24px; }
+  .footer { flex-direction: column; gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<a class="portfolio-back" href="index.html#analysis">&larr; 返回作品集</a>
+
+<div class="container">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">System Deconstruction · Revised V2</div>
+    <h1>
+      《世界弹射物语》系统拆解
+      <span class="en">Needs × Quality Analysis · Per Drive Layer Framework</span>
+    </h1>
+    <div class="hero-meta">
+      <span><strong>BY</strong>Shikamaru</span>
+      <span><strong>FRAMEWORK</strong>玩法系统设计的驱动层评判与思路 V7</span>
+      <span><strong>TARGET</strong>World Flipper / Cygames</span>
+    </div>
+  </header>
+
+  <!-- FRAMEWORK REFERENCE -->
+  <div class="framework-ref">
+    <div class="label">Reading Guide · 阅读指南</div>
+    <div class="body">
+      本文档用驱动层框架对弹射物语六大系统逐一评判。每个系统从五个维度展开:<br>
+      ① <strong>系统的主要 Wants 行为</strong>(玩家在这个系统里在做什么)<br>
+      ② <strong>三线服务</strong>(玩法 / 美术 / 故事——核心体验的三个柱子,这是基础信息)<br>
+      ③ <strong>勾住了哪些 Needs</strong>(性欲 / 暴力欲 / 征服欲 / 好奇欲 / 赌博欲——五大内心渴求,评分 0-5)<br>
+      ④ <strong>Quality 表现如何</strong>(自主感 / 胜任感 / 归属感 / 意义感——评判 Wants 设计好坏,评分 0-5)<br>
+      ⑤ <strong>用了哪些乐趣通道</strong>(策略 / 操作 / 运气 / 时间 / 金钱——满足 Needs 的工具)<br><br>
+      由于弹射物语是<strong>服务型游戏</strong>,采用 5 维乐趣通道(包含时间 / 金钱榨取维度)。
+    </div>
+  </div>
+
+  <!-- CORE EXPERIENCE -->
+  <div class="core-experience">
+    <div class="label">Core Experience · 核心体验</div>
+    <div class="definition">
+      在跨世界冒险的故事框架下,用<strong>像素 × 立绘的反差萌二次元画风</strong>,通过<strong>"轻操作 × 重构筑"</strong>的弹珠玩法,打出华丽连锁的爽感与收集动力。<br><br>
+      <span style="color: var(--text-dim); font-size: 14px;">设计锚点 = 弹珠构筑玩法。但从驱动层看,真正粘住玩家的是性欲 + 征服欲 + 赌博欲的合力。</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1: SYSTEMS -->
+  <div class="section-header">
+    <div class="num">01</div>
+    <h2>六大系统逐项拆解</h2>
+    <div class="en">six systems · needs × quality breakdown</div>
+  </div>
+
+  <!-- ============== 1. 战斗系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">i.</span>战斗系统</h3>
+      <div class="system-tag">Core Wants Container</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · MAIN</div>
+        <div class="line-text">弹射 + 主副合击 + CHAIN,直接产出"轻操作 × 重构筑 × 连锁爽感",是核心体验本体。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label art">美术 · STRONG</div>
+        <div class="line-text">像素小人的弹射动作与技能特效演出,是这游戏的视觉记忆点之一。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label story">故事 · WEAK</div>
+        <div class="line-text">仅通过登场动画、战中台词擦边,不承担主要叙事。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        弹板触发弹射 · 主副合击释放 · CHAIN 连携 · 击败敌人 · 通关关卡 · 共斗中协同击杀 BOSS
+      </div>
+    </div>
+
+    <!-- Needs -->
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-conquest score-3">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">构筑研究 + 通关挑战 + CHAIN 触发,核心驱动。但操作天花板被弹珠物理锁死,征服感的上限受限。</div>
+      </div>
+
+      <div class="score-row need-violence score-2">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">弹射撞击 + 敌人倒下有,但弹珠玩法本身缺打击感,没有断肢、爆头、毁灭演出。</div>
+      </div>
+
+      <div class="score-row need-lust score-1">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">战斗中能看到角色技能演出,但像素小人削弱了立绘的性欲沉浸——情感投射在战斗时大部分被切断。</div>
+      </div>
+
+      <div class="score-row need-gamble score-1">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">弹射轨迹有微小物理浮动,但结果基本可预期,不主导战斗。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-1">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">战斗本身不是探索的——关卡变化少,机制单一,没有"咦,这场战斗里还能这样"的发现感。</div>
+      </div>
+    </div>
+
+    <!-- Quality -->
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-competence score-3">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">通关有反馈,构筑成功有满足感。但操作浅 + 数值墙,胜任感来自"我研究透了"而非"我练精了",上限不高。</div>
+      </div>
+
+      <div class="score-row q-autonomy score-2">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">玩家自己控弹射方向,但战斗本身被关卡 / 任务推动,被属性克制强迫切换队伍——自主感有,但被服务型机制蚕食。</div>
+      </div>
+
+      <div class="score-row q-relatedness score-2">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">共斗中的 CHAIN 协同有"机制层社交",但短暂的、一次性的,不沉淀成关系。单人战斗完全无归属感。</div>
+      </div>
+
+      <div class="score-row q-meaning score-1">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">战斗本身的史诗感薄弱——"我在为什么而战"这个问题在弹射物语里几乎没有答案,叙事被剥离在战斗之外。</div>
+      </div>
+    </div>
+
+    <!-- 乐趣通道 -->
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-4">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">战前构筑层 + 战中决策层双重叠加,策略密度高。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">反弹轨迹可预测,操作浅但有,乐趣来自预判生效。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">弹射物理浮动 + 敌人 AI 的小变化,运气感弱。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">单局即时反馈,不直接吃现实时间——时间消耗在战斗外的副本/任务系统。</div>
+      </div>
+      <div class="score-row score-1">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">战斗内无直接金钱通路。金钱在角色 / 扭蛋系统消费,反作用到战斗能力。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>战斗系统是"核心 Wants 行为的容器",但 Needs 勾得不够深、Quality 也只是中等。</strong>它的根本问题是:弹珠玩法的物理性锁死了暴力欲和操作维度的上限,而真正粘人的性欲 / 赌博欲完全不在战斗系统里被勾住——战斗成了"被动的内容消费场",不是核心驱动场。<em>"轻操作 × 重构筑"听起来美,实际是核心体验本体能勾的 Needs 太少。</em>
+    </div>
+  </div>
+
+  <!-- ============== 2. 角色系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">ii.</span>角色系统</h3>
+      <div class="system-tag">Three-Need Hub</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · STRONG</div>
+        <div class="line-text">构筑供给的弹药库:属性 / 类型 / 队长 / 技能 / 装备 / 羁绊全部是构筑维度。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label art">美术 · STRONG</div>
+        <div class="line-text">立绘 + 像素小人 + 进化解锁新立绘,是二次元情感投射的核心入口。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label story">故事 · STRONG</div>
+        <div class="line-text">每个角色有背景与专属故事副本,是"跨世界遇见伙伴"叙事的人物载体。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        给角色升级 / 突破 / 学习能力 · 收集角色 · 装备觉醒 + 装备珠挂载 · 解锁角色羁绊 · 查看立绘 · 编队
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-lust score-4">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">立绘 + 角色故事 + 进化解锁新立绘——二次元情感投射的主战场。这是玩家"想要这个角色"的根本动力。</div>
+      </div>
+
+      <div class="score-row need-conquest score-4">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">集齐角色 + 养满 + 构筑研究——征服欲的核心载体。FOMO 也在这里持续触发。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-2">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">每个新角色有故事副本 + 新机制——好奇欲被勾起,但叙事短而单薄,机制差异度也有限。</div>
+      </div>
+
+      <div class="score-row need-gamble score-2">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">角色获取上游靠扭蛋——赌博欲的余波延伸到这里(看到角色就想到"我抽到了她")。</div>
+      </div>
+
+      <div class="score-row need-violence score-0">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">角色系统是菜单系统,不勾暴力欲。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-competence score-3">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">养成深度提供"我把这角色玩透了"的胜任感。多重养成线(等级 / 突破 / 能力 / 装备 / 羁绊)累积出可观的实感。</div>
+      </div>
+
+      <div class="score-row q-autonomy score-2">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">想用谁不一定能用——被抽卡运气和养成资源双重限制,自主感被结构性削弱。</div>
+      </div>
+
+      <div class="score-row q-meaning score-2">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">角色专属故事副本承担一部分意义,但叙事单薄、和玩家关系浅——"她对我重要吗"答案不明确。</div>
+      </div>
+
+      <div class="score-row q-relatedness score-1">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">没有"陪伴感"机制——角色不会主动找你说话、不会记得你做过什么。是孤立的"我的卡片",不是"我的伙伴"。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-5">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">养谁 / 组哪队 / 装备珠挂哪——最长线的策略决策。</div>
+      </div>
+      <div class="score-row score-5">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">养成线全是时间换强度——服务型时间榨取的核心场所。</div>
+      </div>
+      <div class="score-row score-4">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">角色获取靠扭蛋,运气大量溢入角色系统。</div>
+      </div>
+      <div class="score-row score-4">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">金钱可通过扭蛋直达,但养成大头仍需时间,金钱效率有上限。</div>
+      </div>
+      <div class="score-row score-1">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">纯菜单系统,无操作考验。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict good">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>角色系统是这游戏的"三 Need 枢纽"——同时勾住性欲 4、征服欲 4、好奇欲 2、赌博欲 2 的余波。</strong>这是它能让二次元玩家入坑的根本原因。但 Quality 层(尤其是归属感 1)非常薄——<em>玩家拥有了"卡片",没有获得"伙伴"</em>。如果游戏要想得到救赎,这是必须改造的位置——比如"角色专属篇章"那样的设计,正是把这里的归属感和意义感拉起来。
+    </div>
+  </div>
+
+  <!-- ============== 3. 副本系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">iii.</span>副本系统</h3>
+      <div class="system-tag">Content Container</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label story">故事 · MAIN</div>
+        <div class="line-text">主线副本 + 角色故事副本 = 跨世界冒险叙事的主舞台。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · STRONG</div>
+        <div class="line-text">不同地形、敌人、机制为构筑提供差异化考验对象,让单一玩法有情境多样性。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label art">美术 · MID</div>
+        <div class="line-text">每个章节 / 世界的视觉风格差异,承载"跨世界"概念的视觉表达。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        打主线副本 · 刷领主战 / BOSS 共斗 · 刷崩坏域武器 · 走角色故事副本 · 参与活动副本 · 完成每日任务
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-conquest score-3">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">通关 + 刷 BOSS + 拿掉落——是征服欲的中等载体。但缺 PVP / 排行榜,征服感封顶。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-2">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">主线副本提供叙事场景,跨世界冒险有点新鲜感,但场景变化和探索深度有限。</div>
+      </div>
+
+      <div class="score-row need-violence score-2">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">击败 BOSS 有,但被弹珠玩法削弱,缺压迫感和爽快感。</div>
+      </div>
+
+      <div class="score-row need-gamble score-2">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">武器 / 装备掉落有概率,但通过重复刷可消解,赌博感不强。</div>
+      </div>
+
+      <div class="score-row need-lust score-1">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">角色故事副本能擦边,但叙事单薄,情感建立度低。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-autonomy score-1">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">任务驱动 + 体力限制 + 限时活动 + 每日 3 次 BOSS 强化点数——服务型机制集中破坏自主感。"我必须刷"压过"我想玩"。</div>
+      </div>
+
+      <div class="score-row q-competence score-3">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">通关高难副本有"我变强了"的反馈,但反馈来自数值膨胀,不是玩家技术成长。</div>
+      </div>
+
+      <div class="score-row q-relatedness score-2">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">共斗副本有协同,其他副本基本是独自重复。</div>
+      </div>
+
+      <div class="score-row q-meaning score-2">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">主线叙事单薄,玩家通关一章后很少有"我做了重要的事"的感觉。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-4">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">"刷"的主场,任务系统加固时间投入,体力恢复强制分散。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">"先打哪个、用哪队"的资源分配策略,密度中等。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">不同副本对操作要求略有差,但本质沿用战斗操作。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">体力可购买加速,礼包包含副本相关道具。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">掉落随机,但通过重复消解,运气感受较弱。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>副本系统是"内容容器",但它最大的问题不是 Needs 勾得弱——是它在 Quality 自主感上极度破坏(1/5)。</strong>每日任务 + 体力 + 限时活动三重夹击,把"我想玩"变成"我必须刷"。<em>它装载了战斗系统的乐趣,但用任务清单的方式把它装载得很压迫</em>——这是手游玩家普遍"一边玩一边骂"的具体来源之一。
+    </div>
+  </div>
+
+  <!-- ============== 4. 社交系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">iv.</span>社交系统</h3>
+      <div class="system-tag">Mechanic-Level Social</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · MAIN</div>
+        <div class="line-text">通过共斗与 CHAIN,把单人构筑爽感放大成多人协同爽感——机制层社交而非 UI 层。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label art">美术 · WEAK</div>
+        <div class="line-text">基本不承担美术输出。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label story">故事 · WEAK</div>
+        <div class="line-text">基本不承担叙事。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        加好友 / 关注玩家 · 募集共斗 · 接受邀请共斗 · 战斗中 CHAIN 协同 · 共斗中救棺材
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-conquest score-2">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">多人共斗协同支配 BOSS。但没有 PVP、没有排行榜,征服欲社交化的部分被砍掉了。</div>
+      </div>
+
+      <div class="score-row need-violence score-2">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">多人击杀 BOSS 有放大,但底子是弹珠玩法,放大有限。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-1">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">看别人的角色和构筑有一点新鲜感,但没有真正的社交内容(没有公会聊天、没有动态)。</div>
+      </div>
+
+      <div class="score-row need-lust score-0">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">几乎不勾——和真人玩家没有情感连接的设计。</div>
+      </div>
+
+      <div class="score-row need-gamble score-1">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">匹配到队友有微弱不确定性,但不是核心。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-relatedness score-2">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">"机制层社交"(CHAIN + 棺材互救)有,但没有公会、没有持续关系链,归属感是单次性的、不积累。这是这游戏在 Quality 上的最大硬伤之一。</div>
+      </div>
+
+      <div class="score-row q-competence score-3">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">多人共斗对释放时机要求更高,做好了有"被队友认可"的胜任感。</div>
+      </div>
+
+      <div class="score-row q-autonomy score-3">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">社交是自愿的——是否加好友、是否参与共斗都由玩家决定,这是少有的自主感得分还行的系统。</div>
+      </div>
+
+      <div class="score-row q-meaning score-1">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">社交没有累积意义——帮过谁、和谁打过 BOSS,游戏不记录。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-3">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">多人配队的技能衔接策略。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">多人对释放时机要求更高,操作压力来自队友期待。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">组队等人的隐性时间成本。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">随机匹配队友有运气成分,但不主导体验。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">金钱可让你成为更强队友,但社交本身不直接消费金钱。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>社交系统选择了"机制层社交"——把 CHAIN 和棺材救嵌入战斗,而不是做公会 / 聊天等"UI 层社交"。</strong>这是个有理由的设计选择(放大玩法乐趣),但<em>代价是归属感无法沉淀</em>。没有公会就没有"我属于一个群体"的实感,玩家之间没有持续关系——脱坑时毫无负担。这是它留存层面的硬伤。
+    </div>
+  </div>
+
+  <!-- ============== 5. 扭蛋系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">v.</span>扭蛋系统</h3>
+      <div class="system-tag">Three-Need Trigger · Autonomy Killer</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label art">美术 · MAIN</div>
+        <div class="line-text">抽卡演出 + 立绘揭晓 = 美术输出的主展示舞台。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · STRONG</div>
+        <div class="line-text">新角色 = 新构筑组件 = 新玩法可能性的供给源。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label story">故事 · MID</div>
+        <div class="line-text">抽到角色解锁角色故事副本,是故事线的入口闸门。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        十连抽 · 单抽 · 查看池子 · 等保底 · 用乐享扭蛋选 1 · 用免费井 · 看抽卡演出
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-gamble score-5">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">这游戏赌博欲的唯一主载体。"开奖前的悬停"被抽卡演出拉到最长,神经层面的间歇性强化最强。</div>
+      </div>
+
+      <div class="score-row need-conquest score-4">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">收集 / 拥有 / 限定 / FOMO——征服欲在扭蛋时被持续触发(没抽到 = 别人抽到了,我没有)。</div>
+      </div>
+
+      <div class="score-row need-lust score-4">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">抽卡时的立绘揭晓是性欲被触发的高潮——一个 Wants 行为同时勾住三个 Needs,这是扭蛋粘性极强的根本。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-2">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">"下一发会出什么"——好奇欲被微量勾起,但本质是赌博欲的伴生。</div>
+      </div>
+
+      <div class="score-row need-violence score-0">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">完全不勾。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-autonomy score-1">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">限时卡池 + FOMO 持续触发损失厌恶——"现在不抽就再难得"。乐享扭蛋和免费井是软化设计,但整体仍是高度自主感破坏。</div>
+      </div>
+
+      <div class="score-row q-meaning score-1">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">抽中后情感投入靠角色故事承担,但故事单薄,抽到的角色和玩家关系浅。</div>
+      </div>
+
+      <div class="score-row q-relatedness score-1">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">没有"和谁一起抽"的设计——抽卡是孤独的行为,虽然可以社区里晒,但游戏本身不连接玩家。</div>
+      </div>
+
+      <div class="score-row q-competence score-0">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">抽卡和能力完全无关——抽中了不是因为我厉害,没抽中也不是我菜。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-5">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">这游戏运气维度的唯一主载体。</div>
+      </div>
+      <div class="score-row score-5">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">金钱转化效率最高的出口——这是赌博欲在现实金钱型上被激活到最强的位置。</div>
+      </div>
+      <div class="score-row score-4">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">不氪玩家靠时间攒石头——长期活跃的核心动力。</div>
+      </div>
+      <div class="score-row score-3">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">抽哪个池、保底用在谁、什么时候十连——策略密度有限,主要是取舍。</div>
+      </div>
+      <div class="score-row score-1">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">点击抽卡,无操作考验。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>扭蛋系统是这游戏最强的 Needs 触发器——一个 Wants 行为同时勾住赌博 5 + 征服 4 + 性欲 4。</strong>这是它能让人氪金的根本。但<em>它在 Quality 上是灾难性的</em>——自主感 1、胜任感 0、归属感 1、意义感 1,四项接近全空。这正是抽卡手游"上瘾且痛苦"的源头。乐享扭蛋和免费井是雷霆的良心补救,但只能缓解,改不了结构。
+    </div>
+  </div>
+
+  <!-- ============== 6. 经济系统 ============== -->
+  <div class="system-card">
+    <div class="system-header">
+      <h3><span class="idx">vi.</span>经济系统</h3>
+      <div class="system-tag">Pacing Regulator · Autonomy Killer</div>
+    </div>
+
+    <!-- 三线服务 - 核心体验基础 -->
+    <div class="three-lines">
+      <div class="three-lines-label">CORE EXPERIENCE · <strong>三线服务</strong>(核心体验基础)</div>
+      <div class="line-item">
+        <div class="line-label gameplay">玩法 · MAIN</div>
+        <div class="line-text">通过资源稀缺,把"养什么、抽什么、给谁"变成长线策略决策——不产生快感,但保护快感。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label art">美术 · WEAK</div>
+        <div class="line-text">基本不承担美术表达。</div>
+      </div>
+      <div class="line-item">
+        <div class="line-label story">故事 · WEAK</div>
+        <div class="line-text">基本不参与叙事。</div>
+      </div>
+    </div>
+
+    <div class="system-wants">
+      <div class="wants-label">SYSTEM WANTS · 主要 Wants 行为</div>
+      <div class="wants-body">
+        消耗体力刷副本 · 等体力恢复 · 商店兑换 · 充月卡 · 看史黛拉甜点 · 完成累充档 · 决定石头怎么用
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">勾住了哪些 <strong>NEEDS</strong></div>
+
+      <div class="score-row need-conquest score-3">
+        <div class="score-name">征服欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">资源最优分配 / 把货币系统玩透——是征服欲在"对规则的征服"上的载体。</div>
+      </div>
+
+      <div class="score-row need-gamble score-1">
+        <div class="score-name">赌博欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">商店里偶有随机礼包,但经济本身不是赌博驱动的。</div>
+      </div>
+
+      <div class="score-row need-lust score-0">
+        <div class="score-name">性欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">不勾。</div>
+      </div>
+
+      <div class="score-row need-violence score-0">
+        <div class="score-name">暴力欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">不勾。</div>
+      </div>
+
+      <div class="score-row need-curiosity score-0">
+        <div class="score-name">好奇欲</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">不勾。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">Wants 行为的 <strong>QUALITY</strong> 表现</div>
+
+      <div class="score-row q-autonomy score-1">
+        <div class="score-name">自主感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">体力机制 + 月卡 + 累充 + 史黛拉甜点 + 限时礼包——服务型榨取设计最集中的位置。"每天必须上线领"是自主感最痛的破坏方式。</div>
+      </div>
+
+      <div class="score-row q-competence score-3">
+        <div class="score-name">胜任感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>3</strong>/5</div>
+        </div>
+        <div class="score-reason">资源管理高手的"我把这套系统玩透"有一定胜任感。</div>
+      </div>
+
+      <div class="score-row q-relatedness score-0">
+        <div class="score-name">归属感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>0</strong>/5</div>
+        </div>
+        <div class="score-reason">经济是孤立行为,完全无社交连接。</div>
+      </div>
+
+      <div class="score-row q-meaning score-1">
+        <div class="score-name">意义感</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">"我攒了多少石头"对玩家自身没有任何意义,只对游戏的留存指标有意义。</div>
+      </div>
+    </div>
+
+    <div class="subblock">
+      <div class="subblock-title">用了哪些 <strong>乐趣通道</strong></div>
+
+      <div class="score-row score-5">
+        <div class="score-name">时间</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">体力恢复 = 时间产出。每日上限 = 时间锁。一切内容消耗都由时间释放。</div>
+      </div>
+      <div class="score-row score-5">
+        <div class="score-name">金钱</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+          <div class="score-num"><strong>5</strong>/5</div>
+        </div>
+        <div class="score-reason">商店 / 礼包 / 累充 / 史黛拉甜点——金钱转化阀门聚集地。</div>
+      </div>
+      <div class="score-row score-4">
+        <div class="score-name">策略</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>4</strong>/5</div>
+        </div>
+        <div class="score-reason">体力分配、石头攒抽、装备珠归属——最长线的资源决策。</div>
+      </div>
+      <div class="score-row score-2">
+        <div class="score-name">运气</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>2</strong>/5</div>
+        </div>
+        <div class="score-reason">经济本身不是运气驱动的,产出与消耗都可预期。</div>
+      </div>
+      <div class="score-row score-1">
+        <div class="score-name">操作</div>
+        <div class="score-dots">
+          <div class="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="score-num"><strong>1</strong>/5</div>
+        </div>
+        <div class="score-reason">纯资源管理,无操作。</div>
+      </div>
+    </div>
+
+    <div class="system-verdict">
+      <div class="v-label">SYSTEM VERDICT</div>
+      <strong>经济系统是服务型时间 / 金钱榨取设计的总开关——它不勾任何深层 Needs,但它通过破坏自主感把玩家"留下来"。</strong>玩家不是因为想玩而每天登录,是因为<em>不登录就亏了</em>。这是服务型游戏最阴险也最常见的设计——用 Quality 自主感的代价换 DAU。从商业角度它有效,从玩家长期幸福角度它是慢性毒药。
+    </div>
+  </div>
+
+  <!-- ========== SECTION 2: SUMMARY MATRIX ========== -->
+  <div class="section-header">
+    <div class="num">02</div>
+    <h2>全局汇总矩阵</h2>
+    <div class="en">aggregate matrix · system × needs × quality × pleasure</div>
+  </div>
+
+  <!-- Needs 矩阵 -->
+  <div class="summary-section-label">— Needs 矩阵 · 每个系统勾住了哪些深层渴求 —</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>系统 / 维度</th>
+        <th>性欲</th>
+        <th>暴力欲</th>
+        <th>征服欲</th>
+        <th>好奇欲</th>
+        <th>赌博欲</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>战斗</td><td class="cell cell-1">1</td><td class="cell cell-2">2</td><td class="cell cell-3">3</td><td class="cell cell-1">1</td><td class="cell cell-1">1</td></tr>
+      <tr><td>角色</td><td class="cell cell-4">4</td><td class="cell cell-0">0</td><td class="cell cell-4">4</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td></tr>
+      <tr><td>副本</td><td class="cell cell-1">1</td><td class="cell cell-2">2</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td></tr>
+      <tr><td>社交</td><td class="cell cell-0">0</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td><td class="cell cell-1">1</td><td class="cell cell-1">1</td></tr>
+      <tr><td>扭蛋</td><td class="cell cell-4">4</td><td class="cell cell-0">0</td><td class="cell cell-4">4</td><td class="cell cell-2">2</td><td class="cell cell-5">5</td></tr>
+      <tr><td>经济</td><td class="cell cell-0">0</td><td class="cell cell-0">0</td><td class="cell cell-3">3</td><td class="cell cell-0">0</td><td class="cell cell-1">1</td></tr>
+      <tr class="total"><td>合计</td><td>10</td><td>6</td><td>19</td><td>8</td><td>12</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Quality 矩阵 -->
+  <div class="summary-section-label">— Quality 矩阵 · 每个系统的 Wants 设计有多好 —</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>系统 / 维度</th>
+        <th>自主感</th>
+        <th>胜任感</th>
+        <th>归属感</th>
+        <th>意义感</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>战斗</td><td class="cell cell-2">2</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-1">1</td></tr>
+      <tr><td>角色</td><td class="cell cell-2">2</td><td class="cell cell-3">3</td><td class="cell cell-1">1</td><td class="cell cell-2">2</td></tr>
+      <tr><td>副本</td><td class="cell cell-1">1</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td></tr>
+      <tr><td>社交</td><td class="cell cell-3">3</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-1">1</td></tr>
+      <tr><td>扭蛋</td><td class="cell cell-1">1</td><td class="cell cell-0">0</td><td class="cell cell-1">1</td><td class="cell cell-1">1</td></tr>
+      <tr><td>经济</td><td class="cell cell-1">1</td><td class="cell cell-3">3</td><td class="cell cell-0">0</td><td class="cell cell-1">1</td></tr>
+      <tr class="total"><td>合计</td><td>10</td><td>15</td><td>8</td><td>8</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 乐趣通道矩阵 -->
+  <div class="summary-section-label">— 乐趣通道矩阵 · 每个系统通过什么满足驱动 —</div>
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>系统 / 维度</th>
+        <th>策略</th>
+        <th>操作</th>
+        <th>运气</th>
+        <th>时间</th>
+        <th>金钱</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>战斗</td><td class="cell cell-4">4</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td><td class="cell cell-2">2</td><td class="cell cell-1">1</td></tr>
+      <tr><td>角色</td><td class="cell cell-5">5</td><td class="cell cell-1">1</td><td class="cell cell-4">4</td><td class="cell cell-5">5</td><td class="cell cell-4">4</td></tr>
+      <tr><td>副本</td><td class="cell cell-3">3</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-4">4</td><td class="cell cell-3">3</td></tr>
+      <tr><td>社交</td><td class="cell cell-3">3</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td><td class="cell cell-3">3</td><td class="cell cell-2">2</td></tr>
+      <tr><td>扭蛋</td><td class="cell cell-3">3</td><td class="cell cell-1">1</td><td class="cell cell-5">5</td><td class="cell cell-4">4</td><td class="cell cell-5">5</td></tr>
+      <tr><td>经济</td><td class="cell cell-4">4</td><td class="cell cell-1">1</td><td class="cell cell-2">2</td><td class="cell cell-5">5</td><td class="cell cell-5">5</td></tr>
+      <tr class="total"><td>合计</td><td>22</td><td>11</td><td>17</td><td>23</td><td>20</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ========== SECTION 3: INSIGHTS ========== -->
+  <div class="section-header">
+    <div class="num">03</div>
+    <h2>关键洞察</h2>
+    <div class="en">key insights from the matrix</div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 01</div>
+    <div class="insight-title">Needs 偏重严重——只勾征服 + 性欲 + 赌博,其他空白</div>
+    <div class="insight-body">
+      从合计看:征服欲 19、赌博欲 12、性欲 10 是三大支柱;暴力欲 6、好奇欲 8 几乎全空白。<strong>这是一个非常典型的"二次元抽卡游戏 Needs 画像"——三个 Needs 一起喂,其他两个不管</strong>。问题不在于偏重,而在于<em>这三个支柱的勾住深度也不够</em>——征服 19 的合计里没有任何一个系统给到 5 分,意味着没有真正"勾到底"的设计点。
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 02</div>
+    <div class="insight-title">Quality 全面塌方——自主感 10、归属感 8、意义感 8</div>
+    <div class="insight-body">
+      Quality 四维合计:自主感 10、胜任感 15、归属感 8、意义感 8。<strong>除了胜任感勉强中等,其他三项都是结构性瘦弱</strong>。<br><br>
+      · <strong>自主感 10</strong> 几乎全压在服务型榨取上(扭蛋 1、副本 1、经济 1),只有社交系统得 3<br>
+      · <strong>归属感 8</strong> 是没公会的直接后果——所有系统都拿不到 3 以上<br>
+      · <strong>意义感 8</strong> 是叙事单薄的体现——没有让玩家觉得"我在做重要的事"的设计<br><br>
+      <em>这就是"上瘾但虚无"的精确数值表现。</em>
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 03</div>
+    <div class="insight-title">扭蛋系统是 Needs/Quality 反差最大的"双面机器"</div>
+    <div class="insight-body">
+      扭蛋系统在 Needs 上拿到 <strong>赌博 5 + 性欲 4 + 征服 4 = 13 分</strong>(六系统最高),但在 Quality 上只有 <strong>1 + 0 + 1 + 1 = 3 分</strong>(六系统最低)。<br><br>
+      <strong>同一个系统,Needs 拿到 13 分、Quality 拿到 3 分——这是结构性"上瘾且痛苦"的源头。</strong>玩家既被扭蛋强烈吸引,又被扭蛋持续伤害自主感和归属感。这种内部冲突是抽卡手游脱坑潮的根本。
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 04</div>
+    <div class="insight-title">"角色系统"是这游戏唯一可能拯救它的位置</div>
+    <div class="insight-body">
+      看角色系统的 Needs 分布:性欲 4 + 征服欲 4 + 好奇欲 2——它本身就是三 Need 枢纽。<strong>它的 Quality 弱点是归属感(1)和意义感(2)。</strong><br><br>
+      <em>如果有救,救法在这里:</em>把角色系统的归属感和意义感拉起来。具体路径就是之前我们讨论的"<strong>角色专属篇章</strong>"——让玩家通过专属副本和角色一起经历故事,情感和角色绑定。这样角色不再是"卡片",而是"伙伴"——归属感和意义感同时拉起,Quality 不再全空。<br><br>
+      <strong>但弹射物语没做这个,所以它死了。</strong>它把所有精力放在 Needs 触发(扭蛋)上,完全忽视 Quality 建设。
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 05</div>
+    <div class="insight-title">服务型榨取过强——时间 23 / 金钱 20,通道吃满了 Quality</div>
+    <div class="insight-body">
+      乐趣通道合计:时间 23、金钱 20——这两个服务型专属的"被榨取"通道,在角色 / 副本 / 扭蛋 / 经济四个系统都给到 4-5 分。<br><br>
+      <strong>越多的时间 / 金钱榨取,越严重的自主感破坏。</strong>这是为什么自主感全表 10 分——榨取通道开太足,自主感被吃光。<br><br>
+      <em>这游戏没有在商业榨取和玩家自主感之间找到平衡点。</em>原神在这方面就好得多——"每日委托"4 个 5 分钟搞定,体力可以溢出再用。弹射物语反过来——体力溢出焦虑、每日任务必须完、活动副本时间紧。这种"紧"短期看保 DAU,长期看挤压玩家、加速脱坑。
+    </div>
+  </div>
+
+  <div class="insight">
+    <div class="insight-num">Insight 06</div>
+    <div class="insight-title">总结:它不是死于不好玩,而是死于 Needs 不深 + Quality 全空</div>
+    <div class="insight-body">
+      之前的版本说"它是被运营续命,不是骨架留存"——现在用驱动层框架看得更清楚:<br><br>
+      <strong>Needs 层</strong>:征服 + 性欲 + 赌博虽然勾住了,但都没有"勾到底"。同期竞品(原神 / 崩铁)在同样的 Needs 上勾得更深。<br>
+      <strong>Quality 层</strong>:除了胜任感勉强,其他三项接近空白——没有"我自愿玩"的体验、没有"我属于这里"的归属、没有"我做的事重要"的意义。<br><br>
+      <em>核心病因不是"它做错了什么",是"它该做的几件大事都没做"。</em>美术好、运营良心、玩法新颖,这些只能让它延寿,不能让它逆转。要救它,得在角色系统和叙事系统上做大幅度增量——而这不是"修一修"能解决的,需要重构。
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>WORLD FLIPPER · SYSTEM DECONSTRUCTION V2 · DRIVE LAYER ANALYSIS</div>
+    <div class="sig">— Shikamaru × Claude, 2026</div>
+  </div>
+
+</div>
+
+</body>
+</html>
