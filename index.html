@@ -671,7 +671,7 @@ section {
 
 .project-whitebox-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1323,19 +1323,38 @@ footer {
         <span class="project-type-note">设计观察 × 空间实践 × 玩法验证</span>
       </div>
       <h3 class="project-name">关卡白盒补充作品</h3>
-      <div class="project-subtitle">左右对照展示：同一方法论下的两种解谜与Boss战验证</div>
+      <div class="project-subtitle">三组关卡白盒：同一方法论（三线协同）下的解谜、机制与Boss战验证</div>
 
       <div class="project-whitebox-grid">
         <article class="project-whitebox-col">
-          <h4>博物馆+放大缩小 关卡白模</h4>
-          <p class="project-whitebox-focus">核心体验：在博物馆空间中完成放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
+          <h4>博物馆+放大缩小 关卡白盒</h4>
+          <p class="project-whitebox-focus">核心体验：在博物馆空间中完成自身放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
           <p class="project-whitebox-desc">聚焦博物馆场景里的关卡解谜与Boss战设计，通过空间探索、信息引导与阶段挑战，验证关卡逻辑与体验连贯性。</p>
           <div class="project-tags">
             <span class="tag">关卡解谜</span>
             <span class="tag">博物馆空间</span>
             <span class="tag">Boss战设计</span>
           </div>
-          <a href="https://www.bilibili.com/video/BV1RMPnzGEke/" class="project-link" target="_blank" rel="noopener noreferrer">查看项目</a>
+          <div class="project-links">
+            <a href="https://www.bilibili.com/video/BV1RMPnzGEke/" class="project-link" target="_blank" rel="noopener noreferrer">B站演示</a>
+            <a href="https://www.kdocs.cn/l/caUjO1gmKjkt" class="project-link" target="_blank" rel="noopener noreferrer">查看GDD</a>
+          </div>
+        </article>
+
+        <article class="project-whitebox-col">
+          <h4>冰 × 工厂 Ice × Factory</h4>
+          <p class="project-whitebox-focus">核心体验：在压迫的流水线工厂中用冰块解谜与战斗，以一记超巨型冰块终结Boss，解放族人。</p>
+          <p class="project-whitebox-desc">冰主题线性解谜关卡白盒（Unity）。完整呈现三线协同产出法、热能三档状态机、冰力值系统与原子化规则R1–R21，含两关教学递进与两阶段Boss战。</p>
+          <div class="project-tags">
+            <span class="tag">冰主题解谜</span>
+            <span class="tag">状态机设计</span>
+            <span class="tag">教学递进</span>
+            <span class="tag">Boss战设计</span>
+          </div>
+          <div class="project-links">
+            <a href="ice-factory-demo.html" class="project-link">查看完整展示</a>
+            <a href="https://www.bilibili.com/video/BV1L6Ej6REjf/" class="project-link" target="_blank" rel="noopener noreferrer">B站演示</a>
+          </div>
         </article>
 
         <article class="project-whitebox-col">

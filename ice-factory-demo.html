@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冰 × 工厂 Ice × Factory — 关卡白盒 Demo 设计展示 | 韩徐泓</title>
+<meta name="description" content="冰主题解谜关卡《冰 × 工厂》白盒 Demo 设计展示：三线协同产出法、热能三档状态机、冰力值系统、原子化规则 R1–R21 与完整关卡攻略。">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="analysis-theme.css">
+<style>
+  .spec-strip {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 0.6rem; margin: 1.8rem 0 0.4rem;
+  }
+  .spec-item {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    color: var(--text-secondary); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.34rem 0.85rem; background: var(--bg-card);
+  }
+  .spec-item b { color: var(--accent-gold); font-weight: 600; }
+
+  .video-embed {
+    position: relative; width: 100%; height: 0; padding-bottom: 56.25%;
+    margin: 1.8rem 0 0.6rem; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--border); background: #000;
+  }
+  .video-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .media-caption { text-align: center; font-size: 0.85rem; color: var(--text-tertiary); margin-bottom: 1rem; }
+
+  figure.shot { margin: 1.5rem 0; }
+  figure.shot img { width: 100%; display: block; border-radius: 12px; border: 1px solid var(--border); }
+  figure.shot figcaption { font-size: 0.85rem; color: var(--text-tertiary); margin-top: 0.55rem; text-align: center; }
+
+  .figure-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+  .figure-row figure.shot { margin: 0; }
+
+  .flow-chain { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 1.1rem 0 1.5rem; }
+  .flow-step {
+    border: 1px solid var(--border-light); border-radius: 8px;
+    padding: 0.4rem 0.75rem; background: var(--bg-card);
+    color: var(--text-primary); font-size: 0.9rem; line-height: 1.3;
+  }
+  .flow-step small { display: block; color: var(--text-tertiary); font-size: 0.72rem; margin-top: 2px; }
+  .flow-arrow { color: var(--accent-gold-dim); font-weight: 700; }
+
+  .dot { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 50%; margin-right: 0.45rem; vertical-align: -1px; }
+  .dot.red   { background: #e0584e; box-shadow: 0 0 6px rgba(224,88,78,0.6); }
+  .dot.green { background: #3dc98a; box-shadow: 0 0 6px rgba(61,201,138,0.5); }
+  .dot.blue  { background: #5bc5e8; box-shadow: 0 0 6px rgba(91,197,232,0.6); }
+
+  .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.6rem; margin: 0.6rem 0 1.2rem; }
+  .rule-item { display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.92rem; }
+  .rk {
+    flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--accent-teal); border: 1px solid var(--border-light);
+    border-radius: 5px; padding: 0.08rem 0.42rem; min-width: 2.4rem; text-align: center;
+  }
+
+  .act { border-left: 2px solid var(--border-light); padding: 0.1rem 0 0.1rem 1.05rem; margin: 1.2rem 0; }
+  .act h4 { margin: 0 0 0.45rem; }
+  .act .emo { display: inline-block; font-size: 0.74rem; color: var(--accent-coral); margin-left: 0.55rem; font-weight: 500; letter-spacing: 0.02em; }
+  .act p { margin-bottom: 0.45rem; }
+  .act .meta { font-size: 0.85rem; color: var(--text-tertiary); }
+  .act .meta b { color: var(--accent-gold-dim); font-weight: 600; }
+  .act .rules { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .act .rules .rk { color: var(--text-tertiary); }
+
+  .stage-label {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.12em; color: var(--accent-teal); border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.18rem 0.6rem; margin-bottom: 0.2rem;
+  }
+
+  .evo-item {
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 0.85rem 1.05rem; margin: 0.85rem 0; background: var(--bg-card);
+  }
+  .evo-item h4 { margin: 0 0 0.45rem; font-size: 0.98rem; }
+  .evo-change {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem;
+    margin: 0.35rem 0 0.55rem; font-size: 0.88rem;
+  }
+  .evo-from { color: var(--text-tertiary); text-decoration: line-through; }
+  .evo-to { color: var(--accent-teal); font-weight: 600; }
+  .evo-change .evo-arrow { color: var(--accent-gold-dim); font-weight: 700; }
+  .evo-why { font-size: 0.86rem; color: var(--text-secondary); margin: 0; }
+  .evo-why b { color: var(--accent-gold-dim); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .figure-row { grid-template-columns: 1fr; }
+    .rule-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="top-links reveal">
+    <a class="top-link" href="index.html#whitebox">← 返回关卡白盒作品</a>
+    <a class="top-link" href="https://www.bilibili.com/video/BV1L6Ej6REjf/" target="_blank" rel="noopener noreferrer">B站实机演示 ↗</a>
+    <a class="top-link" href="index.html">作品集首页</a>
+  </div>
+
+  <header class="hero">
+    <div class="hero-label reveal">Level Whitebox · Ice × Factory</div>
+    <h1 class="reveal">冰 × <span>工厂</span></h1>
+    <p class="hero-sub reveal">在压迫的流水线工厂中，主角用<strong>冰块</strong>与工厂器械解谜、战斗，解放被奴役的族人。一个以「冰」为绝对主角、纯策略不考验操作的线性解谜关卡白盒 Demo。</p>
+    <div class="spec-strip reveal">
+      <span class="spec-item">类型 <b>冰主题解谜</b></span>
+      <span class="spec-item">引擎 <b>Unity</b></span>
+      <span class="spec-item">阶段 <b>白盒 Demo</b></span>
+      <span class="spec-item">结构 <b>线性流程</b></span>
+      <span class="spec-item">规模 <b>200m × 180m</b></span>
+      <span class="spec-item">移速 <b>5.35 m/s</b></span>
+    </div>
+  </header>
+
+  <section class="analysis-section reveal-on-scroll" style="border-top:none;padding-top:0.6rem;">
+    <div class="section-label">实机演示 · Gameplay</div>
+    <div class="video-embed">
+      <iframe src="https://player.bilibili.com/player.html?bvid=BV1L6Ej6REjf&page=1&high_quality=1&danmaku=0&autoplay=0"
+              scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"
+              title="冰工厂 关卡白盒 实机演示"></iframe>
+    </div>
+    <p class="media-caption">关卡白盒实机演示（Bilibili · BV1L6Ej6REjf）。若视频未加载，可点击上方「B站实机演示」前往观看。</p>
+  </section>
+
+  <nav class="toc reveal-on-scroll">
+    <div class="toc-title">目录 · Contents</div>
+    <ul class="toc-list">
+      <li><a href="#overview"><span class="toc-num">00</span>关卡概览与预期体验</a></li>
+      <li><a href="#type"><span class="toc-num">01</span>A · 关卡类型与线性流程</a></li>
+      <li><a href="#rules"><span class="toc-num">02</span>B · 核心规则与状态机</a></li>
+      <li><a href="#design"><span class="toc-num">03</span>C · 设计思路（三线协同）</a></li>
+      <li><a href="#walkthrough"><span class="toc-num">04</span>D · 背景设定与完整攻略</a></li>
+      <li><a href="#tradeoff"><span class="toc-num">05</span>E · 设计取舍：未实现 / 简化</a></li>
+      <li><a href="#iteration"><span class="toc-num">06</span>F · 迭代记录与设计演进</a></li>
+      <li><a href="#credits"><span class="toc-num">07</span>G · 资源与 AIGC 使用说明</a></li>
+    </ul>
+  </nav>
+
+  <!-- 00 概览 -->
+  <section class="analysis-section reveal-on-scroll" id="overview">
+    <div class="section-label">Part 00 · Overview</div>
+    <article class="analysis-content">
+      <blockquote>预期体验：在压迫流水线的工厂中，主角用冰块与工厂器械解密与战斗，解放族人。</blockquote>
+      <p>《冰 × 工厂》是一个<strong>冰主题解谜游戏</strong>的 Unity 白盒 Demo。玩家扮演无法释放热量、只能「控制热量」生成冰块的燃族变异者，沿一条预设线性动线推进：从底层贫民区出发，穿过两座过载工厂、户外冰河，最终在 Boss 战中以一记超巨型冰块终结压迫者。</p>
+      <figure class="shot">
+        <img src="images/ice-demo-overview.png" alt="《冰 × 工厂》关卡俯视图总览" loading="lazy">
+        <figcaption>关卡俯视图：贫民区 → 第一工厂 → 冰河过渡 → 第二工厂 → 冰河大直道 → Boss 战，全程由中心地标巨型烟囱串联。</figcaption>
+      </figure>
+    </article>
+  </section>
+
+  <!-- 01 关卡类型 -->
+  <section class="analysis-section reveal-on-scroll" id="type">
+    <div class="section-label">Part 01 · Level Type</div>
+    <article class="analysis-content">
+      <h2>A · 关卡类型与线性流程</h2>
+      <p>本作为<strong>线性流程关卡</strong>。玩家沿一条预设动线推进，依次经历六个区段：</p>
+
+      <div class="flow-chain">
+        <span class="flow-step">贫民区序章<small>冰可乐 · 生冰块</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">第一工厂<small>教学 + 解谜</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">户外冰河<small>过渡空间</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">第二工厂<small>进阶解谜</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">冰河大直道<small>战斗冲锋</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Boss 战<small>终局</small></span>
+      </div>
+
+      <h3>关卡规模与移速设计</h3>
+      <p>关卡规模 <strong>200m × 180m</strong>，玩家移动速度 <strong>5.35 米/秒</strong>。移速刻意放慢，原因有二：</p>
+      <ol>
+        <li>希望玩家更好地体验空间过渡，<strong>提高空间置信度</strong>；</li>
+        <li>本关考验的不是操作而是<strong>策略</strong>，不希望太强的 3C（角色、镜头、操控）让玩家错过解谜信息。</li>
+      </ol>
+    </article>
+  </section>
+
+  <!-- 02 关卡规则 -->
+  <section class="analysis-section reveal-on-scroll" id="rules">
+    <div class="section-label">Part 02 · Rules</div>
+    <article class="analysis-content">
+      <h2>B · 核心规则与状态机</h2>
+
+      <h3>核心动作</h3>
+      <p>玩家在身体前方生成一个冰块。<strong>同一时间只能存在一个冰块。</strong></p>
+
+      <h3>玩家能力</h3>
+      <ul>
+        <li><strong>防御形态（冰盾）</strong>：冰块可以吸收伤害、挡住敌人的子弹；</li>
+        <li><strong>冰冻能力</strong>：玩家吸收环境中的热量为冰力值充能，同时让机械降温；</li>
+        <li><strong>无跳跃</strong>：玩家不能跳跃，只能在同一平面移动（白盒阶段保留跳跃以便测试）。</li>
+      </ul>
+
+      <h3>热能三档状态机</h3>
+      <p>环境中的工业器械（传送带、门、锤打机等）都有热能状态，通过齿轮的<strong>颜色与转速</strong>表示：</p>
+      <table>
+        <thead><tr><th>档位</th><th>状态</th><th>齿轮颜色</th><th>效果</th></tr></thead>
+        <tbody>
+          <tr><td>3 档</td><td>狂暴（过载）</td><td><span class="dot red"></span>红色</td><td>转速最快，极致危险</td></tr>
+          <tr><td>2 档</td><td>正常</td><td><span class="dot green"></span>绿色</td><td>正常转速</td></tr>
+          <tr><td>1 档</td><td>冻结</td><td><span class="dot blue"></span>冰蓝色</td><td>停止运转，一定时间后恢复至正常状态</td></tr>
+        </tbody>
+      </table>
+      <p>各机关在不同档位下的表现一致：<strong>门</strong>（3 档疯狂开合 / 2 档正常 / 1 档停止）、<strong>锤打机</strong>（3 档快速锤打 / 2 档正常 / 1 档停止）、<strong>传送带</strong>（3 档高速 / 2 档正常 / 1 档停止）。</p>
+
+      <h3>冰力值机制（0～3 档）</h3>
+      <p>冰力档位决定冰块尺寸，吸热充能、冷却恢复：</p>
+      <table>
+        <thead><tr><th>冰力档位</th><th>冰块尺寸</th><th>恢复方式</th></tr></thead>
+        <tbody>
+          <tr><td>0 档</td><td>无法生成</td><td>等 CD 自动恢复至 1 档</td></tr>
+          <tr><td>1 档</td><td>1×1 基础冰块</td><td>CD 冷却后自动恢复</td></tr>
+          <tr><td>2 档</td><td>2×2 中型冰块</td><td>需主动吸热</td></tr>
+          <tr><td>3 档</td><td>3×3 巨型冰块</td><td>需主动吸热</td></tr>
+          <tr><td>???（决战）</td><td>超巨型</td><td>吸取 Boss 大门热能，突破上限</td></tr>
+        </tbody>
+      </table>
+
+      <h3>原子化规则 R1–R21</h3>
+      <p>关卡所有交互被拆解为 21 条原子规则，作为玩法可读性与组合解谜的基础：</p>
+
+      <h4>冰块生成</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R1</span>玩家激活 → 身前生成冰块（尺寸 = 当前冰力档位）</div>
+        <div class="rule-item"><span class="rk">R2</span>场上同时只能存在一个冰块</div>
+        <div class="rule-item"><span class="rk">R3</span>冰块是实体（有碰撞体积）</div>
+        <div class="rule-item"><span class="rk">R4</span>生成冰块会减少冰力值</div>
+      </div>
+
+      <h4>冰力值机制</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R5</span>冰力值 = 0 且 CD 结束 → 自动恢复至 1 档</div>
+        <div class="rule-item"><span class="rk">R6</span>对物件吸热 → 冰力值上升（最高 3 档）</div>
+        <div class="rule-item"><span class="rk">R7</span>物件被吸热 → 该物件热能档位下降</div>
+      </div>
+
+      <h4>热能状态机</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R8</span>物件 3 档（红）→ 最高速 / 最高危险（过载）</div>
+        <div class="rule-item"><span class="rk">R9</span>物件 2 档（绿）→ 常规运转</div>
+        <div class="rule-item"><span class="rk">R10</span>物件 1 档（蓝）→ 冻结停止，一段时间后自动回 2 档</div>
+      </div>
+
+      <h4>交互规则</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R11</span>冰块接触伤害源 → 吸收伤害（防御）</div>
+        <div class="rule-item"><span class="rk">R12</span>冰块堵排气口 / 入锅炉 → 压力堆积爆炸（不可逆）</div>
+        <div class="rule-item"><span class="rk">R13</span>物件 1 档冻结 → 暂时停止（门保持开 / 带暂停），后恢复</div>
+        <div class="rule-item"><span class="rk">R14</span>冰块可冻住生物体的肢体（Boss 战专用）</div>
+      </div>
+
+      <h4>传送带专属</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R15</span>传送带方向固定，玩家不能改变</div>
+        <div class="rule-item"><span class="rk">R16</span>传送带速度对应热能档位</div>
+        <div class="rule-item"><span class="rk">R17</span>无跳跃，仅传送带旁有斜坡时才能上去</div>
+      </div>
+
+      <h4>冰块物理运动 & 回温</h4>
+      <div class="rule-grid">
+        <div class="rule-item"><span class="rk">R18</span>冰块在斜坡上因低摩擦自动滑行</div>
+        <div class="rule-item"><span class="rk">R19</span>滑行 / 被击飞的冰块撞击障碍 → 障碍被撞碎 / 打开</div>
+        <div class="rule-item"><span class="rk">R20</span>锤打机击中冰块 → 冰块被横向击飞</div>
+        <div class="rule-item"><span class="rk">R21</span>物件被冻结后随时间自然回温至 2 档</div>
+      </div>
+
+      <h3>关键机关说明</h3>
+      <ul>
+        <li><strong>门</strong>：有齿轮指示器，狂暴时疯狂开合，冻结后暂停，一段时间恢复；</li>
+        <li><strong>锤打机</strong>：门的空间形态变体——门挡玩家，锤打机挡冰块；可被主动利用击飞冰块破墙；</li>
+        <li><strong>传送带</strong>：运送冰块的核心工具，方向固定，速度随热能档位变化；</li>
+        <li><strong>蒸汽机 / 锅炉</strong>：据点结尾的爆破目标，冰块堵口 + 送冰块进去 → 爆炸。</li>
+      </ul>
+    </article>
+  </section>
+
+  <!-- 03 设计思路 -->
+  <section class="analysis-section reveal-on-scroll" id="design">
+    <div class="section-label">Part 03 · Design Approach</div>
+    <article class="analysis-content">
+      <h2>C · 设计思路</h2>
+
+      <h3>设计起点：脑爆</h3>
+      <p>项目以脑爆（Brainstorming）为起点，围绕「冰 × 工厂」核心主题发散：冰块能做什么？工厂里有什么可以和冰互动的器械？燃族在工厂中的生存状态？最终确定核心概念——<strong>主角的冰能力可以让工厂过载的设施恢复正常</strong>（这是主角存在的叙事理由），同时冰块本身的物理属性（滑动、碰撞、浮于水面）可作为解谜工具。</p>
+
+      <h3>设计框架：三线协同产出法</h3>
+      <p>在脑爆基础上，采用<strong>三线协同产出法</strong>——玩法线、空间线、故事线三条设计线平行推进、互相喂养：</p>
+      <ul>
+        <li>玩法线的机制需求 → 要求空间线提供合适的几何条件；</li>
+        <li>空间线确定场景形态 → 驱动玩法线放入合适的解谜 clips；</li>
+        <li>故事线产出标志性时刻 → 驱动空间线规划场景。</li>
+      </ul>
+      <p>实际顺序：先从脑爆确定核心机制，再推进玩法线（规则、机关、解谜组合），然后搭建空间线（场景布局、动线规划），最后补充故事线（叙事节点、角色事件）。任意一条线只要有足够具体的产出，就能引导另外两条线产出。</p>
+
+      <h3>玩法线：核心设计原则</h3>
+      <ol>
+        <li><strong>冰为绝对主角</strong>：所有设计都呼应「冰」的主题。火 / 热只是「过程」和「供能者」，冰才是一锤定音的终极武器；</li>
+        <li><strong>纯策略，不考验操作</strong>：玩家想到正确的解法顺序就能通关，执行本身不设难度门槛——没有跳跃、没有 timing 挑战；</li>
+        <li><strong>想到即通关</strong>：关卡难度完全来自策略思考——冻哪个、不冻哪个、先做什么后做什么。</li>
+      </ol>
+
+      <h3>空间线：线性流程中的空间策略</h3>
+      <p>受限于美术与空间搭建造诣，本项目将关卡空间分两类处理：<strong>关卡空间（有玩法）</strong>优先保证解谜可读性；<strong>过渡空间（无玩法）</strong>专门做空间置信度，让玩家感受到区域之间的环境变化。两者各自保底，而非强行高度融合。</p>
+      <div class="figure-row">
+        <figure class="shot">
+          <img src="images/ice-demo-gameplay-space.png" alt="玩法空间：工厂流水线解谜区" loading="lazy">
+          <figcaption>玩法空间：以解谜可读性为先的工厂流水线区段。</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="images/ice-demo-transition-space.png" alt="过渡空间：区域之间的环境变化" loading="lazy">
+          <figcaption>过渡空间：专做空间置信度，强化区域间的环境过渡。</figcaption>
+        </figure>
+      </div>
+      <p>在此基础上借鉴箱庭手法，加入局部空间回路与中心地标增强空间感：</p>
+      <ul>
+        <li><strong>捷径电梯回路</strong>：进工厂走远路，救小粉时解锁捷径电梯直接回贫民区——「远路进 → 捷径出」让玩家感知两地的空间关系；</li>
+        <li><strong>冰河二次可见</strong>：从第二工厂出来进 Boss 战前，能从新角度看到之前穿越的冰河——「原来我从那边过来的」，形成前后呼应；</li>
+        <li><strong>中心地标（巨型烟囱）</strong>：贯穿全程的定位物，帮助玩家判断自己在整体空间中的位置。</li>
+      </ul>
+      <blockquote>已知问题：烟囱正面到侧面的角度跨度不够大，空间感建立有限。改进方向：让烟囱造型更具辨识度，使不同角度呈现明显不同的视觉特征。</blockquote>
+
+      <h3>故事线：叙事驱动设计</h3>
+      <p>核心叙事理由：主角的冰能力可以让工厂过载的设施恢复正常，这是主角在工厂中存在的价值。这一设定同时支撑了玩法——玩家冻结过载设备不是「破坏」而是「修复」，冻结效果是暂时的（设备会自然回温），与主角作为工厂维修者的身份一致。故事线产出的标志性时刻（小粉之死、逆行求援、复仇出发）驱动空间线规划关键场景节点。</p>
+
+      <h3>教学递进设计</h3>
+      <p><strong>第一关</strong>每一步只引入一个新概念，后面的解谜再把前面学过的概念组合起来：</p>
+      <p class="case-label">生成冰块（冰可乐）→ 过载疯狂门 + 吸热冻结 → 冰让车失控 + 认识紫色可破坏物 → 再次冻结门 → 冻结传送带中途下车 → 冰块上传送带撞货解堵 → 锅炉堵塞爆破通关</p>
+      <p><strong>第一关 → 第二关</strong>的策略升级：第一关教「冻结一切」，第二关引入锤打机并教「<strong>选择性冻结</strong>」——锤打机既是障碍又是工具，不能全冻，必须判断哪个方向对、哪个要留着。「该冻哪个」比「要不要冻」更难。</p>
+    </article>
+  </section>
+
+  <!-- 04 攻略 -->
+  <section class="analysis-section reveal-on-scroll" id="walkthrough">
+    <div class="section-label">Part 04 · Setting & Walkthrough</div>
+    <article class="analysis-content">
+      <h2>D · 背景设定与完整攻略</h2>
+
+      <h3>背景设定</h3>
+      <ul>
+        <li><strong>世界观</strong>：一个极度压抑的重工业奴隶工厂。「燃族」工人是被剥削的活体燃料，通过自身燃烧为工厂供能。主角是燃族的变异者——无法释放热量，只能通过「控制热量」生成冰块。</li>
+        <li><strong>核心冲突</strong>：主角的同伴「小粉」在维修设备时被装置黏住（类似被高压电吸住），主角逆行求援失败，赶回时小粉已力竭化为灰烬。主角由此踏上摧毁工厂的复仇之路。</li>
+        <li><strong>居住环境</strong>：燃族工人居住在窑洞风格的底层贫民区，与工厂的钢铁工业美学形成强烈的阶级反差。</li>
+      </ul>
+
+      <h3 id="level-1">第一关 · 八幕（教学 + 解谜）</h3>
+
+      <div class="act">
+        <h4>第一幕 · 冰可乐<span class="emo">温情 · 破败 · 杂乱</span></h4>
+        <p>出生点有巨型可乐瓶雕像，小粉引导玩家在瓶口生成冰块放进去，可乐瓶升起，族人欢呼，可乐节日正式开始。</p>
+        <p class="meta"><b>设计目的：</b>教会玩家按 E 生成冰块；用轻松互动建立核心操作认知。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R3</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第二幕 · 上工</h4>
+        <p>小粉带玩家从贫民区步行绕远路前往工厂，途中教玩家基本操作。</p>
+        <p class="meta"><b>设计目的：</b>过渡，建立贫民区 → 工厂的空间距离感与空间转换。</p>
+      </div>
+
+      <div class="act">
+        <h4>第三幕 a · 过载疯狂门</h4>
+        <p>遇到一扇狂暴机械门，齿轮高速旋转发红（3 档过载）。小粉指引玩家对齿轮吸热 → 门冻结 → 通过。</p>
+        <p class="meta"><b>设计目的：</b>首次教会「吸热冻结过载机械」；建立齿轮颜色 = 状态的视觉语言。</p>
+        <div class="rules"><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R8</span><span class="rk">R10</span><span class="rk">R13</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第三幕 b · 冰滑车祸</h4>
+        <p>地面有蓝色冰块，车辆因路面结冰失控打滑，撞坏封锁大门（紫色方块 = 可摧毁物体）。</p>
+        <p class="meta"><b>设计目的：</b>教会「冰会让车失控」+「紫色 = 可破坏」两个概念；被动观察式教学。</p>
+        <div class="rules"><span class="rk">R18</span><span class="rk">R19</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第四幕 a · 冻结门复习</h4>
+        <p>再遇一扇门 → 冻结通过，巩固吸热冻结门的操作。</p>
+        <div class="rules"><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R10</span><span class="rk">R13</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第四幕 b · 传送带冻结下车</h4>
+        <p>3 档狂暴传送带会把玩家送到终点 → 对传送带吸热冻结停转 → 中途自由下车。</p>
+        <p class="meta"><b>设计目的：</b>首次教会「冻结传送带」；传送带从障碍变为可控工具。</p>
+        <div class="rules"><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R8</span><span class="rk">R10</span><span class="rk">R13</span><span class="rk">R16</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第四幕 c · 冰块撞货解堵</h4>
+        <p>前方门没反应，传送带上货物堵塞。结合车祸经验 → 生成冰块放上传送带 → 撞开货物 → 区域恢复通电 → 冻结门通过。</p>
+        <p class="meta"><b>设计目的：</b>组合运用传送带 + 冰块体积 + 碰撞破坏；首次让玩家主动利用传送带运送冰块。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R3</span><span class="rk">R15</span><span class="rk">R16</span><span class="rk">R19</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第五幕 · 小粉被困</h4>
+        <p>小粉修好设备回来，对话得知她在供能时被设备黏住，需回贫民窟叫人。</p>
+        <p class="meta"><b>设计目的：</b>叙事驱动，建立紧迫感与返程动机。</p>
+      </div>
+
+      <div class="act">
+        <h4>第六幕 · 逆行求援</h4>
+        <p>冻住沿途机关逆行解谜回贫民窟，叫到族人后通过捷径电梯返回。</p>
+        <p class="meta"><b>设计目的：</b>综合复用已学能力；捷径电梯建立空间回路（远路进 → 捷径出）。</p>
+        <div class="rules"><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R10</span><span class="rk">R13</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第七幕 · 小粉之死<span class="emo">悲伤 · 愤怒</span></h4>
+        <p>赶回时小粉已化为灰烬。NPC 挡住退路，只能向前。</p>
+        <p class="meta"><b>设计目的：</b>叙事高潮，驱动复仇动机；单向引导玩家前进。</p>
+      </div>
+
+      <div class="act">
+        <h4>第八幕 · 锅炉解谜</h4>
+        <p>锅炉区域：上方传送带可送东西进锅炉，旁边有散热区，高处宝箱引导视线发现结构。冻住散热口齿轮 + 冰块经传送带送入锅炉 → 蒸汽爆炸 → 强化门炸开，第一据点通关。</p>
+        <p class="meta"><b>设计目的：</b>据点收束——综合运用冻结 + 传送带 + 堵塞爆破；以宝箱引导视线的关卡技巧。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R10</span><span class="rk">R12</span><span class="rk">R15</span><span class="rk">R16</span></div>
+      </div>
+
+      <h3 id="river-1">冰河过渡（第一关 → 第二关）</h3>
+      <figure class="shot">
+        <img src="images/ice-demo-river.png" alt="冰河区域：户外过渡与渡河解谜" loading="lazy">
+        <figcaption>户外冰河区域：以「放冰块结冰通路 / 冰滑撞门」复用机制，并承担空间置信度与空间呼应。</figcaption>
+      </figure>
+
+      <div class="act">
+        <h4>冰河渡河<span class="emo">荒芜 · 破败</span></h4>
+        <p>走出第一据点，废墟区域。远处车辆指向下一目标。冰块放到水面 → 生成结冰通路 → 利用两侧机关依次通过。</p>
+        <p class="meta"><b>设计目的：</b>过渡空间增加空间置信度；复用「放冰块到指定位置」的提示语言。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R3</span></div>
+      </div>
+
+      <div class="act">
+        <h4>电梯上行</h4>
+        <p>等电梯上行，可俯瞰下方冰河场景，建立空间纵深感。</p>
+      </div>
+
+      <div class="act">
+        <h4>冰滑撞开大门</h4>
+        <p>桥面公路上车流经过，第二工厂大门封锁 → 路面放冰块 → 车辆打滑失控 → 撞开大门。</p>
+        <p class="meta"><b>设计目的：</b>复用第一关冰滑车祸概念，转为玩家主动运用。</p>
+        <div class="rules"><span class="rk">R18</span><span class="rk">R19</span></div>
+      </div>
+
+      <div class="act">
+        <h4>首次冰盾战斗</h4>
+        <p>敌人出现射击 → 冰块作冰盾挡子弹 + 消灭敌人（部分敌人已被车撞死）→ 冻结机关深入。</p>
+        <p class="meta"><b>设计目的：</b>首次引入冰盾战斗；冰块从解谜工具扩展为战斗防御工具。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R10</span><span class="rk">R11</span><span class="rk">R13</span></div>
+      </div>
+
+      <h3 id="level-2">第二关 · 五幕（进阶解谜：选择性冻结）</h3>
+
+      <div class="act">
+        <h4>第一幕 · 高处滑坡消灭敌人<span class="emo">灵光一现</span></h4>
+        <p>高处俯瞰流水线，大量敌人。从高处生成大冰块 → 斜坡滑下 → 保龄球式冲撞消灭敌人。可摧毁墙壁后有宝箱。</p>
+        <p class="meta"><b>设计目的：</b>展示冰块滑坡的杀伤力；从解谜过渡到战斗运用。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R18</span><span class="rk">R19</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第二幕 · 锤打机击飞破墙</h4>
+        <p>紫色墙壁 + 锤打机 + 传送带 → 冰块放上传送带 → 被锤打机横向击飞 → 撞碎墙壁，宝箱奖励。</p>
+        <p class="meta"><b>设计目的：</b>锤打机作为「击飞工具」首次登场；从「需要冻结的障碍」变为「主动利用的工具」。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R15</span><span class="rk">R16</span><span class="rk">R19</span><span class="rk">R20</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第三幕 · 选择性冻结</h4>
+        <p>直接放冰块会被错误方向的锤打机拦截 → 冻住错误方向的 → 保留正确方向的 → 冰块被正确击飞 → 墙破 → 冻住最后一个安全通过。</p>
+        <p class="meta"><b>设计目的：</b>从「冻结一切」升级到「选择性冻结」：判断哪个该冻、哪个该留。</p>
+        <div class="rules"><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R10</span><span class="rk">R13</span><span class="rk">R15</span><span class="rk">R16</span><span class="rk">R19</span><span class="rk">R20</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第四幕 · 警报 + 三墙击破<span class="emo">紧张</span></h4>
+        <p>工厂警报触发，红白混闪。三面墙降下 → 锤打机方向对准墙壁 + 传送带匹配 → 冰块被击飞依次砸穿三面墙，第二据点通关。</p>
+        <p class="meta"><b>设计目的：</b>高潮收束——锤打机连续击破的视觉冲击；警报营造紧迫氛围。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R15</span><span class="rk">R16</span><span class="rk">R19</span><span class="rk">R20</span></div>
+      </div>
+
+      <div class="act">
+        <h4>第五幕 · 空间回环 + 前往 Boss</h4>
+        <p>回望冰河区域形成空间回环。电梯上行 → 看到中心建筑 + 巨大齿轮暗示 Boss。</p>
+        <p class="meta"><b>设计目的：</b>冰河二次可见建立空间呼应；巨大齿轮作为 Boss 存在的暗示。</p>
+      </div>
+
+      <h3 id="charge">冰河大直道（第二关 → Boss 战）</h3>
+      <div class="act">
+        <h4>冰河大直道<span class="emo">释放</span></h4>
+        <p>桥梁被 Boss 炸断 → 冰块提示 → 冻结河面造出冰河大直道 → 冰盾顶着弹幕前进。</p>
+        <p class="meta"><b>设计目的：</b>战斗冲锋段落——冰盾作为核心生存手段。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R3</span><span class="rk">R11</span></div>
+      </div>
+
+      <h3 id="boss">Boss 战终局（两阶段）</h3>
+      <figure class="shot">
+        <img src="images/ice-demo-boss.png" alt="Boss 战终局场景" loading="lazy">
+        <figcaption>Boss 战终局：传送带 + 锤打机 + 冻结的全机制综合运用，最终以超巨型冰块封口引爆。</figcaption>
+      </figure>
+
+      <div class="act">
+        <h4>阶段一 · 击晕冻脚送炉<span class="emo">紧张</span></h4>
+        <p>Boss 攻击 → 掩体躲避 → 冰块放传送带 → 锤打机击飞砸 Boss → Boss 眩晕 → 冻结 Boss 双脚齿轮 → 传送带拖 Boss 进锅炉。</p>
+        <p class="meta"><b>设计目的：</b>全机制综合运用——传送带 + 锤打机 + 冻结的终极组合。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R6</span><span class="rk">R7</span><span class="rk">R14</span><span class="rk">R15</span><span class="rk">R16</span><span class="rk">R20</span></div>
+      </div>
+
+      <div class="act">
+        <h4>阶段二 · 封口引爆<span class="emo">压力到释放</span></h4>
+        <p>冰盾挡 Boss 攻击 → 生成超巨型冰块 → QTE 推入锅炉口 → 锅炉爆炸 → Boss 消灭。</p>
+        <p class="meta"><b>设计目的：</b>最终决战收束——超巨型冰块作为一锤定音的终极武器。</p>
+        <div class="rules"><span class="rk">R1</span><span class="rk">R11</span><span class="rk">R12</span></div>
+      </div>
+
+      <div class="act">
+        <h4>通关收尾<span class="emo">释放 · 温情 · 胜利</span></h4>
+        <p>宝箱通关奖励 + 再来一杯冰可乐，首尾呼应冰可乐，完成叙事闭环。</p>
+        <div class="rules"><span class="rk">R1</span></div>
+      </div>
+    </article>
+  </section>
+
+  <!-- 05 取舍 -->
+  <section class="analysis-section reveal-on-scroll" id="tradeoff">
+    <div class="section-label">Part 05 · Trade-offs</div>
+    <article class="analysis-content">
+      <h2>E · 有设计但未能实现的内容</h2>
+      <p>白盒阶段的取舍同样是设计的一部分。如实记录被删除、未实现与简化的内容：</p>
+
+      <h3>已设计但主动删除</h3>
+      <ol>
+        <li><strong>据点逐步解放</strong>（族人汇聚力量，参考《旷野之息》神兽光束）：每解放一个据点，族人释放热能光柱指向中心。删除原因：效果很难做出来，实现成本过高。</li>
+        <li><strong>工厂压迫者 / 监工角色、Boss 角色设定、体验生成链路模型</strong>：设计过程中判断不需要，删除。</li>
+        <li><strong>锅炉「眼睛」指示器</strong>（白壳 + 红色方块）：原设计 Boss 阶段二锅炉上有眼睛形状指示器变红表示状态，删除。</li>
+      </ol>
+
+      <h3>规则层确认、白盒未实现</h3>
+      <ol>
+        <li><strong>冰块等级差异化</strong>：目前 1 档和 3 档在 gameplay 中差别不大。</li>
+        <li><strong>传送带冰盾战斗</strong>：原设计玩家站在传送带上，两侧大量小兵射击，需用冰块同时挡前方和后方子弹。有设计但未实现。</li>
+      </ol>
+
+      <h3>实现中简化</h3>
+      <ol>
+        <li><strong>第一关结尾（蒸汽机解谜）</strong>：原设计需冻结一段 3 档逆向斜坡传送带让冰块滑下，因 PCG 工具配置问题 + 过于复杂，简化为「放冰块 + 冻住一处」。</li>
+        <li><strong>斜坡与传送带的教学</strong>：原设计组合教学（斜坡传送带），实际分开讲解——白盒阶段很难在空间中融合两个概念。</li>
+        <li><strong>NPC 聚集挡路</strong>：设计中 NPC 聚集到小粉死亡位置挡住退路，优先级最低，视剩余时间而定。</li>
+        <li><strong>冰块滑动特性的斜坡教学</strong>：原想让玩家在高处放冰块 → 沿斜坡滑下来教学，但工厂场景缺少合适斜坡 / 楼层落差，最终放弃；替代方案用「冰让路面结冰 → 车辆失控打滑」强调滑动属性，勉强达到教学目的。</li>
+      </ol>
+    </article>
+  </section>
+
+  <!-- 06 迭代记录 / 设计演进 -->
+  <section class="analysis-section reveal-on-scroll" id="iteration">
+    <div class="section-label">Part 06 · Iteration & Evolution</div>
+    <article class="analysis-content">
+      <h2>F · 迭代记录与设计演进</h2>
+      <p>本作的设计并非一蹴而就。白盒从 2026/3/30 立项到 4/5 全流程跑通，核心机制、关卡流程与高光演出在持续迭代中不断收敛。以下罗列<strong>关键决策的演进路径</strong>、支撑这些决策的<strong>底层设计思路</strong>，以及制作中期的<strong>反思</strong>。</p>
+
+      <div class="flow-chain">
+        <span class="flow-step">3/30<small>立项 · 玩法线打通</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">3/31<small>能力做减法 · Boss 定两阶段</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">4/1<small>中期回顾 · 教学补强</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">4/2<small>第一关搭建</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">4/3<small>冲刺：二关 · 冰河 · Boss</small></span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">4/5<small>全流程跑通</small></span>
+      </div>
+
+      <h3>一、关键设计决策的演进</h3>
+      <p>每条记录「改动前 → 改动后 + 原因」：</p>
+
+      <div class="evo-item">
+        <h4>热能档位：四档 → 三档</h4>
+        <div class="evo-change">
+          <span class="evo-from">极热 / 次热 / 常温 / 冻结（红黄绿蓝）</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">狂暴 / 正常 / 冻结（红绿蓝）</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>黄色「次热」档在纯策略框架下没有独立价值——它最自然的用途是 timing 挑战，而本项目刻意压低操作维度。玩家的决策本质只在三态间选择：危险（红）、安全（绿）、锁死（蓝）。砍掉黄档让视觉语言更锐利、信息传达更高效。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>冰力值与冰块尺寸：0–4 档 → 0–3 档</h4>
+        <div class="evo-change">
+          <span class="evo-from">0–4 档，冰块 4 级</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">0–3 档，冰块 3 级（1×1 / 2×2 / 3×3）</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>与热能档位同步收敛，减少玩家的资源管理负担，让档位之间的差异更聚焦、更易读。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>玩家能力：做减法，聚焦「温度控制」</h4>
+        <div class="evo-change">
+          <span class="evo-from">投掷冰块 / 修复齿轮 / 垫脚石 · 搭桥 / 温度控制……</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">仅保留：冰盾防御 + 温度控制 + 冰块物理运动</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>投掷不需要远程；修复齿轮玩法冗余；垫脚石因「冰块尺寸有限 + 无跳跃」会让动线规划变得混乱。砍掉后玩家动线完全由关卡物理空间（楼梯、电梯、传送带）决定，更可控。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>跳跃：待考虑 → 确定删除</h4>
+        <div class="evo-change">
+          <span class="evo-from">是否保留跳跃能力（待定）</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">玩家没有跳跃能力</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>跳跃天然带 timing 与精度要求，会把策略解谜变成平台跳跃。删除后衍生出 <strong>R17</strong>——只有传送带旁有斜坡时玩家才能上去，让设计者能精确控制「哪些传送带玩家能坐、哪些不能」，与「不考验操作」原则完全一致。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>Boss 战：单阶段 → 两阶段</h4>
+        <div class="evo-change">
+          <span class="evo-from">Boss 被送进锅炉后直接堵口爆炸</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">阶段一冻腿送炉 + 阶段二封口引爆</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>增加戏剧张力——Boss 进炉后并未死亡，疯狂射击，玩家需顶着弹幕堵口。最后一刻的反击让通关更有「封印」的仪式感；节奏上「先动脑后动手」，但动手依然不考验操作。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>高光关卡：工业长直道 → 冰河大直道</h4>
+        <div class="evo-change">
+          <span class="evo-from">两侧布满红色狂暴机械的工业长直通道</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">Boss 炸桥 → 超级冰块冻河成冰面大直道，逐段塌陷</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>与「冰」的主题绑定更强——路本身就是冰造的，是冰之力的证明，而非工业通道。左右逐段塌陷、只能向前的演出渲染「一往无前的勇气」，呼应主角的复仇决心。</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>原子化规则：17 → 20 → 21 条</h4>
+        <div class="evo-change">
+          <span class="evo-from">最初 17 条</span>
+          <span class="evo-arrow">→</span>
+          <span class="evo-to">收敛为 21 条</span>
+        </div>
+        <p class="evo-why"><b>原因：</b>随玩法做减法与 Boss 战、第二关玩法成型，规则集重构：删除垫脚相关规则，新增 R14（冻住生物体肢体）、R17（斜坡准入）、R18 / R19（滑冰破障）、R20（锤打机击飞）、R21（回温）。规则数增加，是因为更精确地拆分了「冰的物理运动」这一类玩法。</p>
+      </div>
+
+      <h3>二、支撑迭代的底层设计思路</h3>
+      <p>之所以能这样大幅删改而不伤筋动骨，靠的是两条贯穿始终的方法：</p>
+
+      <h4>触发器解耦：热能档位作为中间层</h4>
+      <p>热能档位在系统中扮演<strong>触发器 / 中间层</strong>，把输入端与输出端解耦：</p>
+      <ul>
+        <li><strong>输入端</strong>（怎么改变档位）：玩家吸热、环境自然升温、剧情事件……</li>
+        <li><strong>输出端</strong>（档位变了会怎样）：速度变化、危险程度变化、到 1 档时状态锁定……</li>
+      </ul>
+      <p>扩展时不需要发明新机制，只需替换输入或输出的任意一侧。砍掉黄档之所以「成本很低、未来想加回来也容易」，正是因为这套解耦架构——这也是「锤打机不是新机关，只是门换了输出端」的底层依据。</p>
+
+      <h4>目标张力分析：用规则组合制造策略深度</h4>
+      <p>策略深度不靠堆数值，而来自规则之间的矛盾。这套张力分析也是判断「该保留 / 该删除哪个机制」的标尺：</p>
+      <ul>
+        <li><strong>吸热悖论</strong>（R6 + R7）：吸热让我变强，却也改变了我可能需要保持原样的环境——「吸多少」成为纯策略决策。</li>
+        <li><strong>独子约束</strong>（R2）：场上只有一块冰，却同时需要挡伤害、堵管子、运送——必须排优先级。</li>
+        <li><strong>冻结时机</strong>（R10 + R13）：冻结锁定的是「当前状态」，门开时冻 = 永久通道，门关时冻 = 永久墙——是决策时机，而非操作 timing（可先观察行为再下手）。</li>
+        <li><strong>选择性冻结</strong>（R10 + R13 + R20）：障碍即工具——锤打机既挡路又能击飞冰块，「该冻哪个」比「要不要冻」更难。</li>
+        <li><strong>爆炸不可逆</strong>（R12）：堵口爆炸是单向的，会永久改变环境——承诺感最重的一个动作，逼玩家行动前想清后果链。</li>
+      </ul>
+
+      <h3>三、制作中期的反思（4/1 回顾）</h3>
+
+      <h4>不要死磕程序</h4>
+      <p>中期最大的教训是<strong>太注重程序实现，浪费时间在脚本细节上</strong>。典型案例：第一关结尾原设计了「起伏传送带 + 冻结 + 冰块滑下」的解谜，但自制 PCG 工具配置出问题导致无法实现，最终花了太久才决定舍弃，简化为「放冰块 + 冻住一处」。</p>
+      <blockquote>教训：白盒阶段「能跑就行」，遇到实现困难应快速简化设计，不要死磕程序。这个简化决定是对的，但应该更早做出。</blockquote>
+
+      <h4>与 AI 协作：警惕总结偏离设计本意</h4>
+      <p>本项目用 Gemini / Claude 辅助发散与整理，但作者多次「复查修正」把 AI 总结拉回原始创意。例如：</p>
+      <ul>
+        <li>AI 自行添加的「燃烧炉」概念 → 改回作者本意「被黏住松不开」的触电感；</li>
+        <li>AI 把简单引导过度包装成「核心循环教学」 → 改回「仅是让玩家知道能生成冰块」；</li>
+        <li>AI 基于「正转 / 逆转」过度推导出「玩家可控方向」 → 改回「方向关卡预设固定，玩家不能改变」。</li>
+      </ul>
+      <p>思路：AIGC 是发散和整理的工具，但所有采纳与表述的最终决策权始终在设计者本人。</p>
+
+      <h3>四、设计备忘录（待验证的迭代方向）</h3>
+      <p>以下是制作中产生的设计直觉，尚未执行，作为后续迭代的思考方向记录：</p>
+
+      <div class="evo-item">
+        <h4>备忘 1 · 吸热 → 放冰降温</h4>
+        <p class="evo-why">现状：玩家「吸热」就能让齿轮降档，但这跟「冰」的主题绑定不够强——更像抽象的按键交互。<b>方向：</b>吸热仍可获取冰力值，但不直接降档；要让齿轮降温，必须把冰块放到旁边，用冰块的物理存在去降温。这样「冰」才是真正的核心动词——不是「吸」而是「放冰」。（较大机制改动，待白盒搭完后统一评估。）</p>
+      </div>
+
+      <div class="evo-item">
+        <h4>备忘 2 · 冰块等级差异化</h4>
+        <p class="evo-why">现状：1 档冰与 3 档冰在游玩中差别不大。<b>方向：</b>给每个等级找不可替代的用途——燃烧炉需 2 档以上才塞得进；冰河结冰范围随等级变化（1 档小范围、3 档大范围），逼玩家权衡「我需要多大的冰面才能过去」，从而决定攒到几档再放。</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- 07 资源 & AIGC -->
+  <section class="analysis-section reveal-on-scroll" id="credits">
+    <div class="section-label">Part 07 · Resources & AIGC</div>
+    <article class="analysis-content">
+      <h2>G · 资源与 AIGC 使用说明</h2>
+
+      <h3>网络资源（第三方模型）</h3>
+      <ul>
+        <li>Boss 模型：<a href="https://sketchfab.com/3d-models/godzilla-skeleton-1954cf3a19696113401795110b0a10aa6700" target="_blank" rel="noopener noreferrer">Godzilla Skeleton（Sketchfab）</a></li>
+        <li>货车模型：<a href="https://sketchfab.com/3d-models/old-truck-a9f888b7832d4bbf9ed18fe18f00bf89" target="_blank" rel="noopener noreferrer">Old Truck（Sketchfab）</a></li>
+        <li>可乐模型：<a href="https://sketchfab.com/3d-models/coca-cola-bottle-34075fedb0ef40d9a172231134849914" target="_blank" rel="noopener noreferrer">Coca-Cola Bottle（Sketchfab）</a></li>
+        <li>集装箱模型：<a href="https://sketchfab.com/3d-models/cargo-container-d58c9efa8eef4494bc3017c7685d6ebb" target="_blank" rel="noopener noreferrer">Cargo Container（Sketchfab）</a></li>
+      </ul>
+
+      <h3>AIGC 使用说明</h3>
+      <table>
+        <thead><tr><th>工具</th><th>用途</th><th>性质</th></tr></thead>
+        <tbody>
+          <tr><td>Gemini</td><td>项目早期脑爆阶段的发散对话伙伴，围绕「冰」「工业」两个主题词发散素材</td><td>辅助发散，所有采纳决策由本人判断筛选</td></tr>
+          <tr><td>Nano Banana</td><td>定义性场景的视觉化图表制作</td><td>可视化工具</td></tr>
+          <tr><td>Claude</td><td>设计文档的结构化整理（将本人的设计笔记与对话记录梳理为结构化文档）</td><td>文档整理工具，内容由本人审核修正</td></tr>
+          <tr><td>Codex</td><td>白盒阶段的程序脚本实现（Vibe Coding）</td><td>代码实现工具</td></tr>
+        </tbody>
+      </table>
+
+      <h3>本人完成的工作</h3>
+      <ul>
+        <li><strong>所有创意设计与决策</strong>：三线协同产出法框架、热能三档状态机、冰力值系统、原子化规则 R1–R21、全部关卡流程设计（第一关、第二关、Boss 战）、教学递进逻辑、故事线叙事弧等所有玩法与创意层面内容均为本人原创；</li>
+        <li><strong>Unity 白盒搭建</strong>：整个白盒关卡的空间搭建、动线设计、机关配置、色彩方案均由本人在 Unity 中完成；</li>
+        <li><strong>最终文档核对</strong>：本展示内容由本人最终审核、修正并定稿。</li>
+      </ul>
+      <blockquote>AIGC 直接生成内容标注：Gemini 在脑爆中补充了「管道与阀门」「高压蒸汽喷射」「熔炉与铁水」等工业场景素材，经本人筛选后影响了世界观氛围构思，但未直接引用原文；Claude 辅助了笔记的结构化整理，但所有内容经本人审核、修正并重写，最终表述为本人定稿。</blockquote>
+    </article>
+  </section>
+
+  <div class="article-nav reveal-on-scroll">
+    <a class="article-link" href="index.html#whitebox">← 返回关卡白盒作品</a>
+    <a class="article-link primary" href="https://www.bilibili.com/video/BV1L6Ej6REjf/" target="_blank" rel="noopener noreferrer">B站观看实机演示 →</a>
+  </div>
+
+  <footer>
+    <p>Level Whitebox · 冰 × 工厂 Ice × Factory · Unity Demo</p>
+  </footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.gsap) return;
+
+  gsap.fromTo('.hero .reveal',
+    { opacity: 0, y: 24 },
+    { opacity: 1, y: 0, duration: 0.75, stagger: 0.1, ease: 'power2.out' }
+  );
+
+  const revealBlocks = document.querySelectorAll('.reveal-on-scroll');
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      gsap.fromTo(entry.target,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }
+      );
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12 });
+
+  revealBlocks.forEach(el => io.observe(el));
+});
+</script>
+
+<script src="nav-boost.js" defer></script>
+</body>
+</html>
