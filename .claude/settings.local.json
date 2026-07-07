@@ -6,7 +6,28 @@
       "Bash(where python3:*)",
       "Bash(where node:*)",
       "Bash(ls -lh D:/ChromeDownload/HxH_portfolio-main/HxH_portfolio/*.html)",
-      "Bash(grep -n \"</body>\" D:/ChromeDownload/HxH_portfolio-main/HxH_portfolio/*.html)"
+      "Bash(grep -n \"</body>\" D:/ChromeDownload/HxH_portfolio-main/HxH_portfolio/*.html)",
+      "PowerShell($items = Get-ChildItem 'E:\\\\GitHubLibrary\\\\Portfolio\\\\HxH_portfolio\\\\assets\\\\graduation\\\\' -File; $items | ForEach-Object { [PSCustomObject]@{ Name = $_.Name; SizeMB = [math]::Round\\($_.Length / 1MB, 2\\); LastWriteTime = $_.LastWriteTime } } | Format-Table -AutoSize)",
+      "PowerShell(ffprobe -v error -show_entries stream=codec_name,profile,level,width,height,bit_rate,duration,pix_fmt -show_entries format=duration,bit_rate,size 'E:\\\\GitHubLibrary\\\\Portfolio\\\\HxH_portfolio\\\\assets\\\\graduation\\\\graduation-memory-2026-mobile-lite.mp4' 2>&1)",
+      "Bash(where pdftoppm *)",
+      "Bash(pip show *)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\pdftotext.exe\" -f 1 -l 8 -layout \"设计文档.pdf\" -)",
+      "Bash(\"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\pdftotext.exe\" -enc UTF-8 -f 1 -l 4 \"设计文档.pdf\" -)",
+      "Bash(awk '{ print NR\": \"length\\($0\\) }' index.html)",
+      "Bash(sort -t: -k2 -rn)",
+      "WebFetch(domain:www.bilibili.com)",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(py --version)",
+      "Bash(git check-ignore *)",
+      "WebFetch(domain:www.kdocs.cn)",
+      "Bash(Select-String -Pattern '^@@' -Context 0,0)",
+      "Bash(Write-Output \"=== full remaining hunks below ===\")",
+      "Bash(Select-Object -Skip 60)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(awk '{ if \\(length\\($0\\) > 5000\\) print NR\": \"length\\($0\\)\" chars\" }' index.html)",
+      "Bash(awk 'NR==1210 { print substr\\($0, 1, 300\\) } NR==1263 { print substr\\($0, 1, 300\\) }' index.html)"
     ]
   }
 }
