@@ -1,21 +1,23 @@
 :root {
-  --bg-deep: #0a0a0f;
-  --bg-card: #12121a;
-  --bg-surface: #1a1a26;
-  --bg-hover: #22223a;
-  --accent-gold: #d4a853;
-  --accent-gold-dim: #a07d3a;
-  --accent-teal: #3dc9a0;
-  --accent-teal-dim: #2a8d70;
-  --accent-coral: #e06852;
+  /* 与主页「关卡编辑器 / 白盒蓝图」主题对齐——仅换配色变量,排版结构不动。
+     原金色阅读主题保留在 git 历史(HEAD~ 的 analysis-theme.css)。 */
+  --bg-deep: #07090e;
+  --bg-card: #10141d;
+  --bg-surface: #141926;
+  --bg-hover: #1b2333;
+  --accent-gold: #ff6b35;      /* 主橙(沿用变量名,全站引用无需改动) */
+  --accent-gold-dim: #c9502a;
+  --accent-teal: #2fd6bd;
+  --accent-teal-dim: #1f9e8c;
+  --accent-coral: #ff8a58;
   --accent-purple: #9b7ee8;
-  --accent-blue: #5b9ee8;
-  --text-primary: #e8e4dc;
-  --text-secondary: #9e9a92;
-  --text-tertiary: #6a675f;
-  --text-muted: #6a675f;
-  --border: #2a2a3a;
-  --border-light: #3a3a4e;
+  --accent-blue: #5d96ff;      /* 蓝图蓝 */
+  --text-primary: #eceae4;
+  --text-secondary: #929aab;
+  --text-tertiary: #5c6175;
+  --text-muted: #5c6175;
+  --border: rgba(126, 160, 220, 0.12);
+  --border-light: rgba(126, 160, 220, 0.24);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
