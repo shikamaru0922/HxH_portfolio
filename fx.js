@@ -28,12 +28,24 @@
     glow: ['.project-card', '.ai-section'],
     // 磁吸元素
     magnetic: ['.badge', '.contact-btn', '.philosophy-link'],
+    // AI 流水线 ↔ 工具卡联动：map[步骤下标] = 卡片下标（按 DOM 顺序）
+    // 步骤：创意构思 检索 文档代码 开发 美术 ｜ 卡片：Gemini Codex ChatGPT Claude 生图
+    aiPipeline: {
+      section: '.ai-section',
+      steps: '.ai-pipeline .pipeline-step',
+      cards: '.ai-card',
+      map: [0, 2, 3, 1, 4]
+    },
+    // 「蓝图显影」进场的媒体（新增封面图会自动获得）
+    develop: ['.project-visual .project-cover-image', '.project-visual .project-cover-video'],
     // 成就定义（localStorage 持久化）
     achievements: {
       landing:  { icon: '🚩', name: '进入关卡：欢迎来到 HXH.design' },
       explorer: { icon: '🗺️', name: '全图探索：走遍了所有区域' },
       bottom:   { icon: '🏁', name: '抵达关底：感谢读到最后' },
-      whitebox: { icon: '📦', name: '白盒之眼：发现了设计师看世界的方式' }
+      whitebox: { icon: '📦', name: '白盒之眼：发现了设计师看世界的方式' },
+      pipeline: { icon: '🔗', name: '接线成功：发现了 AI 工作流的联动' },
+      graybox:  { icon: '🧱', name: '灰盒巡礼：用设计师之眼看完了整个关卡' }
     },
     storeKey: 'hxh-achievements'
   };
@@ -321,6 +333,121 @@
   }
 
   /* ─────────────────────────────────────────
+     9b. AI 流水线 ↔ 工具卡联动（悬停连线）
+     ───────────────────────────────────────── */
+  function initAiLink() {
+    var cfg = CONFIG.aiPipeline;
+    var section = $(cfg.section);
+    if (!section) return;
+    var steps = $$(cfg.steps, section);
+    var cards = $$(cfg.cards, section);
+    if (!steps.length || !cards.length) return;
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'ai-link-svg');
+    svg.setAttribute('aria-hidden', 'true');
+    section.appendChild(svg);
+
+    function clear() {
+      svg.innerHTML = '';
+      steps.concat(cards).forEach(function (n) { n.classList.remove('linked'); });
+    }
+    function connect(stepIdx) {
+      var card = cards[cfg.map[stepIdx]];
+      var step = steps[stepIdx];
+      if (!card || !step) return;
+      clear();
+      step.classList.add('linked');
+      card.classList.add('linked');
+      var sr = section.getBoundingClientRect();
+      var a = step.getBoundingClientRect();
+      var b = card.getBoundingClientRect();
+      var x1 = a.left + a.width / 2 - sr.left, y1 = a.bottom - sr.top;
+      var x2 = b.left + b.width / 2 - sr.left, y2 = b.top - sr.top;
+      var mid = (y1 + y2) / 2;
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M' + x1 + ' ' + y1 + ' C ' + x1 + ' ' + mid + ', ' + x2 + ' ' + mid + ', ' + x2 + ' ' + y2);
+      svg.appendChild(path);
+      unlock('pipeline');
+    }
+    steps.forEach(function (s, i) {
+      s.addEventListener('mouseenter', function () { connect(i); });
+      s.addEventListener('mouseleave', clear);
+    });
+    cards.forEach(function (c, ci) {
+      var si = cfg.map.indexOf(ci);
+      if (si === -1) return;
+      c.addEventListener('mouseenter', function () { connect(si); });
+      c.addEventListener('mouseleave', clear);
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     9c. 封面鼠标方向视差
+     ───────────────────────────────────────── */
+  function initCoverParallax() {
+    if (!finePointer || reduced) return;
+    $$('.project-visual').forEach(function (v) {
+      v.addEventListener('mousemove', function (e) {
+        var r = v.getBoundingClientRect();
+        var dx = (e.clientX - r.left) / r.width - 0.5;
+        var dy = (e.clientY - r.top) / r.height - 0.5;
+        v.style.setProperty('--pvx', (-dx * 14).toFixed(1) + 'px');
+        v.style.setProperty('--pvy', (-dy * 10).toFixed(1) + 'px');
+      }, { passive: true });
+      v.addEventListener('mouseleave', function () {
+        v.style.setProperty('--pvx', '0px');
+        v.style.setProperty('--pvy', '0px');
+      });
+    });
+  }
+
+  /* ─────────────────────────────────────────
+     9d. 蓝图显影：封面进入视口时线稿 → 成图
+     ───────────────────────────────────────── */
+  function initDevelop() {
+    if (reduced || !('IntersectionObserver' in window)) return;
+    var targets = $$(CONFIG.develop.join(',')).filter(function (m) {
+      return getComputedStyle(m).display !== 'none';
+    });
+    if (!targets.length) return;
+    targets.forEach(function (m) { m.classList.add('bp'); });
+    function develop(m, withScan) {
+      m.classList.add('bp-in');
+      if (withScan) {
+        var box = m.parentElement;
+        if (box) {
+          var scan = el('i', 'bp-scan', box);
+          box.classList.add('bp-scanning');
+          setTimeout(function () { scan.remove(); box.classList.remove('bp-scanning'); }, 1400);
+        }
+      }
+      m.addEventListener('animationend', function done() {
+        m.classList.remove('bp', 'bp-in');
+        m.removeEventListener('animationend', done);
+      });
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        develop(en.target, true);
+      });
+    }, { threshold: 0.25 });
+    targets.forEach(function (m) { io.observe(m); });
+    // 保险:若 IO 未触发（后台标签、异常），2.5s 后直接摘掉 .bp —— 不依赖
+    // 动画完成,即使动画被冻结/禁用,封面也绝不会永久停留在 opacity:0
+    setTimeout(function () {
+      targets.forEach(function (m) {
+        if (m.classList.contains('bp') && !m.classList.contains('bp-in')) {
+          io.unobserve(m);
+          m.classList.remove('bp');
+        }
+      });
+    }, 2500);
+  }
+
+  /* ─────────────────────────────────────────
      10. 数字统计滚动计数（仅纯数字型）
      ───────────────────────────────────────── */
   function initCounters() {
@@ -423,12 +550,28 @@
   /* ─────────────────────────────────────────
      13. 白盒模式彩蛋（Konami / 连点 logo ×5）
      ───────────────────────────────────────── */
+  var wbVisited = {};
   function toggleWhitebox() {
     var on = document.body.classList.toggle('whitebox');
     if (readoutMode) readoutMode.textContent = on ? ' · MODE:WHITEBOX' : '';
-    if (on) unlock('whitebox');
+    if (on) {
+      unlock('whitebox');
+      if (spy.current) wbVisited[spy.current] = true;
+    }
   }
   window.__whitebox = toggleWhitebox; // 控制台入口
+
+  // 灰盒巡礼：白盒模式下走遍所有区域
+  function checkGrayboxTour(id) {
+    if (!document.body.classList.contains('whitebox') || !id) return;
+    wbVisited[id] = true;
+    var links = $$('.nav-links a');
+    var all = links.every(function (a) {
+      var s = (a.getAttribute('href') || '').slice(1);
+      return !s || wbVisited[s];
+    });
+    if (all && links.length) unlock('graybox');
+  }
 
   function initEasterEggs() {
     // Konami: ↑↑↓↓←→←→BA
@@ -450,6 +593,8 @@
         if (clicks >= 5) { clicks = 0; toggleWhitebox(); }
       });
     }
+    // 灰盒巡礼追踪
+    spy.listeners.push(checkGrayboxTour);
     // 控制台彩蛋
     try {
       console.log(
@@ -475,6 +620,9 @@
     initCards();
     initMagnetic();
     initHero();
+    initAiLink();
+    initCoverParallax();
+    initDevelop();
     initCounters();
     initMobileMenu();
     initAchievements();
