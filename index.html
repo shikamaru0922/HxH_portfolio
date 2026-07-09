@@ -1005,6 +1005,7 @@ html.fx .rv.rv-in { opacity: 1; transform: translateY(0); }
 .pv-meme > img { display: none; }
 .pv-q { background: linear-gradient(135deg, #0a1a2a, #102030, #0a2028); }
 .pv-sky { background: linear-gradient(135deg, #1a1520, #201828, #282030); }
+.pv-revive { background: linear-gradient(135deg, #07111f, #102d4a, #102337); }
 .pv-dislocation { background: #ecebe7; }
 
 .project-award {
@@ -1638,7 +1639,7 @@ body.whitebox .project-award,
 body.whitebox .t-icon {
   filter: saturate(0) contrast(1.05);
 }
-body.whitebox .pv-meme, body.whitebox .pv-q, body.whitebox .pv-sky {
+body.whitebox .pv-meme, body.whitebox .pv-q, body.whitebox .pv-sky, body.whitebox .pv-revive {
   background: repeating-linear-gradient(45deg, rgba(143, 163, 200, .05) 0 2px, transparent 2px 14px);
 }
 body.whitebox .pv-dislocation { background: #b9b8b4; }
@@ -1997,6 +1998,30 @@ body.whitebox .project-visual {
     </div>
   </div>
 
+  <!-- 《复活吧！我滴爱人！》 -->
+  <div class="project-card">
+    <div class="project-visual pv-revive">
+      <div class="project-award">🎮 网页可直接试玩</div>
+      <img class="project-cover-image" src="images/projects/revive-beloved-cover.png" alt="《复活吧！我滴爱人！》弹射 Roguelike 原型封面" loading="lazy" width="1024" height="1024">
+    </div>
+    <div class="project-content">
+      <div class="project-type">游戏策划</div>
+      <h3 class="project-name">《复活吧！我滴爱人！》</h3>
+      <div class="project-subtitle">弹射动作 Roguelike · 可玩原型 · 2026</div>
+      <div class="project-experience">核心体验：构筑决定玩家下限，操作决定玩家上限；用弹板、弹射角度与技能时机驾驭 PF、大招、Fever 与碎片 Build。</div>
+      <p class="project-desc">
+        受《世界弹射物语》启发的 20 房 Roguelike 原型。完成角色编队、49 张在池碎片、多流派资源循环、局外解锁与上下文新手教学，并将完整试玩与系统资源流整合到项目页。
+      </p>
+      <div class="project-tags">
+        <span class="tag">系统设计</span>
+        <span class="tag">Roguelike构筑</span>
+        <span class="tag">资源循环</span>
+        <span class="tag">网页试玩</span>
+      </div>
+      <a href="revive-beloved.html" class="project-link">进入项目并试玩</a>
+    </div>
+  </div>
+
   <!-- Project Q -->
   <div class="project-card">
     <div class="project-visual pv-q">
@@ -2021,31 +2046,6 @@ body.whitebox .project-visual {
         <span class="tag">数据分析</span>
       </div>
       <a href="https://kdocs.cn/l/cezMhb7LhLTm" class="project-link" target="_blank">查看项目详情</a>
-    </div>
-  </div>
-
-  <!-- Unity训练营 -->
-  <div class="project-card">
-    <div class="project-visual pv-sky">
-      <div class="project-visual-inner">🔫</div>
-    </div>
-    <div class="project-content">
-      <div class="project-type">游戏策划 · Unity开发</div>
-      <h3 class="project-name">Unity训练营</h3>
-      <div class="project-subtitle">类吸血鬼幸存者射击游戏 · 2022</div>
-      <div class="project-experience">核心体验：拥有《Noita》般自由编程构筑build魔法子弹的科幻版《吸血鬼幸存者》</div>
-      <p class="project-desc">
-        训练营期间深入学习Unity引擎、C#编程及游戏生产管线，团队合作开发一款俯视角第三人称射击游戏。
-        设计Boss AI时结合NavMesh和有限状态机（FSM）构建智能寻路与战斗逻辑，
-        编写玩家控制器并集成Cinemachine实现平滑视角切换。借此Demo成功获得Unity中国Offer。
-      </p>
-      <div class="project-tags">
-        <span class="tag">Unity</span>
-        <span class="tag">Boss AI</span>
-        <span class="tag">NavMesh · FSM</span>
-        <span class="tag">Cinemachine</span>
-      </div>
-      <a href="https://www.bilibili.com/video/BV1Se4y1t7X2/" class="project-link" target="_blank">查看项目视频</a>
     </div>
   </div>
 
@@ -2481,4 +2481,3 @@ body.whitebox .project-visual {
 <script src="nav-boost.js" defer></script>
 </body>
 </html>
-

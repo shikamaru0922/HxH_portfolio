@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="《复活吧！我滴爱人！》——将弹射动作、Roguelike 构筑与多资源战斗循环结合的可玩游戏原型。">
+  <title>《复活吧！我滴爱人！》· 弹射 Roguelike 系统设计</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#f5f8ff;--muted:#9aa8bf;--dim:#697891;--bg:#050914;--panel:#0b1221;
+      --line:rgba(154,181,226,.18);--cyan:#55d9ee;--gold:#ffc85a;--red:#ff6c6c;
+      --green:#6ee7a8;--purple:#bb8cff;--radius:22px;
+      --mono:"Space Mono",monospace;--display:"Chakra Petch","Noto Sans SC",sans-serif;--sans:"Noto Sans SC",sans-serif;
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}
+    body{margin:0;overflow-x:hidden;color:var(--ink);background:radial-gradient(circle at 76% 7%,rgba(65,105,220,.2),transparent 26rem),radial-gradient(circle at 8% 33%,rgba(28,177,191,.1),transparent 24rem),var(--bg);font-family:var(--sans);line-height:1.75}
+    body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(126,155,202,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(126,155,202,.06) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 86%)}
+    a{color:inherit}button,a{-webkit-tap-highlight-color:transparent}.shell{width:min(1180px,calc(100% - 40px));margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(5,9,20,.82);backdrop-filter:blur(18px)}
+    .topbar-inner{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:inline-flex;align-items:center;gap:11px;text-decoration:none;font-family:var(--display);font-weight:700;letter-spacing:.03em}
+    .brand-mark{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(85,217,238,.55);border-radius:50%;color:var(--cyan);box-shadow:inset 0 0 18px rgba(85,217,238,.16)}
+    .topnav{display:flex;gap:22px}.topnav a{color:var(--muted);text-decoration:none;font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;transition:color .2s}.topnav a:hover{color:var(--cyan)}
+    .hero{min-height:720px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(350px,.75fr);align-items:center;gap:72px;padding:88px 0 76px}
+    .kicker,.section-kicker{color:var(--cyan);font:700 12px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase}.kicker::before,.section-kicker::before{content:"// ";color:var(--dim)}
+    h1{margin:22px 0 12px;font:700 clamp(48px,7vw,86px)/.98 var(--display);letter-spacing:-.045em}h1 span{color:var(--cyan)}
+    .hero-subtitle{margin:0 0 22px;color:var(--gold);font:600 clamp(18px,2.2vw,25px)/1.4 var(--display)}
+    .hero-copy{max-width:670px;margin:0;color:#bdc7d8;font-size:16px}.hero-copy strong{color:var(--ink)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+    .button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border:1px solid var(--line);border-radius:999px;color:var(--ink);background:rgba(255,255,255,.03);text-decoration:none;font:700 13px/1 var(--mono);cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+    .button:hover{transform:translateY(-2px);border-color:rgba(85,217,238,.6)}.button.primary{color:#041118;border-color:transparent;background:linear-gradient(135deg,var(--cyan),#84efff);box-shadow:0 12px 32px rgba(85,217,238,.18)}
+    .hero-visual{position:relative;display:grid;place-items:center;min-height:500px}.orbit{position:absolute;width:min(42vw,470px);aspect-ratio:1;border:1px solid rgba(85,217,238,.22);border-radius:50%;animation:rotate 24s linear infinite}
+    .orbit::before,.orbit::after{content:"";position:absolute;width:13px;height:13px;border-radius:50%;background:var(--cyan);box-shadow:0 0 22px var(--cyan)}.orbit::before{top:11%;left:15%}.orbit::after{right:3%;bottom:30%;background:var(--gold);box-shadow:0 0 22px var(--gold)}
+    .orbit.o2{width:min(31vw,350px);animation-duration:17s;animation-direction:reverse;border-color:rgba(255,200,90,.2)}.orbit.o3{width:min(19vw,220px);animation-duration:11s;border-style:dashed}@keyframes rotate{to{transform:rotate(360deg)}}
+    .hero-ball{position:relative;width:min(26vw,300px);aspect-ratio:1;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,.28);background:url("images/projects/revive-beloved-cover.png") center/cover;box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 0 50px rgba(91,168,255,.26)}
+    .hero-ball::after{content:"PLAYABLE BUILD";position:absolute;right:-1px;bottom:30px;padding:8px 15px;color:#071018;background:var(--gold);font:700 10px/1 var(--mono);letter-spacing:.09em}
+    .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-bottom:108px;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:var(--line)}
+    .metric{padding:24px 25px;background:rgba(10,17,31,.96)}.metric strong{display:block;color:var(--cyan);font:700 30px/1 var(--display)}.metric span{display:block;margin-top:8px;color:var(--muted);font-size:12px}
+    section{scroll-margin-top:88px}.section-head{margin-bottom:34px}.section-title{margin:13px 0 10px;font:700 clamp(30px,4vw,48px)/1.15 var(--display);letter-spacing:-.025em}.section-desc{max-width:760px;margin:0;color:var(--muted)}
+    .play-section,.design-section,.flow-section{padding:0 0 112px}.play-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+    .game-stage{position:relative;min-height:790px;padding:14px;overflow:hidden;border:1px solid rgba(85,217,238,.25);border-radius:28px;background:linear-gradient(180deg,rgba(23,42,74,.8),rgba(7,12,23,.95)),url("images/projects/revive-beloved-cover.png") center/cover;box-shadow:0 35px 90px rgba(0,0,0,.35)}
+    .game-stage iframe{display:block;width:100%;min-height:760px;border:0;border-radius:18px;background:#050914}.play-note{position:absolute;left:26px;bottom:26px;z-index:3;padding:8px 12px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#b9c8da;background:rgba(5,9,20,.72);backdrop-filter:blur(10px);font:700 10px/1 var(--mono);pointer-events:none}
+    .tutorial-rail{position:sticky;top:88px;padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(11,18,33,.84)}.tutorial-rail h3{margin:0 0 8px;font:700 22px/1.25 var(--display)}.tutorial-rail>p{margin:0 0 24px;color:var(--muted);font-size:13px}
+    .tutorial-list{display:grid;gap:16px}.tutorial-step{display:grid;grid-template-columns:30px 1fr;gap:12px}.step-num{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(85,217,238,.35);border-radius:50%;color:var(--cyan);font:700 10px/1 var(--mono)}
+    .tutorial-step b{display:block;margin-bottom:2px;font-size:13px}.tutorial-step span{color:var(--muted);font-size:12px;line-height:1.55}.reset-button{width:100%;margin-top:24px}
+    .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.pillar{min-height:250px;padding:27px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(16,26,46,.92),rgba(8,14,26,.92));transition:transform .25s,border-color .25s}.pillar:hover{transform:translateY(-4px);border-color:rgba(85,217,238,.38)}
+    .pillar-code{color:var(--dim);font:700 11px/1 var(--mono)}.pillar h3{margin:46px 0 11px;font:700 22px/1.25 var(--display)}.pillar p{margin:0;color:var(--muted);font-size:13px}.pillar:nth-child(2) h3{color:var(--gold)}.pillar:nth-child(3) h3{color:var(--purple)}
+    .loop-panel{padding:34px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(10,17,31,.88)}.loop{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.loop-step{position:relative;min-height:150px;padding:22px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}
+    .loop-step:not(:last-child)::after{content:"→";position:absolute;top:50%;right:-14px;z-index:2;transform:translate(50%,-50%);color:var(--cyan);font:700 18px/1 var(--mono)}.loop-step small{color:var(--cyan);font:700 10px/1 var(--mono)}.loop-step h3{margin:21px 0 7px;font:700 18px/1.2 var(--display)}.loop-step p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+    .systems{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.system-card{display:grid;grid-template-columns:90px 1fr;gap:20px;min-height:180px;padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(11,18,33,.86)}
+    .system-icon{display:grid;place-items:center;width:76px;height:76px;border:1px solid rgba(85,217,238,.3);border-radius:22px;color:var(--cyan);background:rgba(85,217,238,.06);font:700 20px/1 var(--display)}.system-card:nth-child(2) .system-icon{color:var(--gold);border-color:rgba(255,200,90,.3);background:rgba(255,200,90,.06)}.system-card:nth-child(3) .system-icon{color:var(--red);border-color:rgba(255,108,108,.3);background:rgba(255,108,108,.06)}.system-card:nth-child(4) .system-icon{color:var(--green);border-color:rgba(110,231,168,.3);background:rgba(110,231,168,.06)}
+    .system-card h3{margin:3px 0 8px;font:700 20px/1.2 var(--display)}.system-card p{margin:0;color:var(--muted);font-size:13px}.system-card b{color:var(--ink)}
+    .flow-frame{overflow:hidden;border:1px solid var(--line);border-radius:26px;background:#0b1020}.frame-bar{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.025)}
+    .frame-dots{display:flex;gap:7px}.frame-dots i{width:8px;height:8px;border-radius:50%;background:var(--red)}.frame-dots i:nth-child(2){background:var(--gold)}.frame-dots i:nth-child(3){background:var(--green)}.frame-title{color:var(--muted);font:700 11px/1 var(--mono)}.frame-link{color:var(--cyan);font:700 11px/1 var(--mono);text-decoration:none}.flow-frame iframe{display:block;width:100%;height:900px;border:0;background:#0d1323}
+    .outcome-section{padding:0 0 110px}.outcome-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.outcome-card{padding:30px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(11,18,33,.86)}.outcome-card h3{margin:0 0 18px;font:700 22px/1.2 var(--display)}.outcome-card ul{margin:0;padding:0;list-style:none}.outcome-card li{position:relative;padding:10px 0 10px 22px;border-top:1px solid rgba(154,181,226,.1);color:var(--muted);font-size:13px}.outcome-card li::before{content:"↗";position:absolute;left:0;color:var(--cyan)}
+    .status-list{display:grid;gap:10px}.status{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.035);color:var(--muted);font-size:12px}.status b{color:var(--green);font:700 10px/1 var(--mono)}.status.pending b{color:var(--gold)}
+    footer{padding:34px 0 44px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}.footer-inner{display:flex;justify-content:space-between;gap:20px}footer a{color:var(--muted);text-decoration:none}
+    @media(max-width:980px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:72px}.hero-visual{min-height:380px}.orbit{width:380px}.orbit.o2{width:290px}.orbit.o3{width:190px}.hero-ball{width:250px}.play-layout{grid-template-columns:1fr}.tutorial-rail{position:static}.tutorial-list{grid-template-columns:repeat(2,1fr)}.pillars{grid-template-columns:1fr}.pillar{min-height:190px}.pillar h3{margin-top:30px}.loop{grid-template-columns:1fr}.loop-step{min-height:0}.loop-step:not(:last-child)::after{content:"↓";top:auto;right:50%;bottom:-15px;transform:translate(50%,50%)}}
+    @media(max-width:720px){.shell{width:min(100% - 24px,1180px)}.topnav{display:none}.hero{gap:28px;padding:58px 0 52px}h1{font-size:clamp(44px,15vw,68px)}.hero-visual{min-height:320px;overflow:hidden}.orbit{width:320px}.orbit.o2{width:245px}.orbit.o3{width:165px}.hero-ball{width:210px}.metric-row{grid-template-columns:repeat(2,1fr);margin-bottom:82px}.play-section,.design-section,.flow-section{padding-bottom:82px}.game-stage{min-height:690px;padding:6px;border-radius:18px}.game-stage iframe{min-height:675px;border-radius:13px}.tutorial-list{grid-template-columns:1fr}.systems{grid-template-columns:1fr}.system-card{grid-template-columns:64px 1fr;padding:22px}.system-icon{width:58px;height:58px;border-radius:17px;font-size:16px}.loop-panel{padding:18px}.frame-title{display:none}.flow-frame iframe{height:760px}.outcome-grid{grid-template-columns:1fr}.footer-inner{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="index.html#projects" aria-label="返回作品集核心项目"><span class="brand-mark">↙</span><span>HXH / PROJECT</span></a>
+      <nav class="topnav" aria-label="项目页导航"><a href="#play">Play</a><a href="#design">Design</a><a href="#systems">Systems</a><a href="#flow">Resource Flow</a></nav>
+    </div>
+  </header>
+  <main>
+    <div class="shell">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="kicker">Playable prototype · System design · 2026</div>
+          <h1 id="hero-title">复活吧！<br><span>我滴爱人！</span></h1>
+          <p class="hero-subtitle">弹射动作 × Roguelike 构筑 × 多资源战斗循环</p>
+          <p class="hero-copy">一款受《世界弹射物语》启发的独立玩法原型。玩家不只是在“看球弹”，而是在弹板时机、弹射角度和技能窗口中主动操作；再用角色、碎片与资源汇率搭出一套会改变战斗规则的 Build。<strong>构筑决定下限，操作决定上限。</strong></p>
+          <div class="hero-actions"><a class="button primary" href="#play">立即开始新手流程 ↓</a><a class="button" href="#flow">查看系统资源流</a></div>
+        </div>
+        <div class="hero-visual" aria-hidden="true"><div class="orbit"></div><div class="orbit o2"></div><div class="orbit o3"></div><div class="hero-ball"></div></div>
+      </section>
+      <div class="metric-row" aria-label="项目数据">
+        <div class="metric"><strong>20</strong><span>房间完整 Run</span></div><div class="metric"><strong>8</strong><span>可编队角色原型</span></div><div class="metric"><strong>49</strong><span>在池构筑碎片</span></div><div class="metric"><strong>6+1</strong><span>资源线与 PF 体验车道</span></div>
+      </div>
+      <section class="play-section" id="play">
+        <div class="section-head"><div class="section-kicker">01 · Play it here</div><h2 class="section-title">不用下载，直接玩一局</h2><p class="section-desc">网页试玩默认进入新玩家状态。教学只在机制第一次出现时暂停解释，做出正确操作后立即回到战斗。</p></div>
+        <div class="play-layout">
+          <div class="game-stage"><iframe id="game-frame" src="worldflipper-game/index.html" title="《复活吧！我滴爱人！》网页试玩" allow="fullscreen; gamepad" loading="eager"></iframe><div class="play-note">KEYBOARD + MOUSE / MOBILE TOUCH</div></div>
+          <aside class="tutorial-rail">
+            <h3>新手流程</h3><p>这不是单独录制的演示，而是项目当前可运行版本。</p>
+            <div class="tutorial-list">
+              <div class="tutorial-step"><span class="step-num">01</span><div><b>选择初始编队</b><span>索妮雅主位，搭配瓦格纳与白板副位。</span></div></div>
+              <div class="tutorial-step"><span class="step-num">02</span><div><b>学会弹板与冲刺</b><span>掌握接球、击飞与空中二次修正。</span></div></div>
+              <div class="tutorial-step"><span class="step-num">03</span><div><b>认识 PF 与大招</b><span>Combo 蓄 PF，移动距离为三条大招槽充能。</span></div></div>
+              <div class="tutorial-step"><span class="step-num">04</span><div><b>清房三选一</b><span>围绕 PF、技能、飞弹或贯通逐渐形成 Build。</span></div></div>
+              <div class="tutorial-step"><span class="step-num">05</span><div><b>第 7 房解锁角色</b><span>用局内表现获取资格，自选新的资源转换器。</span></div></div>
+            </div>
+            <button class="button reset-button" id="reset-tutorial" type="button">重置新手进度并重开</button>
+          </aside>
+        </div>
+      </section>
+      <section class="design-section" id="design">
+        <div class="section-head"><div class="section-kicker">02 · Design thesis</div><h2 class="section-title">我想解决的三个问题</h2><p class="section-desc">重点并不是复刻弹射表现，而是验证“弹射手感、战斗资源和 Roguelike 构筑”能否相互产生因果。</p></div>
+        <div class="pillars">
+          <article class="pillar"><span class="pillar-code">QUESTION_01 / AGENCY</span><h3>让玩家持续做有意义的决策</h3><p>清房后的选择必须改变下一场战斗，而不只是把面板数字抬高。玩家要能看懂资源、判断方向，并在有代价的选项间取舍。</p></article>
+          <article class="pillar"><span class="pillar-code">QUESTION_02 / SKILL</span><h3>构筑与操作谁都不能替代谁</h3><p>弹板、角度、冲刺和技能时机决定执行质量；角色和碎片提供能力边界。好 Build 可以让你更强，但仍需把机会真正打出来。</p></article>
+          <article class="pillar"><span class="pillar-code">QUESTION_03 / SYNERGY</span><h3>追求规则碰撞，而非数值堆叠</h3><p>角色给流派根源，碎片负责激活、放大或改写路径。真正有趣的组合会改变资源的输入、输出或用途。</p></article>
+        </div>
+      </section>
+      <section class="design-section" aria-labelledby="loop-title">
+        <div class="section-head"><div class="section-kicker">03 · Core loop</div><h2 class="section-title" id="loop-title">打 → 选 → 变强 → 再打</h2></div>
+        <div class="loop-panel"><div class="loop">
+          <div class="loop-step"><small>INPUT</small><h3>弹射战斗</h3><p>接球、击飞、冲刺与大招释放共同控制战斗节奏。</p></div>
+          <div class="loop-step"><small>READ</small><h3>资源判断</h3><p>观察 Combo、PF、Fever、三条大招槽与当前血量。</p></div>
+          <div class="loop-step"><small>CHOOSE</small><h3>清房三选一</h3><p>从碎片中判断短期收益、流派方向与组合潜力。</p></div>
+          <div class="loop-step"><small>TRANSFORM</small><h3>规则被改写</h3><p>改变门槛、触发源、弹道、回产或爆发窗口。</p></div>
+          <div class="loop-step"><small>TEST</small><h3>更强房间验证</h3><p>新敌人与 Boss 检验 Build 是否真的成立。</p></div>
+        </div></div>
+      </section>
+      <section class="design-section" id="systems">
+        <div class="section-head"><div class="section-kicker">04 · System highlights</div><h2 class="section-title">四套彼此咬合的玩法系统</h2><p class="section-desc">每条资源有自己的燃料和出口，避免一次高频命中顺手喂满所有系统。</p></div>
+        <div class="systems">
+          <article class="system-card"><div class="system-icon">PF</div><div><h3>Power Flip：把 Combo 变成弹药</h3><p>单次飞行积累 Combo，弹板发射瞬间结算 PF 等级并消费。<b>剑、拳、射</b>分别对应扫场、集火与直线贯穿，而不只是三组倍率。</p></div></article>
+          <article class="system-card"><div class="system-icon">ULT</div><div><h3>三角色大招：让移动距离成为燃料</h3><p>三条技能槽随主球位移充能，默认不吃 PF 与飞弹段数。角色大招提供冰盾、召唤、吐息、突进等具名玩法入口。</p></div></article>
+          <article class="system-card"><div class="system-icon">BUILD</div><div><h3>碎片构筑：改写资源汇率</h3><p>49 张在池碎片覆盖 PF、技能、直击、飞弹、贯通与生存。通过触发器、放大器、弹道和协同件形成组合，而非只叠攻击力。</p></div></article>
+          <article class="system-card"><div class="system-icon">META</div><div><h3>局外循环：失败也能形成目标</h3><p>第 7 房首过获得一次角色解锁资格，之后累计每清 20 房再得一次。成绩单则把一局的主要伤害来源沉淀成可追逐的判词。</p></div></article>
+        </div>
+      </section>
+      <section class="flow-section" id="flow">
+        <div class="section-head"><div class="section-kicker">05 · Full resource architecture</div><h2 class="section-title">系统、数值与资源循环全图</h2><p class="section-desc">下图从角色定义与编队入口，一直追踪到 Combo、PF、大招、Fever、怪物 HP、清房奖励、成绩单与角色解锁；同时记录当前风险与待验证指标。</p></div>
+        <div class="flow-frame"><div class="frame-bar"><span class="frame-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="frame-title">SYSTEM_RESOURCE_FLOW_VISUALIZATION.HTML</span><a class="frame-link" href="worldflipper-resource-flow.html" target="_blank" rel="noopener">全屏查看 ↗</a></div><iframe src="worldflipper-resource-flow.html" title="游戏战斗系统资源流转图" loading="lazy"></iframe></div>
+      </section>
+      <section class="outcome-section">
+        <div class="section-head"><div class="section-kicker">06 · My contribution</div><h2 class="section-title">从体验命题到可验证原型</h2></div>
+        <div class="outcome-grid">
+          <article class="outcome-card"><h3>负责内容</h3><ul>
+            <li>定义“构筑决定下限、操作决定上限”的核心体验与验证目标</li><li>设计弹射手感、PF、大招、Fever、角色编队、碎片构筑与局外解锁循环</li><li>建立 462 项数值归类、资源流字段图、转换边与防失控闸门</li><li>实现 20 房 Run、上下文新手教学、成绩单与网页 / PC / Android 试玩版本</li><li>通过伤害来源、首次资源时间、流派占比与第二局动机持续迭代</li>
+          </ul></article>
+          <article class="outcome-card"><h3>当前验证状态</h3><div class="status-list">
+            <div class="status"><span>PF 与大招资源分家</span><b>VERIFIED</b></div><div class="status"><span>PF 具备独立“弹药感”</span><b>VERIFIED</b></div><div class="status"><span>剑 / 拳 / 射 PF 差异</span><b>3 / 5 LIVE</b></div><div class="status pending"><span>Fever 来源权重与窗口封顶</span><b>ITERATING</b></div><div class="status pending"><span>杖 / 特殊 PF 的体验闭环</span><b>NEXT</b></div>
+          </div></article>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer><div class="shell footer-inner"><span>© 2026 韩徐泓 · 游戏系统设计与原型开发</span><a href="index.html#projects">← 返回核心项目</a></div></footer>
+  <script>
+    const resetButton=document.getElementById('reset-tutorial');
+    const gameFrame=document.getElementById('game-frame');
+    resetButton.addEventListener('click',()=>{
+      try{
+        const gameStorage=gameFrame.contentWindow.localStorage;
+        gameStorage.setItem('worldflipper.debugPlayerMode','new_player');
+        gameStorage.removeItem('worldflipper.newPlayerProgress.v1');
+      }catch(error){console.warn('无法直接清理试玩存档，将重新载入游戏。',error)}
+      gameFrame.src='worldflipper-game/index.html?restart='+Date.now();
+      resetButton.textContent='已重置，正在载入…';
+      window.setTimeout(()=>{resetButton.textContent='重置新手进度并重开'},1800);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>游戏战斗系统资源流转图</title>
+<style>
+  :root {
+    --bg: #090a0d;
+    --panel: rgba(16, 19, 23, 0.9);
+    --line: rgba(236, 232, 216, 0.14);
+    --line-strong: rgba(236, 232, 216, 0.3);
+    --text: #f3efe5;
+    --muted: #aaa79d;
+    --faint: #75756c;
+    --gold: #f1c75b;
+    --jade: #68c08e;
+    --cyan: #6ccbd8;
+    --coral: #f28a63;
+    --plum: #b68dd8;
+    --peri: #8ea4e8;
+    --red: #e85f57;
+    --radius: 8px;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.55;
+  }
+  .page-shell {
+    min-height: 100vh;
+    background-image:
+      linear-gradient(180deg, rgba(9, 10, 13, 0.68), #090a0d 640px),
+      url("../assets/stage-background-crystal-ruins.png");
+    background-size: 100% 720px, cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    padding: 24px;
+  }
+  .container { width: min(1560px, 100%); margin: 0 auto; }
+  .panel {
+    background: linear-gradient(180deg, rgba(17, 20, 24, 0.93), rgba(13, 15, 18, 0.93));
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+    backdrop-filter: blur(10px);
+    padding: clamp(18px, 2.4vw, 34px);
+    margin-bottom: 20px;
+  }
+  h1 { margin: 0; font-size: clamp(30px, 4.6vw, 58px); line-height: 1.05; }
+  h2 { margin: 0 0 6px; font-size: clamp(20px, 2vw, 27px); }
+  h3 { margin: 0 0 8px; font-size: 16px; }
+  .experience-stack {
+    margin-top: 24px;
+    border-top: 1px solid var(--line-strong);
+  }
+  .experience-row {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .experience-row h2 {
+    margin: 0;
+    color: var(--gold);
+    font-size: 17px;
+  }
+  .experience-copy > p {
+    max-width: 1120px;
+    margin: 0;
+    color: #eee8da;
+    font-size: 15px;
+  }
+  .experience-copy > p strong { color: #fff2c9; }
+  .experience-points {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 12px;
+  }
+  .experience-point {
+    padding-left: 12px;
+    border-left: 2px solid var(--line-strong);
+    color: var(--muted);
+    font-size: 12.8px;
+  }
+  .experience-point b {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--cyan);
+    font-size: 13px;
+  }
+  .metric-strip { display: grid; grid-template-columns: repeat(6, minmax(110px, 1fr)); gap: 10px; margin-top: 24px; }
+  .metric { padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,0.045); }
+  .metric strong { display: block; font-size: 26px; line-height: 1.1; color: var(--gold); font-variant-numeric: tabular-nums; }
+  .metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 12.5px; }
+  .section-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+  .section-head p { margin: 0; color: var(--muted); font-size: 13.5px; max-width: 900px; }
+
+  /* ------- diagram board ------- */
+  .board-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255,255,255,0.04); cursor: pointer;
+    font-size: 12.5px; color: var(--muted); user-select: none; transition: all .15s;
+  }
+  .chip .dot { width: 14px; height: 3px; border-radius: 2px; background: var(--gold); }
+  .chip.on { color: var(--text); border-color: var(--line-strong); background: rgba(255,255,255,0.08); }
+  .chip.off { opacity: 0.42; }
+  .zoom-wrap { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: var(--muted); font-size: 12.5px; }
+  .zoom-wrap input { accent-color: var(--gold); width: 150px; }
+  .zoom-wrap button {
+    border: 1px solid var(--line); background: rgba(255,255,255,0.05); color: var(--text);
+    border-radius: 6px; padding: 4px 10px; font-size: 12.5px; cursor: pointer;
+  }
+  .board {
+    position: relative; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius);
+    background:
+      linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
+      #0b0d10;
+    background-size: 40px 40px, 40px 40px;
+    max-height: 90vh;
+  }
+  .board svg { display: block; }
+  .tooltip {
+    position: fixed; z-index: 40; max-width: 380px; padding: 12px 14px; border-radius: 8px;
+    background: rgba(14, 16, 20, 0.97); border: 1px solid var(--line-strong);
+    box-shadow: 0 12px 34px rgba(0,0,0,0.5); pointer-events: none; opacity: 0; transition: opacity .12s;
+    font-size: 12.8px;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .tt-title { font-weight: 600; margin-bottom: 6px; color: var(--gold); }
+  .tooltip .tt-intent { color: #ddd7c9; }
+  .tooltip .tt-gate { margin-top: 6px; color: var(--cyan); }
+
+  /* svg element classes */
+  .node-box { fill: rgba(18, 21, 26, 0.96); stroke: rgba(236,232,216,0.22); stroke-width: 1.2; rx: 8; }
+  .node-head { rx: 8; }
+  .node-title { font-size: 14.5px; font-weight: 600; fill: #101215; }
+  .node-tag { font-size: 10.5px; font-weight: 600; fill: rgba(16,18,21,0.72); }
+  .node-sub { font-size: 11.5px; fill: var(--faint); font-style: italic; }
+  .node-row { font-size: 12.1px; fill: #e8e3d5; }
+  .node-row.dim { fill: #8b8a80; }
+  .node-row.warn { fill: #f2b263; }
+  .edge { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .edge-hit { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; }
+  .edge-label { font-size: 12px; font-weight: 700; paint-order: stroke; stroke: #0b0d10; stroke-width: 6px; stroke-linejoin: round; }
+  .arrow { stroke: none; }
+  g.faded .edge { opacity: 0.10; }
+  g.faded .edge-label { opacity: 0.08; }
+  g.hidden-kind { display: none; }
+  g.node-g { cursor: default; }
+  g.node-g.faded { opacity: 0.25; }
+
+  /* ------- tables & cards ------- */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid rgba(236,232,216,0.09); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: 0.04em; }
+  td b { color: var(--gold); font-weight: 600; }
+  td .gate { color: var(--cyan); }
+  td .warn { color: var(--coral); }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px; margin-right: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .tag.conv { color: var(--gold); border-color: rgba(241,199,91,0.4); }
+  .tag.rule { color: var(--cyan); border-color: rgba(108,203,216,0.4); }
+  .tag.heal { color: var(--jade); border-color: rgba(104,192,142,0.4); }
+  .tag.pen { color: var(--red); border-color: rgba(232,95,87,0.4); }
+  .tag.build { color: var(--plum); border-color: rgba(182,141,216,0.4); }
+  .tag.meta { color: var(--peri); border-color: rgba(142,164,232,0.4); }
+  .tag.fever { color: var(--coral); border-color: rgba(242,138,99,0.45); }
+  .tag.todo { color: #e8c76a; border-color: rgba(232,199,106,0.45); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+  .intent-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; background: rgba(255,255,255,0.035); }
+  .intent-card h3 { color: var(--gold); }
+  .intent-card p { margin: 6px 0; font-size: 13px; color: #d8d2c4; }
+  .intent-card p.how { color: var(--muted); }
+  .intent-card p.gate { color: var(--cyan); font-size: 12.5px; }
+  .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .class-card { border: 1px solid var(--line); border-left-width: 4px; border-radius: var(--radius); padding: 12px 14px; background: rgba(255,255,255,0.035); }
+  .class-card h3 { font-size: 14.5px; }
+  .class-card p { margin: 4px 0; font-size: 12.5px; color: var(--muted); }
+  .class-card .vals { color: #d8d2c4; }
+  .table-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+  .mini-note { color: var(--muted); font-size: 12.5px; }
+  .field-table td:nth-child(2), .flow-table td:nth-child(2) { color: #fff0c2; font-weight: 600; }
+  .field-table code, .flow-table code {
+    color: var(--cyan);
+    background: rgba(108,203,216,0.08);
+    border: 1px solid rgba(108,203,216,0.16);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+  .flow-board { display: grid; gap: 12px; }
+  .flow-lane {
+    display: grid;
+    grid-template-columns: 150px repeat(5, minmax(132px, 1fr));
+    gap: 10px;
+    align-items: stretch;
+  }
+  .lane-title {
+    border: 1px solid var(--line-strong);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 12px;
+    background: rgba(255,255,255,0.055);
+    font-size: 13px;
+    color: #eee7d8;
+  }
+  .lane-title b { display: block; margin-bottom: 4px; color: var(--gold); font-size: 15px; }
+  .flow-step {
+    position: relative;
+    min-height: 118px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 13px;
+    background: rgba(255,255,255,0.035);
+  }
+  .flow-step:not(.end)::after {
+    content: "";
+    position: absolute;
+    right: -11px;
+    top: 50%;
+    width: 11px;
+    border-top: 2px solid currentColor;
+    opacity: .9;
+  }
+  .flow-step:not(.end)::before {
+    content: "";
+    position: absolute;
+    right: -13px;
+    top: calc(50% - 4px);
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    opacity: .9;
+  }
+  .flow-step h3 { margin-bottom: 6px; font-size: 14px; color: #fff2cf; }
+  .flow-step p { margin: 0; font-size: 12.6px; color: #d6d0c3; }
+  .flow-step .data { display: block; margin-top: 7px; color: var(--cyan); font-size: 12px; }
+  .flow-step .risk { color: var(--coral); }
+  .flow-step.pf { color: var(--coral); }
+  .flow-step.ult { color: var(--gold); }
+  .flow-step.fever { color: var(--coral); }
+  .flow-step.meta { color: var(--peri); }
+  .flow-step.clear { color: var(--jade); }
+  .pf-type-grid, .assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .pf-card, .assessment-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 15px;
+    background: rgba(255,255,255,0.035);
+  }
+  .pf-card h3, .assessment-card h3 { font-size: 14.5px; color: var(--gold); }
+  .pf-card p, .assessment-card p { margin: 6px 0 0; color: #d8d2c4; font-size: 12.8px; }
+  .pf-card .state, .assessment-card .state { color: var(--cyan); font-size: 12px; }
+  .assessment-card.good { border-left: 4px solid var(--jade); }
+  .assessment-card.warn { border-left: 4px solid var(--coral); }
+  .assessment-card.todo { border-left: 4px solid var(--peri); }
+  .assessment-card.risk { border-left: 4px solid var(--red); }
+  @media (max-width: 980px) {
+    .flow-lane { grid-template-columns: 1fr; }
+    .flow-step:not(.end)::after,
+    .flow-step:not(.end)::before { display: none; }
+    .experience-row { grid-template-columns: 1fr; gap: 8px; }
+    .experience-points { grid-template-columns: 1fr; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <div class="container">
+
+    <!-- ===================== HERO ===================== -->
+    <section class="panel">
+      <h1>游戏战斗系统资源流转图</h1>
+      <div class="experience-stack">
+        <section class="experience-row" aria-labelledby="core-experience-title">
+          <h2 id="core-experience-title">核心体验</h2>
+          <div class="experience-copy">
+            <p><strong>让玩家持续做有意义的决策。</strong>游戏内容的价值不取决于关卡数量，而取决于每一局里玩家能否看懂当前资源、判断构筑方向，并在有代价的选项之间作出选择。</p>
+            <div class="experience-points">
+              <div class="experience-point"><b>打 → 选 → 变强 → 再打</b>清房后的选择要改变下一场战斗，而不是只把面板数字抬高。</div>
+              <div class="experience-point"><b>角色给根源，碎片给路径</b>角色决定流派为何成立，碎片负责激活、放大或改写这套玩法。</div>
+              <div class="experience-point"><b>规则碰撞，而非数值叠加</b>好构筑会改变资源的输入、输出和用途，让玩家发现可以主动利用的组合。</div>
+            </div>
+          </div>
+        </section>
+        <section class="experience-row" aria-labelledby="battle-experience-title">
+          <h2 id="battle-experience-title">战斗体验</h2>
+          <div class="experience-copy">
+            <p><strong>构筑决定玩家下限，操作决定玩家上限：赢得更快、更漂亮。</strong>玩家用弹板、弹射角度与释放时机控制战斗节奏，再把移动距离、Combo、Fever、大招槽和角色能力转化为不同的爆发机会。</p>
+            <div class="experience-points">
+              <div class="experience-point"><b>资源入口彼此拆分</b>移动距离充大招、Combo 蓄 PF、有效命中积累 Fever，避免一个高频循环顺手喂满全部资源。</div>
+              <div class="experience-point"><b>不同 PF 带来不同决策</b>扫场、集火、贯穿、增益与定点爆破的区别，是释放位置和时机不同，不只是倍率不同。</div>
+              <div class="experience-point"><b>每次释放都应有取舍</b>现在释放、继续蓄力、保留到 Boss，或把 PF 用于清场与保命，都应成为玩家能感知的选择。</div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><strong>462</strong><span>数值全量归类(盘点附录 D)</span></div>
+        <div class="metric"><strong>字段图</strong><span>角色定义 / 编队槽位 / 战斗资源分开</span></div>
+        <div class="metric"><strong>6+1 条</strong><span>资源线 + PF 专用体验车道</span></div>
+        <div class="metric"><strong>26+15</strong><span>图上边 + 表内补充边</span></div>
+        <div class="metric"><strong>49 张</strong><span>在池碎片(改写汇率的手)</span></div>
+        <div class="metric"><strong>2 条</strong><span>局外循环: 解锁资格 / 成绩单</span></div>
+      </div>
+    </section>
+
+    <!-- ===================== DIAGRAM ===================== -->
+    <section class="panel" id="diagram">
+      <div class="section-head">
+        <h2>① 战斗资源流类图</h2>
+        <p>读法: 每个盒子是字段集合,不是说明文。左侧从 <b>角色定义 → 当前编队 → 球体状态 / 玩家 HP / 解锁字段</b> 展开;中间是 Combo、三条大招槽、PF、Fever;右侧是怪物 HP、清房和成绩单。连线表示字段写入、读取或转换。</p>
+      </div>
+      <div class="board-tools" id="kind-chips"></div>
+      <div class="board" id="board"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </section>
+
+    <!-- ===================== FIELD GLOSSARY ===================== -->
+    <section class="panel" id="field-glossary">
+      <div class="section-head">
+        <h2>② 字段中文速查与连线说明</h2>
+        <p>上面的图尽量保持短标签,这里把字段翻成中文。重点看“中文名”和“流向”:它说明这个资源从哪里来、写到哪里、在战斗里意味着什么。</p>
+      </div>
+      <div class="table-tools">
+        <span class="mini-note">提示: 图上看结构,表里看含义。英文代码字段只是定位用,中文名才是策划阅读入口。</span>
+      </div>
+      <table class="field-table">
+        <thead><tr><th style="width:150px">所属盒子</th><th style="width:160px">中文名</th><th style="width:260px">代码字段</th><th>备注 / 流向</th></tr></thead>
+        <tbody id="field-table"></tbody>
+      </table>
+      <table class="flow-table" style="margin-top:18px">
+        <thead><tr><th style="width:52px">组</th><th style="width:220px">中文关系</th><th style="width:250px">从哪个字段来</th><th style="width:250px">流到哪个字段</th><th>这条线意味着什么</th></tr></thead>
+        <tbody id="flow-table"></tbody>
+      </table>
+    </section>
+
+    <!-- ===================== PF FLOW ===================== -->
+    <section class="panel" id="pf-flow">
+      <div class="section-head">
+        <h2>③ PF 资源流转与体验考察</h2>
+        <p>PF 的设计目的不是"多一条伤害线",而是把 Combo 变成弹药:玩家在场上攒、在弹板发射时扣扳机、用不同 PF 类型打出不同体验。这里用车道图拆开,避免线缠在一起。</p>
+      </div>
+
+      <div class="flow-board">
+        <div class="flow-lane">
+          <div class="lane-title"><b>PF 主资源线</b>连击变弹药</div>
+          <div class="flow-step pf">
+            <h3>合格命中</h3>
+            <p>主球、跟随球、技能、召唤、PF 命中都会进入命中事件。</p>
+            <span class="data">组件 / 灼烧不计 Combo</span>
+          </div>
+          <div class="flow-step pf">
+            <h3>Combo.count</h3>
+            <p>单次飞行攒弹药,发射 / 掉球 / 换房清零。拿"不灭连击"才变成房间级弹匣。</p>
+            <span class="data">门槛钩子: 9 / 15 / 39</span>
+          </div>
+          <div class="flow-step pf">
+            <h3>弹板发射结算</h3>
+            <p>发射瞬间读取 Combo 定 PF 等级,然后把弹药打出去。</p>
+            <span class="data">速凝 ×0.6,白板副位 ×0.33</span>
+          </div>
+          <div class="flow-step pf">
+            <h3>Power Flip</h3>
+            <p>剑=扫场,拳=单体,射=直线;杖/特殊是待补的增益窗与定点爆破。</p>
+            <span class="data">当前 3/5 类型实装</span>
+          </div>
+          <div class="flow-step pf end">
+            <h3>伤害 / 清房</h3>
+            <p>PF 进入统一伤害乘区,再通过怪物 HP 转成清房、碎片、成绩单和解锁进度。</p>
+            <span class="data">PF 判词: 强击裁决</span>
+          </div>
+        </div>
+
+        <div class="flow-lane">
+          <div class="lane-title"><b>防串线规则</b>各流派有燃料</div>
+          <div class="flow-step ult">
+            <h3>移动距离</h3>
+            <p>主球位移是大招基础充能入口,不是命中段数。</p>
+            <span class="data">大招: 0.3 / 100px</span>
+          </div>
+          <div class="flow-step ult">
+            <h3>大招槽</h3>
+            <p>默认不吃 Combo / PF / 飞弹命中,技能流回充必须由碎片或角色具名。</p>
+            <span class="data">canChargeUltFromComboSource = false</span>
+          </div>
+          <div class="flow-step pf">
+            <h3>PF 命中</h3>
+            <p>可以继续制造 Combo 和 Fever,但"静默强击"会主动剪断全部回产。</p>
+            <span class="data">+60% PF 伤害,换零产出</span>
+          </div>
+          <div class="flow-step fever">
+            <h3>Fever</h3>
+            <p>PF 已确认应计入 Fever,但不能按段数无限线性灌满。</p>
+            <span class="data risk">待补: 来源权重 + 2s 窗口封顶</span>
+          </div>
+          <div class="flow-step fever end">
+            <h3>重审边</h3>
+            <p>Fever 期间直接 +5 大招/s 会把 Fever 又变成技能流引擎。</p>
+            <span class="data risk">建议改为距离充能速度 +X%</span>
+          </div>
+        </div>
+
+        <div class="flow-lane">
+          <div class="lane-title"><b>局外体验线</b>为什么再开一局</div>
+          <div class="flow-step clear">
+            <h3>清房</h3>
+            <p>清房是唯一门:碎片、回血、跨房层、局外资格都从这里结算。</p>
+            <span class="data">防刷怪龟缩</span>
+          </div>
+          <div class="flow-step meta">
+            <h3>成绩单</h3>
+            <p>PF 占比高时给"强击裁决",把一局沉淀成可回味、可追逐的结果。</p>
+            <span class="data">来源占比因果干净</span>
+          </div>
+          <div class="flow-step meta">
+            <h3>解锁资格</h3>
+            <p>第 7 关首过 +1,之后累计每 20 房 +1,失败局推进也不白费。</p>
+            <span class="data">清房数 = 局外资源</span>
+          </div>
+          <div class="flow-step meta">
+            <h3>解锁角色</h3>
+            <p>玩家自选新角色,也就是选择新的资源汇率和新的 PF / 大招入口。</p>
+            <span class="data">角色是根源,碎片是放大</span>
+          </div>
+          <div class="flow-step meta end">
+            <h3>下一局</h3>
+            <p>带新角色、追新判词、赌新 Boss,形成"打 → 看结果 → 拿目标 → 再打"。</p>
+            <span class="data">满足第二局动机</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pf-type-grid">
+        <div class="pf-card"><h3>剑 PF · slash</h3><p class="state">✅ 已实装</p><p>扫场压制。玩家要把球钻进怪堆里,用圆形范围清杂兵;适合群狩、Lv3 强化、范围扩大。</p></div>
+        <div class="pf-card"><h3>拳 PF · strike</h3><p class="state">✅ 已实装</p><p>集中爆发。先接触目标再贴脸连打,适合 Boss 和单体高血量目标;和剑 PF 的"扫"形成体验差异。</p></div>
+        <div class="pf-card"><h3>射 PF · beam</h3><p class="state">✅ 已实装</p><p>贯穿延伸。玩家要控制弹出角度,把一条线上的目标串起来;天然接贯通流和线性房间。</p></div>
+        <div class="pf-card"><h3>杖 PF · wand</h3><p class="state">⬜ 待实装</p><p>增益爆发。不是主要打伤害,而是开全队 buff 窗口,让后续大招、直击、飞弹一起变强。</p></div>
+        <div class="pf-card"><h3>特殊 PF · special</h3><p class="state">⬜ 待实装</p><p>定点轰爆。撞到第一个目标后在脚下炸开 AOE;和拳 PF 同样接触触发,但体验从单点变成扩散。</p></div>
+      </div>
+
+      <div class="assessment-grid">
+        <div class="assessment-card good"><h3>已达成: PF 与大招分家</h3><p>PF 命中默认不再喂大招,大招改由移动距离基础充能。这个结构满足"不要让 PF 流被拖成大招流"的目的。</p></div>
+        <div class="assessment-card good"><h3>已达成: PF 有自己的弹药感</h3><p>Combo 作为弹药,发射瞬间定级并消费;PF 流碎片围绕门槛、弹匣、弹头、用途决策展开,玩家能感到是在经营一发 PF。</p></div>
+        <div class="assessment-card warn"><h3>部分达成: 类型体验还缺 2/5</h3><p>剑、拳、射已经分别覆盖扫场、单体、直线;杖和特殊还没落地,所以 PF 的"五种体验不是五种数值"还没有完全闭环。</p></div>
+        <div class="assessment-card risk"><h3>风险: Fever 仍可能串回大招</h3><p>Fever 直接 +5 大招/s 与"大招吃移动距离"的设计目标冲突。建议改成 Fever 期间距离充能速度提升,或者先移除。</p></div>
+        <div class="assessment-card risk"><h3>风险: PF → Fever 需要刹车</h3><p>PF 段数回调后,如果 Fever 仍按每段命中线性加,会重新出现高段数白嫖爆发窗。需要来源权重、伤害压缩或窗口封顶。</p></div>
+        <div class="assessment-card todo"><h3>验证指标</h3><p>重点看 PF 判词出现率、PF 专精局时长、第一发大招时间、第一次 Fever 时间、PF 占比、玩家第二局开始率和解锁资格消费率。</p></div>
+      </div>
+    </section>
+
+    <!-- ===================== EDGE TABLE ===================== -->
+    <section class="panel">
+      <div class="section-head">
+        <h2>④ 循环边总表(含未入图的细边)</h2>
+        <p>每一条资源流动:从哪个类到哪个类、汇率是多少、<b>为什么这么设计</b>、防失控的闸门在哪。图里为了可读性省略的细边(莉可 30C 回血、三重奏、贯通球速等)在这里补全。⏳ = 设计方向,未实施。</p>
+      </div>
+      <table>
+        <thead><tr><th style="width:52px">组</th><th style="width:200px">边(类 → 类)</th><th style="width:190px">转换率(现值)</th><th>设计意图</th><th style="width:200px">闸门 / 备注</th></tr></thead>
+        <tbody id="edge-table"></tbody>
+      </table>
+    </section>
+
+    <!-- ===================== INTENT CARDS ===================== -->
+    <section class="panel">
+      <div class="section-head">
+        <h2>⑤ 设计意图深读</h2>
+        <p>每张卡说明这条循环怎么转、为什么要这样设计，以及依靠什么闸门防止资源失控。</p>
+      </div>
+      <div class="card-grid" id="intent-cards"></div>
+    </section>
+
+    <!-- ===================== CLASS MAP ===================== -->
+    <section class="panel">
+      <div class="section-head">
+        <h2>⑥ 数值归类速查(哪个数值属于哪个类)</h2>
+        <p>与盘点文档 §1 的十个类一一对应;每类列代表数值,全量 462 项逐条见盘点文档附录 D。边框颜色与上图盒子标题色一致。</p>
+      </div>
+      <div class="class-grid" id="class-cards"></div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   数据层: 节点(类盒子) / 边(资源流) / 意图卡 / 类速查
+   坐标为手工布线 —— 改动盒子位置时同步检查 via 通道。
+============================================================ */
+const COLORS = {
+  conv: '#f1c75b',   // 主循环: 资源转换
+  rule: '#6ccbd8',   // 选人/碎片带来的规则改写
+  fever: '#f28a63',  // Fever 增益(含 ⚠️ 张力边)
+  heal: '#68c08e',   // 回复
+  pen:  '#e85f57',   // 惩罚
+  build:'#b68dd8',   // 构筑回边
+  meta: '#8ea4e8',   // 局外循环
+};
+const KIND_NAMES = {
+  conv: '主循环(转换)', rule: '规则改写(选人)', fever: 'Fever 增益', heal: '回复',
+  pen: '惩罚', build: '构筑回边', meta: '局外循环',
+};
+const DASHED = { rule: '7 5', pen: '8 6', meta: '9 6', build: '' };
+
+const NODES = [
+  { id:'CHAR', x:70,  y:64,  w:350, h:200, color:'#f1c75b', tag:'C1 角色定义', title:'角色定义 characterDefs[8]',
+    sub:'角色字段,不是当前上场槽位',
+    rows:[
+      ['角色编号 id / 名字 name / 元素 element'],
+      ['职业定位 role / 种族 race'],
+      ['PF类型 pfType: slash / strike / beam'],
+      ['大招类型 engine_ult_type + ultimate{}'],
+      ['被动 passives[] / 队长技 captain_skill'],
+      ['基础面板 base_stats: HP/ATK/技能消耗','dim'],
+      ['角色 max_hp 不接玩家 HP','warn'],
+    ]},
+  { id:'TEAM', x:70, y:310, w:350, h:155, color:'#f1c75b', tag:'当前编队', title:'当前编队 team',
+    sub:'槽位字段 = 战斗入口顺序',
+    rows:[
+      ['主位 mainId → 主球 / 队长技'],
+      ['副1 subIds[0] → 跟随球 follower[0]'],
+      ['副2 subIds[1] → 跟随球 follower[1]'],
+      ['队伍顺序 teamIds() ↔ 大招三槽'],
+      ['副位判断 hasSubCharacter(id) → 被动'],
+    ]},
+  { id:'OP', x:70, y:520, w:350, h:160, color:'#9aa7b4', tag:'C2 物理字段', title:'玩家操作 / 球体状态',
+    sub:'操作与球字段产生资源输入',
+    rows:[
+      ['球位置 ball.x/y + prevX/prevY → 距离'],
+      ['球状态 alive / trapped / fallFrames'],
+      ['操作事件 launch / drop / dash / aim'],
+      ['速度上限 MAX_BALL_SPEED'],
+      ['掉球扣血 DROP_HP_COST'],
+    ]},
+  { id:'HIT', x:500, y:550, w:230, h:90, color:'#9aa7b4', tag:'事件字段', title:'HitEvent',
+    sub:'',
+    rows:[
+      ['命中来源 source: 球/跟随球/技能/PF/子弹'],
+      ['命中位置 fx/fy'],
+      ['组件 comp / 灼烧 trail 不进 Combo','dim'],
+    ]},
+  { id:'ULT', x:790, y:64, w:360, h:180, color:'#f1c75b', tag:'C3 · R1', title:'大招槽 ultCharges[0..2]',
+    sub:'3 槽与 teamIds() 同序',
+    rows:[
+      ['大招槽1 ultCharges[0] ↔ 主位 mainId'],
+      ['大招槽2 ultCharges[1] ↔ 副1 subIds[0]'],
+      ['大招槽3 ultCharges[2] ↔ 副2 subIds[1]'],
+      ['满槽值 ULT_MAX_CHARGE = 100'],
+      ['槽上限 ultChargeCap(): 100 / 150'],
+      ['释放 releaseUlt(slot) → 本槽清零'],
+    ]},
+  { id:'COMBO', x:790, y:330, w:360, h:145, color:'#6ccbd8', tag:'C3 · R2', title:'Combo',
+    sub:'combo 对象字段',
+    rows:[
+      ['当前连击 combo.count'],
+      ['最高连击 maxThisRun / maxThisRoom'],
+      ['来源 source ← HitEvent.source'],
+      ['清零 reset: 发射 / 掉球 / 换房'],
+      ['流向: PF / Fever / 飞弹 / 回血'],
+    ]},
+  { id:'FEVER', x:790, y:590, w:360, h:160, color:'#f28a63', tag:'C3 · R4', title:'Fever',
+    sub:'fever 对象字段',
+    rows:[
+      ['Fever能量 fever.energy / 上限1000'],
+      ['剩余时间 fever.framesLeft / 20s'],
+      ['获得量 gain: 当前 +1/命中'],
+      ['待改: 来源权重 sourceWeight + 窗口上限','warn'],
+      ['输出: 伤害×2 / 球速×1.3 / 回复'],
+    ]},
+  { id:'SKILL', x:1250, y:64, w:370, h:150, color:'#f1c75b', tag:'角色大招', title:'ultimate[teamIds()[slot]]',
+    sub:'每个槽释放自己的角色大招',
+    rows:[
+      ['大招类型 engine_ult_type: 召唤/子弹/护盾...'],
+      ['技能倍率 skill_multiplier'],
+      ['命中段数 hit_count'],
+      ['释放效果 on_cast_effects'],
+      ['命中效果 on_hit_effects'],
+      ['角色技能消耗 skill_cost_max: 未接槽','dim'],
+    ]},
+  { id:'PF', x:1250, y:330, w:370, h:160, color:'#f28a63', tag:'C3 · R3', title:'PowerFlip state',
+    sub:'PF 状态字段',
+    rows:[
+      ['待释放等级 pendingLevel / 当前等级 level'],
+      ['PF形态 type ← 主位 pfType'],
+      ['等级门槛 threshold: 9 / 15 / 39'],
+      ['持续帧 activeFrames / 群狩目标数'],
+      ['释放时连击 comboAtCast → 超连击/延展'],
+      ['PF命中 → Combo/Fever(静默可剪断)'],
+    ]},
+  { id:'DMG', x:1700, y:170, w:360, h:150, color:'#e8c76a', tag:'C4 字段', title:'DamageRecord',
+    sub:'伤害结算字段',
+    rows:[
+      ['伤害来源 source'],
+      ['基础伤害 baseDamage / 最终伤害 finalDamage'],
+      ['乘区明细 breakdown.parts[] / mult'],
+      ['来源统计 damageBySource[source]'],
+      ['最大单击 maxSingleHit / 房间DPS roomDps'],
+      ['怪物扣血 m.hp -= finalDamage'],
+    ]},
+  { id:'ENEMY', x:2140, y:64, w:350, h:145, color:'#e85f57', tag:'C5+C7 字段', title:'Room / Monster',
+    sub:'',
+    rows:[
+      ['当前房间 run.roomIndex / ROOMS[]'],
+      ['怪物血量 m.hp / m.maxHp'],
+      ['怪物类型 type / 房间倍率 hpScale'],
+      ['攻击间隔 attackInterval / 攻击伤害'],
+      ['全灭检查 anyMonsterAlive()'],
+    ]},
+  { id:'BOSS', x:2140, y:330, w:350, h:130, color:'#e85f57', tag:'C6 字段', title:'Boss state',
+    sub:'',
+    rows:[
+      ['Boss类型 bossType / 阶段标记 phase flags'],
+      ['结晶盾 PF命中数 crystalShieldPfHits'],
+      ['眩晕 crystalStun / 对波 dragonClash'],
+      ['触手 tentaclesAlive / 墨水 squidInk'],
+    ]},
+  { id:'CLEAR', x:2140, y:610, w:350, h:150, color:'#68c08e', tag:'结算字段', title:'RoomClear',
+    sub:'房间结算字段',
+    rows:[
+      ['房间结果 room.result = clear / fail'],
+      ['清房数 roomsCleared / 房间推进 roomIndex++'],
+      ['奖励选项 pickChoices[] / 奖励数量 rewardCount'],
+      ['进出血量 hpStart / hpEnd / 房间DPS'],
+      ['新手清房记录 recordNewPlayerRoomClear()'],
+    ]},
+  { id:'FRAG', x:1250, y:910, w:460, h:145, color:'#b68dd8', tag:'C8 字段', title:'Fragments / comps',
+    sub:'碎片字段与运行时组件',
+    rows:[
+      ['已选碎片 selectedComps'],
+      ['组件判断 hasComp(id)'],
+      ['分类 cat / 标签 tags / 描述 desc'],
+      ['效果 effects: 门槛/倍率/获得量/冷却'],
+      ['流派标签: skill / PF / missile / pierce'],
+    ]},
+  { id:'SUBRES', x:1250, y:1110, w:460, h:135, color:'#b68dd8', tag:'C3 · R6', title:'SubResources',
+    sub:'流派内部资源字段',
+    rows:[
+      ['飞弹燃料 missileVolleyFuel / 子弹数 bullets.length'],
+      ['贯通蓄势 flightStacks / 记忆层'],
+      ['技能连咏 ultChainStacks / 回响预算'],
+      ['蓄招层 bankedUltDamageStacks / 军备 roomArmory'],
+    ]},
+  { id:'HP', x:70, y:805, w:350, h:155, color:'#e85f57', tag:'C3 · R5', title:'玩家 HP game.hp',
+    sub:'全局玩家血量,不是角色血量',
+    rows:[
+      ['玩家血上限 PLAYER_MAX_HP = 100'],
+      ['当前血量 game.hp / 房间首尾 hpStart-hpEnd'],
+      ['扣血来源: 敌袭 enemyHit / 掉球 drop'],
+      ['回血来源: 清房 / 莉可 / Fever / 大招'],
+      ['base_stats.max_hp: 未接入','dim'],
+    ]},
+  { id:'META', x:70, y:1110, w:350, h:145, color:'#8ea4e8', tag:'C9 字段', title:'CharacterUnlockState',
+    sub:'局外角色池字段',
+    rows:[
+      ['已解锁角色 unlockedIds[]'],
+      ['解锁资格 unlockCredits'],
+      ['累计清房 totalRoomsCleared'],
+      ['第7关里程碑 room7MilestoneClaimed'],
+      ['起始角色[6,5,1] / 可解锁[2,3,4,7,8]'],
+    ]},
+  { id:'SCORE', x:500, y:1110, w:350, h:145, color:'#8ea4e8', tag:'C9 字段', title:'RunSummary / ScoreCard',
+    sub:'局末数据字段',
+    rows:[
+      ['逐房数据 runData.rooms[]'],
+      ['伤害来源 combat.damageBySource'],
+      ['总伤害 / 最高连击 / 击杀 / 用时'],
+      ['流派判词 archetypeLabel / 导出 export zip'],
+    ]},
+];
+
+/* 边: from/to = [节点, 边, 0..1 位置]; via = 手工布线拐点(正交) */
+const EDGES = [
+  // ---- 字段映射 ----
+  { id:'C0', kind:'rule', from:['CHAR','bottom',0.5], to:['TEAM','top',0.5], via:[],
+    label:'选中角色 → 写入编队槽', labelAt:[210,292],
+    intent:'从角色定义池里选 3 个 id,写入当前编队槽位。', gate:'只有 unlockedIds 中的角色可被选入队伍。' },
+
+  // ---- 主循环 conv ----
+  { id:'M1', kind:'conv', from:['OP','right',0.28], to:['ULT','left',0.45], via:[[610,565],[610,145]],
+    label:'球移动距离 → 大招充能', labelAt:[616,350],
+    intent:'大招的基础输入只吃"主球位移"。如果吃 Combo/命中,Fever 与大招会互相加速,所有高命中构筑都被拖向大招流——用游戏里已有的移动距离做拆分,控球/持续弹射成为大招流自己的身份。',
+    gate:'命中回充恒关(canChargeUltFromComboSource=false);<0.5px/帧抖动不计;演出/QTE 不计。' },
+  { id:'M2', kind:'conv', from:['OP','right',0.62], to:['HIT','left',0.5], via:[],
+    label:'碰撞命中 → 命中事件', labelAt:[430,590],
+    intent:'操作的第二产物:命中事件。距离与命中从同一个操作里分流成两条资源线。', gate:'' },
+  { id:'M3', kind:'conv', from:['HIT','right',0.28], to:['COMBO','left',0.65], via:[[760,575],[760,424]],
+    label:'命中来源 → 连击+1', labelAt:[742,500],
+    intent:'Combo 是"单次飞行攒的弹药":球/召唤/子弹/技能/PF 都计,但组件与灼烧不计——防触发流白嫖连击。',
+    gate:'发射/掉球/换房清零是天然节流。' },
+  { id:'M4', kind:'conv', from:['HIT','right',0.72], to:['FEVER','left',0.35], via:[[760,615],[760,646]],
+    label:'命中事件 → 狂热能量+1', labelAt:[588,680],
+    intent:'现状 Fever 是"每命中 +1"的泛资源。目标是让 Fever 奖励短时攻击表现,而不是被高段数玩法轻易灌满。图上保留这条线是为了看见现状与目标的差距。',
+    gate:'方向(未实施): 来源加权 + √伤害压缩 + 2s 窗口封顶 120。' },
+  { id:'M5', kind:'conv', from:['COMBO','right',0.5], to:['PF','left',0.48], via:[],
+    label:'连击数 → PF待释放等级', labelAt:[1168,395],
+    intent:'PF 在弹板发射的瞬间结算:达到门槛就按当时 Combo 定级,然后清零重攒——"攒一发弹药打一发"。',
+    gate:'门槛修正: 速凝×0.6 / 白板副位×0.33 / Lv3词条-2。' },
+  { id:'M6', kind:'conv', from:['ULT','right',0.44], to:['SKILL','left',0.52], via:[],
+    label:'按槽释放 → 对应角色大招', labelAt:[1168,125],
+    intent:'大招是整槽消费、无差异成本(skill_cost_max 数据休眠)。重大招/轻大招的差异化还没选边。',
+    gate:'过载咏唱: 池 100→150,溢出转技伤。' },
+  { id:'M7', kind:'conv', from:['PF','right',0.35], to:['DMG','left',0.8], via:[[1660,386],[1660,290]],
+    label:'PF等级/形态 → PF伤害', labelAt:[1628,370],
+    intent:'PF 伤害进统一乘区,吃 PF 专属加成(觉醒+75%/静默+60%/群狩/超连击 max+3000%)。', gate:'' },
+  { id:'M8', kind:'conv', from:['SKILL','right',0.5], to:['DMG','left',0.27], via:[[1660,139],[1660,210]],
+    label:'大招伤害表 → 技能伤害', labelAt:[1630,118],
+    intent:'技能伤害区吃队长技(+260%/+160%/+60%)与技能词条——大招流的乘区身份。', gate:'' },
+  { id:'M9', kind:'conv', from:['DMG','right',0.3], to:['ENEMY','left',0.5], via:[[2115,215],[2115,136]],
+    label:'最终伤害 → 怪物扣血', labelAt:[2050,205],
+    intent:'对抗面: 有效怪 HP=模板×房间曲线×总旋钮 5——清房时间≈有效HP÷DPS,是整个数值系统的最终校验方程。', gate:'' },
+  { id:'M10', kind:'conv', from:['DMG','right',0.7], to:['BOSS','left',0.5], via:[[2115,275],[2115,395]],
+    label:'最终伤害 → 首领状态', labelAt:[2050,268],
+    intent:'Boss 用防御乘区制造节奏: 结晶盾固定 1 伤逼 PF、眩晕窗 ×5 给爆发、乌贼触手逼切换目标。', gate:'' },
+  { id:'M11', kind:'conv', from:['ENEMY','right',0.5], to:['CLEAR','right',0.25], via:[[2520,136],[2520,648]],
+    label:'怪物全灭 → 房间清算', labelAt:[2524,380],
+    intent:'当房间里没有存活怪物时,房间进入清算:记录房间数据、发放奖励、推进到下一房。', gate:'anyMonsterAlive() 为 false 才触发。' },
+  { id:'M12', kind:'conv', from:['BOSS','right',0.5], to:['CLEAR','right',0.5], via:[[2505,395],[2505,685]],
+    label:'首领击破 → 房间清算', labelAt:[2458,520],
+    intent:'Boss 血量归零后同样进入清房结算,后续奖励、成绩单、解锁进度都挂在这个出口上。', gate:'boss.hp <= 0。' },
+  { id:'M13', kind:'conv', from:['CLEAR','bottom',0.2], to:['FRAG','right',0.46], via:[[2210,980],[1730,980]],
+    label:'清房结果 → 碎片奖励', labelAt:[1850,972],
+    intent:'清房是唯一的门:碎片奖励绑定"过房",每次强化都为下一房更快服务;三选一是构筑决策点(跟流派还是转向)。',
+    gate:'⏳半定向随机(已选流派权重×1.5)是方向,当前均匀随机。' },
+
+  // ---- 构筑回边 build ----
+  { id:'B1', kind:'build', from:['FRAG','top',0.5], to:['DMG','bottom',0.5], via:[[1480,520],[1880,520]],
+    label:'碎片效果 → 改倍率/规则', labelAt:[1500,512],
+    intent:'碎片是改写汇率的"手":门槛×0.6、乘区+%、规则级改写(不灭连击把 Combo 从飞行级抬到房间级;静默强击剪断 PF 自喂;手动阀门把 Fever 交还玩家)。',
+    gate:'规则改写型碎片都自带代价或互斥张力。' },
+  { id:'B2', kind:'build', from:['FRAG','left',0.8], to:['ULT','bottom',0.5], via:[[1180,1026],[1180,270],[970,270]],
+    label:'回充碎片 → 大招槽加值', labelAt:[1186,780],
+    intent:'技能流的"快"必须花碎片位换,且每条都有预算:回响 40/次、开局+30、5杀+15、三重奏 10s 窗口——快得有身份,而不是所有高段数玩法都顺手变成技能流。',
+    gate:'大招回响预算 40/次释放,防"大招→回满→大招"自循环。' },
+  { id:'B3', kind:'build', from:['FRAG','bottom',0.5], to:['SUBRES','top',0.5], via:[],
+    label:'碎片 → 流派小资源', labelAt:[1440,1058],
+    intent:'一些碎片不会直接给伤害,而是打开流派自己的计数器或燃料池,例如飞弹燃料、贯通蓄势、技能连咏层。', gate:'这些小资源通常有封顶、预算或过房清零。' },
+  { id:'B4', kind:'build', from:['CLEAR','bottom',0.35], to:['SUBRES','right',0.4], via:[[2260,1180]],
+    label:'清房 → 跨房层数', labelAt:[1810,1172],
+    intent:'把"房间数"本身变成资源,奖励推进。蓄招过房故意奖励"满槽不放"——与技能流形成一对张力选择。',
+    gate:'军备/共鸣 8 层封顶;蓄招无上限(已知风险,盘点观察)。' },
+
+  // ---- 规则改写 rule (选人) ----
+  { id:'R0', kind:'rule', from:['TEAM','right',0.25], to:['ULT','left',0.18], via:[[610,349],[610,96]],
+    label:'编队顺序 ↔ 三条大招槽', labelAt:[616,225],
+    intent:'三条大招槽不是抽象团队槽,而是按 [主位,副1,副2] 对齐角色。', gate:'UI 1/2/3 与 ultCharges[0/1/2] 同序。' },
+  { id:'R1', kind:'rule', from:['TEAM','top',0.3], to:['ULT','top',0.3], via:[[175,284],[900,284],[900,40]],
+    label:'风铃在副位 → 每秒充能', labelAt:[420,276],
+    intent:'选人阶段就是 build 的第一次下注:副位被动直接改资源汇率——风铃是技能流的入口。', gate:'' },
+  { id:'R2', kind:'rule', from:['TEAM','right',0.45], to:['PF','left',0.14], via:[[640,380],[1220,380],[1220,352]],
+    label:'主位PF/副位被动 → PF规则', labelAt:[820,372],
+    intent:'白板/射手的副位被动改 PF 的门槛与几何——PF 流从选人开始成型。', gate:'白板需"本房放过大招"激活,跨资源联动。' },
+  { id:'R3', kind:'rule', from:['TEAM','right',0.66], to:['DMG','left',0.18], via:[[650,412],[650,525],[1680,525],[1680,197]],
+    label:'主位队长技 → 伤害乘区', labelAt:[900,517],
+    intent:'主位=队长技:技伤乘区从选主位那一刻定调(瓦格纳+260% 是技能流最大单源)。', gate:'' },
+  { id:'R4', kind:'rule', from:['TEAM','bottom',0.5], to:['OP','top',0.5], via:[],
+    label:'冰卫在副位 → 球速上限下降', labelAt:[210,492],
+    intent:'冰卫是"代价型"被动:牺牲全队球速换防御——手感值(球速)在这里被当成可交易的资源。', gate:'' },
+
+  // ---- Fever 增益 fever ----
+  { id:'F1', kind:'fever', from:['FEVER','right',0.6], to:['DMG','left',0.93], via:[[1660,686],[1660,310]],
+    label:'狂热中 → 伤害翻倍', labelAt:[1260,678],
+    intent:'Fever 开启是全来源 ×2 的爆发窗口,同时球速 ×1.3(又一次征用手感值)+Boss 房制导弹簧。', gate:'时长 20s(面板;源码默认 8——面板即现行)。' },
+  { id:'F2', kind:'fever', from:['FEVER','right',0.2], to:['ULT','bottom',0.7], via:[[1170,622],[1170,274],[1042,274]],
+    label:'⚠️ 狂热中 → 大招每秒充能', labelAt:[1178,430],
+    intent:'张力边:大招已改吃距离,但 Fever 期间仍直接灌槽——Fever 又可能变成技能流引擎。建议移除这条直充,或改为"距离充能速度+X%"。保留在图上是为了看见它。',
+    gate:'待重审。' },
+  { id:'F3', kind:'heal', from:['FEVER','left',0.6], to:['HP','right',0.2], via:[[610,686],[610,836]],
+    label:'狂热中 → 玩家回血', labelAt:[616,760],
+    intent:'Fever 兼职回复窗口:打得好=活得久。', gate:'' },
+
+  // ---- 回复 heal ----
+  { id:'H1', kind:'heal', from:['CLEAR','bottom',0.7], to:['HP','right',0.4], via:[[2385,1510],[460,1510],[460,867]],
+    label:'清房/治疗效果 → 玩家回血', labelAt:[1350,1503],
+    intent:'回复经济全绑清房与里程碑:打得快=活得久,防龟缩。', gate:'莉可 30C 限 3 次/房;夺命 1 次/房。' },
+
+  // ---- 惩罚 pen ----
+  { id:'P1', kind:'pen', from:['OP','bottom',0.5], to:['HP','top',0.5], via:[],
+    label:'掉球 → 玩家扣血', labelAt:[245,742],
+    intent:'掉球口宽 65 是物理惩罚入口——满血恰好 4 次机会,等价于旧多命制。', gate:'过载贯通碎片自愿加倍这个惩罚,换蓄势不封顶。' },
+  { id:'P2', kind:'pen', from:['ENEMY','left',0.2], to:['HP','right',0.05], via:[[2110,93],[2110,785],[460,785],[460,813]],
+    label:'敌人攻击 → 玩家扣血', labelAt:[1150,777],
+    intent:'受击压力随攻击间隔曲线(1.15→0.42)越深越密;它与掉球共用同一个 HP 池——受击压力和操作失误在同一个容错预算里结算。',
+    gate:'冰盾期间全免;连续源每 6 帧一跳(🔗交叉值)。' },
+
+  // ---- 局外 meta ----
+  { id:'X1', kind:'meta', from:['CLEAR','bottom',0.85], to:['META','right',0.5], via:[[2438,1600],[450,1600],[450,1183]],
+    label:'清房数 → 解锁资格', labelAt:[1320,1593],
+    intent:'通关房间数成为局外资源:第 7 关(第一个 Boss)给第一个资格——第一局就够得到;之后每 20 房(约一局的量级)再给——跨局累加,对新手友好:只要清房进度在走,解锁就不断。',
+    gate:'资格由玩家自选消费(先解锁谁=玩家的一次表达)。' },
+  { id:'X2', kind:'meta', from:['META','left',0.5], to:['CHAR','left',0.5], via:[[30,1183],[30,164]],
+    label:'消耗资格 → 解锁角色', labelAt:[36,660],
+    intent:'解锁一个角色=打开一条流派入口("角色是根源、碎片是放大")。玩家带着"这个新角色能怎么玩"的期待再开一局——这就是愿意玩第二局的动力。',
+    gate:'把角色多样性从"开局泄光"改为"一路揭开"。' },
+  { id:'X3', kind:'meta', from:['CLEAR','bottom',0.5], to:['SCORE','right',0.4], via:[[2315,1420],[870,1420],[870,1168]],
+    label:'战斗数据 → 成绩单', labelAt:[1350,1413],
+    intent:'把一局的过程沉淀成结果:大数字、双曲线、判词、纪录——有了结果,才有回味、炫耀和再挑战的对象。',
+    gate:'判词按实际输出来源判(诚实红线:占比因果干净,碎片跳变只做"高光感觉")。' },
+  { id:'X4', kind:'meta', from:['HP','bottom',0.8], to:['SCORE','top',0.2], via:[[350,1040],[570,1040]],
+    label:'血量归零 → 失败成绩单', labelAt:[360,1032],
+    intent:'失败也想看自己打了多少——败局同排版红灰基调,数字照滚。', gate:'' },
+  { id:'X5', kind:'meta', from:['SCORE','left',0.25], to:['META','right',0.25], via:[],
+    label:'成绩单结果 → 下一局目标', labelAt:[432,1148],
+    intent:'"打 → 看结果 → 拿到新东西/立下新目标 → 换个舞台再打"——重玩闭环的最后一环:判词收集欲、纪录追逐、解锁期待共同给出"下一局的理由"。',
+    gate:'' },
+];
+
+/* -------- 表格补充边(未入图的细边) -------- */
+const TABLE_EXTRA = [
+  ['heal','Combo → HP','30C → +25,限 3 次/房','莉可灵泉:连击表现兑换回复,把"打得顺"变成"活得久"。','<span class="gate">3 次/房封顶</span>'],
+  ['build','PF → 大招','默认 0','PF 流不再顺手喂大招,满足"PF 伤害变高但不把别的槽一起喂满"的设计目的。','<span class="gate">大招基础入口改为移动距离</span>'],
+  ['build','PF → Fever','计入,但待封顶','PF 打得热闹应该贡献 Fever,但不能让段数回调后按命中数线性灌满。','<span class="gate">待补: 来源权重 / 2s 窗口封顶</span>'],
+  ['build','Combo → PF 弹药','9/15/39 → Lv1/2/3','PF 的身份是"连击压进膛里的子弹":攒一管,发射时扣一次扳机。','<span class="gate">发射/掉球/换房清零;不灭连击是付费改写</span>'],
+  ['build','PF 碎片 → 玩法决策','门槛/弹匣/弹头/闸门','PF 流碎片不是只加伤害,而是在改"何时放、攒多少、要不要清幕、是否剪断回产"。','静默强击 / 不灭连击 / 拔刀净空 / 群狩'],
+  ['build','PF 类型 → 玩家体验','扫场/单体/直线/增益/爆破','五种 PF 的差异化目标是体验不同,不是谁数值更高。当前剑/拳/射已覆盖 3 类体验,杖/特殊待落地。','<span class="gate">还差 2/5 类型</span>'],
+  ['build','Combo → 飞弹燃料','16 次弹射命中 → 喷 3 发','连射协议只吃主球/跟随球/PF 命中——飞弹自己不喂自己。','<span class="gate">防自循环:飞弹命中不计燃料</span>'],
+  ['build','Combo → 球速','贯通态 +0.4/C,硬限 180','连击驱动让 Combo 直接兑换机动性,突破普通球速上限(🔗征用)。','<span class="gate">PIERCE_SPEED_HARD_CAP 180</span>'],
+  ['build','穿怪 → 蓄势 → 伤害','+1 层/怪,+12%/层','贯通流的小经济:穿得多打得痛,一发入魂(≥12 层)双倍兑现后清空。','<span class="gate">20 层封顶;过载碎片解除但掉球×2</span>'],
+  ['build','大招释放 → 连咏层','+25% 技伤/层,无上限','黑剑连咏奖励"本房连放",但过房清零——房间是它的预算窗口。','<span class="gate">过房清零</span>'],
+  ['build','溢出充能 → 技伤','1 点 → +1%(5s)','过载咏唱把"攒过头"变成资源而不是浪费。','<span class="gate">溢出上限 50</span>'],
+  ['conv','击杀 → 充能','5 杀 → +15(碎片)','克拉莉丝:击破节奏喂技能流——明确写出的回充源之一。',''],
+  ['meta','第 7 关 → 舞台悬念','乌贼 / 黑龙 各 50%','同一构筑撞上不同 Boss,打法完全不同——中段变成悬念时刻;想看黑龙对波的玩家会主动带瓦格纳去赌。',''],
+  ['todo','已选流派 → 掉落权重','⏳ 同流派候选 ×1.5(未实施)','半定向随机:玩家已经表态走某流派,系统就更容易给相关工具,减少无用三选一。','<span class="gate">现状仍是均匀随机</span>'],
+  ['todo','Fever → 攻击表现公式','⏳ 加权+√压缩+窗口 120/2s','Fever 新公式:飞弹不计入、PF 计入但要封顶。',''],
+];
+
+const FIELD_ROWS = [
+  ['角色定义', '角色编号', 'characterDefs[].id', '角色池里的唯一编号;被写入 mainId / subIds 后才进入战斗。'],
+  ['角色定义', 'PF 类型', 'characterDefs[].pfType', '主位角色读取这个字段,决定 PF 是剑/拳/射等形态。'],
+  ['角色定义', '角色大招', 'characterDefs[].ultimate', '大招槽释放时,按槽位找到对应角色的大招配置。'],
+  ['角色定义', '被动 / 队长技', 'passives[] / captain_skill', '副位被动改资源规则;主位队长技进入伤害乘区。'],
+  ['角色定义', '基础血量', 'base_stats.max_hp', '目前是数据字段,没有接入玩家 HP;玩家血量仍是全局 game.hp。'],
+  ['当前编队', '主位', 'team.mainId', '主球、主位 PF 类型、队长技和大招槽1的来源。'],
+  ['当前编队', '副1 / 副2', 'team.subIds[0] / team.subIds[1]', '两个跟随球和副位被动来源,对应大招槽2/3。'],
+  ['当前编队', '队伍顺序', 'teamIds()', '返回 [主位, 副1, 副2],与 ultCharges[0..2] 一一对齐。'],
+  ['大招槽', '三条大招槽', 'ultCharges[0..2]', '每个槽对应一个编队槽位;满 100 后可释放该角色大招。'],
+  ['大招槽', '满槽值', 'ULT_MAX_CHARGE', '当前统一 100;角色 skill_cost_max 暂未接入。'],
+  ['玩家操作', '球移动距离', 'ball.x/y + prevX/prevY', '每帧位移转化为三条大招槽的基础充能。'],
+  ['命中事件', '命中来源', 'HitEvent.source', '决定这次命中是否加 Combo、Fever、飞弹燃料等。'],
+  ['Combo', '当前连击', 'combo.count', 'PF 的弹药;也会喂 Fever、部分回血和飞弹燃料。'],
+  ['PF', '待释放等级', 'powerFlip.pendingLevel', '发射瞬间由 combo.count 换算出来。'],
+  ['PF', 'PF 形态', 'powerFlip.type', '来自主位角色 pfType,决定扫场/单体/直线等体验。'],
+  ['Fever', 'Fever 能量', 'fever.energy', '现状由命中 +1 推进;未来应改为来源权重和窗口封顶。'],
+  ['Fever', 'Fever 剩余时间', 'fever.framesLeft', '大于 0 时开启伤害、球速、回血等状态效果。'],
+  ['玩家 HP', '玩家血量', 'game.hp', '全局生命池;受击/掉球扣它,清房/Fever/技能回复它。'],
+  ['房间/怪物', '怪物血量', 'm.hp / m.maxHp', '伤害最终扣这里;全灭后进入房间清算。'],
+  ['清房', '房间结果', 'room.result', '决定是否发碎片、记录成绩、累计解锁进度。'],
+  ['局外解锁', '解锁资格', 'unlockCredits', '由清房数获得,消耗后把角色 id 加进 unlockedIds。'],
+  ['局末成绩单', '伤害来源统计', 'combat.damageBySource', '用于环形图和流派判词,告诉玩家这局主要靠什么打赢。'],
+];
+
+const FLOW_FIELD_HINTS = {
+  C0: ['角色定义里的角色编号', '当前编队的主位/副位槽'],
+  M1: ['球的帧移动距离', '三条大招槽充能值'],
+  M2: ['球体碰撞结果', '命中事件'],
+  M3: ['命中来源', '当前连击数'],
+  M4: ['命中事件', 'Fever 能量'],
+  M5: ['当前连击数', 'PF 待释放等级'],
+  M6: ['已满的大招槽', '该槽位角色的大招配置'],
+  M7: ['PF 等级和形态', 'PF 来源的伤害记录'],
+  M8: ['角色大招伤害表', '技能/大招来源的伤害记录'],
+  M9: ['最终伤害', '怪物当前血量'],
+  M10: ['最终伤害', 'Boss 阶段/护盾/眩晕状态'],
+  M11: ['怪物存活检查', '房间清算'],
+  M12: ['Boss 血量', '房间清算'],
+  M13: ['清房结果', '碎片奖励选项'],
+  B1: ['已选碎片效果', '倍率/门槛/规则'],
+  B2: ['回充类碎片判断', '三条大招槽'],
+  B3: ['已选碎片', '流派内部资源'],
+  B4: ['清房事件', '跨房层数/记忆/蓄招'],
+  R0: ['编队顺序', '三条大招槽顺序'],
+  R1: ['副位风铃', '大招槽每秒充能'],
+  R2: ['主位 PF 类型与副位被动', 'PF 形态/门槛/半径'],
+  R3: ['主位队长技', '伤害乘区明细'],
+  R4: ['副位冰卫', '球速上限'],
+  F1: ['Fever 剩余时间', '伤害倍率'],
+  F2: ['Fever 剩余时间', '大招槽自动充能'],
+  F3: ['Fever 剩余时间', '玩家血量'],
+  H1: ['清房或治疗效果', '玩家血量'],
+  P1: ['掉球事件', '玩家血量'],
+  P2: ['敌人攻击', '玩家血量'],
+  X1: ['累计清房数', '解锁资格'],
+  X2: ['解锁资格', '已解锁角色列表'],
+  X3: ['本局战斗数据', '局末成绩单'],
+  X4: ['玩家血量归零', '失败成绩单'],
+  X5: ['成绩单结果/判词/纪录', '下一局目标'],
+};
+
+/* -------- 意图卡 -------- */
+const INTENTS = [
+  { t:'为什么大招吃"移动距离"?', how:'主球每 100px 位移给三条槽 +0.3;命中回充全局关闭。',
+    why:'如果大招吃 Combo/命中:Fever 和大招的回充会互相加速,高命中构筑(PF 延展、飞弹、多段技能)全都顺手把大招喂满——所有 build 殊途同归变成"大招流",构筑多样性就死了。移动距离是游戏里已有、且只有"控球/持续弹射"才能高效产出的量,拿它做大招入口,等于给大招流一个独立身份。',
+    gate:'抖动阈值 0.5px/帧;演出/QTE 不计;明确回充源全部单独具名、各自封顶。' },
+  { t:'Combo 为什么在"发射瞬间"结算成 PF?', how:'合格命中 +1;弹板发射时 ≥9/15/39 就按当时读数定级,随后清零。',
+    why:'Combo 被定义成"单次飞行攒的弹药"——攒一发打一发。发射清零是天然节流,让 Combo 无法跨飞行无限堆叠;想改变这个等级(房间级 Combo)必须花碎片位拿"不灭连击",而那是一次明确的构筑下注。',
+    gate:'静默强击=玩家亲手剪断"PF 命中→Combo→下一发 PF"的自喂回路,换 +60% 伤害——回路可以存在,但要玩家自己选。' },
+  { t:'PF 流为什么要做成"弹药流"?', how:'Combo 是弹药,PF 是扳机,碎片负责改弹匣、弹头、射速和用途。',
+    why:'PF 流要解决的不是"再加一个伤害按钮",而是让玩家感到自己在经营一发爆发:速凝蓄力让射速变快,不灭连击让弹匣变大,超连击蓄势让弹药量变成火药量,拔刀净空让这发 PF 可以拿来保命。这样 PF 流的强不是白嫖别的资源,而是围绕"何时发射这一发"形成决策。',
+    gate:'PF 命中不回大招是基础规则;静默强击用零回产换 +60% 伤害;PF 连击延展只读 comboAtCast,当前 PF 的新 Combo 不会继续延长自己。' },
+  { t:'PF 体验目标是否满足?', how:'当前剑/拳/射已实装,分别对应扫场、单体爆发、直线贯穿;杖/特殊待补。',
+    why:'现状已经满足"PF 不只是数值高低"的第一阶段:剑 PF 要钻怪堆,拳 PF 要找单体接触,射 PF 要控角度串线。还没完全满足的是五类型闭环:缺杖 PF 的增益窗口和特殊 PF 的定点轰爆,所以"PF 类型差异化"还差最后两种体验拼图。',
+    gate:'下一步优先特殊 PF(复用接触锁定+范围伤害),再做杖 PF(需要临时 buff 系统)。验证看 PF 判词出现率、PF 专精局时长和玩家是否能说出"这局为什么是 PF 流"。' },
+  { t:'Fever:现状与方向的差距', how:'现状:每合格命中 +1,满 1000 自动开 20s。',
+    why:'Fever 的身份应该是"短时间攻击表现攒出的爆发窗口"——奖励打得密、打得重,而不是移动或白嫖段数。目标公式采用来源加权(跟随球 0.6/技能 0.8-1.2/飞弹 0)+ 伤害平方根压缩 + 2 秒窗口封顶 120。图上把现状线和 ⚠️ 张力边都画出来,是为了随时看见"还差哪一步"。',
+    gate:'已拍板:PF 计入 Fever(需封顶),飞弹不计入。' },
+  { t:'⚠️ Fever 期间 +5 充能/s:一条要重审的边', how:'Fever 开启时三条大招槽每秒自动 +5。',
+    why:'大招改吃距离之后,这条边让 Fever 又变成技能流引擎——高 Fever 构筑等于间接回到"命中喂大招"。建议先移除直充,或改成"Fever 期间距离充能速度 +X%",让它仍奖励高速弹射但不脱离距离规则。',
+    gate:'方案待确认。' },
+  { t:'技能流要"快得有身份"', how:'回充只能来自明确具名的源:风铃 +5/s、开局 +30、5 杀 +15、回响 +2/命中、三重奏 +20。',
+    why:'技能流当然可以转得快,但每一分"快"都要有出处:要么选人(风铃/瓦格纳),要么花碎片位。这样技能流是一个玩家主动组出来的身份,而不是所有高段数玩法的默认终点。',
+    gate:'大招回响预算 40/次释放——防"大招→命中回满→再大招"的永动;三重奏要求 10s 内三人各放一次(编队协调成本)。' },
+  { t:'清房是唯一的门', how:'碎片、跨房永久层、回血、局外资格,全部只在"清房"时结算。',
+    why:'单一结算点让"推进"成为所有奖励的共同货币:玩家的每次强化都在为"下一房更快"服务,不存在刷怪/龟缩的第二收益路径。奖励房(第 1/3 关后连选 2 张)在前期加速构筑成型,呼应"前六关要更快进入状态"。',
+    gate:'蓄招过房故意奖励"满槽不放"——和技能流(鼓励多放)形成一对张力,构筑必须二选一。' },
+  { t:'通关房间数 = 解锁货币(为什么玩家愿意开第二局)', how:'首过第 7 关 +1 资格;之后累计每清 20 房 +1;1 资格自选解锁 1 名角色。',
+    why:'重玩动机的本质:开一局新的,会得到一次明显不同的体验,或一个具体想追的东西。把"清房数"做成跨局累加的货币,失败局的推进也不白费(对新手友好);第一个资格放在第 7 关——第一局就够得到,立刻发第一张"下一局的理由"。让玩家自选解锁谁,先解锁谁本身就是玩家的一次表达。',
+    gate:'解锁一个角色=打开一条流派入口(角色是根源、碎片是放大)——新玩具直接改变下一局的资源汇率。' },
+  { t:'成绩单闭环:打 → 看结果 → 立目标 → 再打', how:'胜负都出成绩单:大数字、输出/存活双曲线、来源环形图、流派判词、新纪录。',
+    why:'一局的过程要沉淀成"结果",玩家才有回味、炫耀和再挑战的对象。判词按实际输出来源判定(9 种),生出"我想把所有判词都打出来一次"的收集欲;纪录追逐让长线玩家跟上一个自己比。它和解锁资格共同构成局外的两台发动机。',
+    gate:'诚实红线:来源占比因果干净可做严谨百分比;碎片级 DPS 跳变只做"高光感觉",不做精确排行。' },
+  { t:'选人=选汇率(编队是构筑的第一步)', how:'副位被动直接改资源规则:风铃 +5/s、白板 PF 门槛 ×0.33、射手 PF 半径 ×2、冰卫球速 ×0.8;主位决定队长技乘区。',
+    why:'在拿到任何碎片之前,编队已经完成了 build 的第一次下注。解锁循环(X2)之所以能提供重玩动力,正因为每个新角色真的改变这张图里的汇率,而不只是换皮。',
+    gate:'冰卫是代价型:防御换全队球速——手感值被当成可交易资源的范例。' },
+  { t:'HP:唯一的惩罚池(风险集中)', how:'受击(-5/-15)与掉球(-25)共用 100 点;回复绑清房/里程碑/Fever。',
+    why:'操作失误和受击压力在同一个容错预算里结算,玩家对"危险"只需要维护一个心理账户;掉球 25=满血 4 次机会,等价于旧多命制但允许回复经济介入。',
+    gate:'已知风险(盘点观察 4):无第二惩罚资源,HP 上限也无成长来源——未来做护盾/复活类内容时这里是挂点。' },
+  { t:'流派小经济:雪球有半径', how:'贯通蓄势、飞弹燃料、连咏层、跨房军备——每个流派有自己的滚雪球资源。',
+    why:'流派要有"越玩越强"的成长感,但每个雪球都被明确闸门包住:蓄势 20 层封顶(解除封顶要接受掉球 ×2)、飞弹不喂自己燃料+全局 170 上限+密度 8 档、回响预算 40、连咏过房清零。失控被挡在设计层,而不是靠后期削数值。',
+    gate:'唯一无上限的是蓄招过房(+50%/房)——已在盘点观察中挂账。' },
+  { t:'对抗面:越深越硬、越深越急', how:'怪 HP 曲线 1.0→17.7(×总旋钮 5);攻击间隔 3.2s×1.15→0.42。',
+    why:'两条曲线一条顶 DPS(你的构筑成型了吗)、一条顶生存(你的操作稳吗)——把 build 成型速度和玩家状态同时顶在脸上。第 18-20 关 HP 峰值已回调 40%,避免纯堆血;第 7 关双 Boss 轮换给中段一个悬念记忆点。',
+    gate:'ROOM_HP_SCALE=5 是节奏总旋钮,一个数字控制全局清房时长。' },
+];
+
+/* -------- 类速查 -------- */
+const CLASSES = [
+  ['C1 角色与编队', '#f1c75b', '8 角色的大招/被动/队长技;基础五维休眠', '大招参数 ×8 · 副位被动 4 条 · 队长技 3 条 · 💤 skill_cost_max/impact_damage/charge_per_hit'],
+  ['C2 编队与弹球实体', '#9aa7b4', '主球/跟随球/协力球三种实体的资源规则', 'FOLLOWER_GAP_PX 80 · 跟随球=主球伤害 · 协力球不吃组件'],
+  ['C3 战斗资源(六线)', '#6ccbd8', '本图的主角:充能/Combo/PF/Fever/HP/子资源', 'ULT_CHARGE_PER_100PX 0.3 · PF 门槛 9/15/39 · FEVER 1000 · HP 100 · DROP 25'],
+  ['C4 伤害与乘区', '#e8c76a', '所有扣怪血走同一条 13 段流水线', 'ATTACK_DAMAGE 20 · PF 50/90/150 · FEVER ×2 · 来源 10 类'],
+  ['C5 小怪(6 种)', '#e85f57', '对抗节奏的基本单元', '弹 5/15 · 横扫/冲撞 5 · 间隔 3.2s×曲线 · 蛛网禁锢 3s'],
+  ['C6 Boss(3+1 休眠)', '#e85f57', '机制血线与防御乘区', '结晶 10万/盾50PF · 黑龙 20万/对波-30% · 乌贼 ×0.25/×4'],
+  ['C7 关卡房间(20)', '#e88f6a', 'HP/攻击双曲线+总旋钮;地形层现休眠', 'HP 曲线 1→17.7 · ROOM_HP_SCALE 5 · 奖励房 {1,3}=2 张 · 🚫地形开关全 0'],
+  ['C8 构筑碎片(49)', '#b68dd8', '改写汇率的手;5 流派+通用', '技能9/PF8/飞弹13/贯通12/Fever1/通用7 · 退池钩子 ~24'],
+  ['C9 局外元进度', '#8ea4e8', '解锁资格+成绩单:两台重玩发动机', '第 7 关+1 · 每 20 房+1 · 判词 9 种 · 新纪录'],
+  ['C10 暂不纳入 🚫', '#75756c', '纯手感/表现/调试:只归组不入循环', '球物理 10 · 弹板手感 19 · 受击表现 13 · 遥测 17 · (球速上限/掉球口等 4 项已划出为 🔗)'],
+];
+
+/* ============================================================
+   渲染层
+============================================================ */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const VB_W = 2580, VB_H = 1660;
+const nodeById = Object.fromEntries(NODES.map(n => [n.id, n]));
+
+function port(ref) {
+  const [id, side, t] = ref;
+  const n = nodeById[id];
+  if (side === 'left')   return [n.x, n.y + n.h * t];
+  if (side === 'right')  return [n.x + n.w, n.y + n.h * t];
+  if (side === 'top')    return [n.x + n.w * t, n.y];
+  return [n.x + n.w * t, n.y + n.h];
+}
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(SVG_NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+/* 正交折线 + 圆角 */
+function orthPath(pts, r = 10) {
+  if (pts.length < 2) return '';
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [px, py] = pts[i - 1], [cx, cy] = pts[i], [nx, ny] = pts[i + 1];
+    const d1 = Math.hypot(cx - px, cy - py), d2 = Math.hypot(nx - cx, ny - cy);
+    const rr = Math.min(r, d1 / 2, d2 / 2);
+    const ux1 = (cx - px) / (d1 || 1), uy1 = (cy - py) / (d1 || 1);
+    const ux2 = (nx - cx) / (d2 || 1), uy2 = (ny - cy) / (d2 || 1);
+    d += ` L ${cx - ux1 * rr} ${cy - uy1 * rr}`;
+    d += ` Q ${cx} ${cy} ${cx + ux2 * rr} ${cy + uy2 * rr}`;
+  }
+  d += ` L ${pts[pts.length - 1][0]} ${pts[pts.length - 1][1]}`;
+  return d;
+}
+/* 让相邻点强制正交(容差内自动对齐) */
+function normalizeOrtho(pts) {
+  for (let i = 1; i < pts.length; i++) {
+    const p = pts[i - 1], c = pts[i];
+    if (Math.abs(c[0] - p[0]) < Math.abs(c[1] - p[1])) c[0] = p[0]; else c[1] = p[1];
+  }
+  return pts;
+}
+
+const board = document.getElementById('board');
+const svg = el('svg', { viewBox: `0 0 ${VB_W} ${VB_H}`, style: `width:${VB_W}px` }, board);
+
+/* 箭头 marker(按颜色) */
+const defs = el('defs', {}, svg);
+for (const k in COLORS) {
+  const m = el('marker', { id: 'arr-' + k, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7.5, markerHeight: 7.5, orient: 'auto-start-reverse' }, defs);
+  el('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: COLORS[k], class: 'arrow' }, m);
+}
+
+const gEdges = el('g', { id: 'g-edges' }, svg);
+const gNodes = el('g', { id: 'g-nodes' }, svg);
+const edgeGroups = {};
+
+/* ---- 画边 ---- */
+for (const e of EDGES) {
+  const p0 = port(e.from), p1 = port(e.to);
+  let pts = [p0, ...(e.via || []).map(p => [...p]), p1];
+  // 端点接入方向兜底:若首/末段非正交,插入拐点
+  const fixed = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const p = fixed[fixed.length - 1], c = pts[i];
+    if (p[0] !== c[0] && p[1] !== c[1]) fixed.push(i === pts.length - 1 ? [p[0], c[1]] : [c[0], p[1]]);
+    fixed.push(c);
+  }
+  pts = fixed;
+  const g = el('g', { class: 'edge-g', 'data-kind': e.kind, 'data-from': e.from[0], 'data-to': e.to[0], 'data-id': e.id }, gEdges);
+  edgeGroups[e.id] = g;
+  const d = orthPath(pts);
+  el('path', { d, class: 'edge-hit' }, g);
+  const stroke = COLORS[e.kind];
+  const attrs = { d, class: 'edge', stroke, 'marker-end': `url(#arr-${e.kind})` };
+  if (DASHED[e.kind]) attrs['stroke-dasharray'] = DASHED[e.kind];
+  el('path', attrs, g);
+  if (e.label) {
+    const t = el('text', { x: e.labelAt[0], y: e.labelAt[1], class: 'edge-label', fill: stroke }, g);
+    t.textContent = e.label;
+  }
+}
+
+/* ---- 画节点 ---- */
+for (const n of NODES) {
+  const g = el('g', { class: 'node-g', 'data-id': n.id }, gNodes);
+  el('rect', { x: n.x, y: n.y, width: n.w, height: n.h, rx: 8, class: 'node-box' }, g);
+  el('rect', { x: n.x, y: n.y, width: n.w, height: 30, rx: 8, fill: n.color, class: 'node-head' }, g);
+  el('rect', { x: n.x, y: n.y + 22, width: n.w, height: 8, fill: n.color }, g); // 压平圆角下缘
+  const title = el('text', { x: n.x + 12, y: n.y + 20.5, class: 'node-title' }, g);
+  title.textContent = n.title;
+  const tag = el('text', { x: n.x + n.w - 12, y: n.y + 20, class: 'node-tag', 'text-anchor': 'end' }, g);
+  tag.textContent = n.tag;
+  let ry = n.y + 30;
+  if (n.sub) {
+    ry += 17;
+    const s = el('text', { x: n.x + 12, y: ry, class: 'node-sub' }, g);
+    s.textContent = n.sub;
+  }
+  for (const row of n.rows) {
+    ry += 21;
+    const cls = 'node-row' + (row[1] ? ' ' + row[1] : '');
+    const t = el('text', { x: n.x + 12, y: ry, class: cls }, g);
+    t.textContent = row[0];
+  }
+}
+
+/* ---- 交互: 悬停高亮 / 提示 / 过滤 / 缩放 ---- */
+const tooltip = document.getElementById('tooltip');
+function showTip(e, edge) {
+  let html = `<div class="tt-title">${edge.label || edge.id}</div>`;
+  if (edge.intent) html += `<div class="tt-intent">${edge.intent}</div>`;
+  if (edge.gate) html += `<div class="tt-gate">🚧 ${edge.gate}</div>`;
+  tooltip.innerHTML = html;
+  tooltip.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e) {
+  const pad = 16;
+  let x = e.clientX + pad, y = e.clientY + pad;
+  const r = tooltip.getBoundingClientRect();
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - pad;
+  if (y + r.height > innerHeight - 8) y = e.clientY - r.height - pad;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+function hideTip() { tooltip.classList.remove('show'); }
+
+const allEdgeGs = [...gEdges.querySelectorAll('g.edge-g')];
+const allNodeGs = [...gNodes.querySelectorAll('g.node-g')];
+for (const e of EDGES) {
+  const g = edgeGroups[e.id];
+  g.addEventListener('mouseenter', ev => {
+    showTip(ev, e);
+    allEdgeGs.forEach(x => { if (x !== g) x.classList.add('faded'); });
+  });
+  g.addEventListener('mousemove', moveTip);
+  g.addEventListener('mouseleave', () => {
+    hideTip();
+    allEdgeGs.forEach(x => x.classList.remove('faded'));
+  });
+}
+for (const ng of allNodeGs) {
+  const id = ng.dataset.id;
+  ng.addEventListener('mouseenter', () => {
+    allEdgeGs.forEach(x => {
+      const hit = x.dataset.from === id || x.dataset.to === id;
+      x.classList.toggle('faded', !hit);
+    });
+    allNodeGs.forEach(x => {
+      if (x === ng) return;
+      const linked = EDGES.some(e => (e.from[0] === id && e.to[0] === x.dataset.id) || (e.to[0] === id && e.from[0] === x.dataset.id));
+      x.classList.toggle('faded', !linked);
+    });
+  });
+  ng.addEventListener('mouseleave', () => {
+    allEdgeGs.forEach(x => x.classList.remove('faded'));
+    allNodeGs.forEach(x => x.classList.remove('faded'));
+  });
+}
+
+/* 过滤 chips */
+const chipBox = document.getElementById('kind-chips');
+for (const k in KIND_NAMES) {
+  const chip = document.createElement('span');
+  chip.className = 'chip on';
+  chip.innerHTML = `<span class="dot" style="background:${COLORS[k]}"></span>${KIND_NAMES[k]}`;
+  chip.onclick = () => {
+    chip.classList.toggle('on');
+    chip.classList.toggle('off');
+    const on = chip.classList.contains('on');
+    allEdgeGs.forEach(x => { if (x.dataset.kind === k) x.classList.toggle('hidden-kind', !on); });
+  };
+  chipBox.appendChild(chip);
+}
+/* 缩放 */
+const zoomWrap = document.createElement('span');
+zoomWrap.className = 'zoom-wrap';
+zoomWrap.innerHTML = `缩放 <input type="range" min="30" max="160" value="100" id="zoom"> <button id="fitall">看全图</button><button id="fitw">适配宽度</button>`;
+chipBox.appendChild(zoomWrap);
+const zoomInput = zoomWrap.querySelector('#zoom');
+zoomInput.oninput = () => { svg.style.width = (VB_W * zoomInput.value / 100) + 'px'; };
+zoomWrap.querySelector('#fitw').onclick = () => {
+  const w = board.clientWidth - 2;
+  zoomInput.value = Math.round(w / VB_W * 100);
+  svg.style.width = w + 'px';
+};
+zoomWrap.querySelector('#fitall').onclick = () => {
+  const wScale = (board.clientWidth - 2) / VB_W;
+  const hScale = (Math.max(360, Math.min(window.innerHeight * 0.86, board.clientHeight || window.innerHeight * 0.86)) - 2) / VB_H;
+  const pct = Math.max(30, Math.floor(Math.min(wScale, hScale) * 100));
+  zoomInput.value = pct;
+  svg.style.width = (VB_W * pct / 100) + 'px';
+  board.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+};
+
+/* ---- ② 字段中文速查 / 连线说明 ---- */
+function escHtml(v) {
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+}
+function codeCell(v) {
+  return `<code>${escHtml(v)}</code>`;
+}
+const fieldTbody = document.getElementById('field-table');
+if (fieldTbody) {
+  for (const r of FIELD_ROWS) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escHtml(r[0])}</td><td>${escHtml(r[1])}</td><td>${codeCell(r[2])}</td><td>${escHtml(r[3])}</td>`;
+    fieldTbody.appendChild(tr);
+  }
+}
+const flowTbody = document.getElementById('flow-table');
+if (flowTbody) {
+  for (const e of EDGES) {
+    const hint = FLOW_FIELD_HINTS[e.id] || [nodeById[e.from[0]].title, nodeById[e.to[0]].title];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="tag ${e.kind}">${(KIND_NAMES[e.kind] || '方向').split('(')[0]}</span></td>
+      <td>${escHtml(e.label || e.id)}</td>
+      <td>${escHtml(hint[0])}</td>
+      <td>${escHtml(hint[1])}</td>
+      <td>${escHtml(e.intent || '这是一条状态或资源推进线。')}</td>`;
+    flowTbody.appendChild(tr);
+  }
+}
+
+/* ---- ④ 边总表 ---- */
+const tbody = document.getElementById('edge-table');
+function edgeRow(kind, name, rate, intent, gate) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><span class="tag ${kind}">${(KIND_NAMES[kind] || '⏳ 方向').split('(')[0]}</span></td>
+    <td>${name}</td><td><b>${rate}</b></td><td>${intent}</td><td>${gate}</td>`;
+  tbody.appendChild(tr);
+}
+for (const e of EDGES) {
+  const name = `${nodeById[e.from[0]].title.split('(')[0]} → ${nodeById[e.to[0]].title.split('(')[0]}`;
+  edgeRow(e.kind, name, e.label || '—', e.intent || '—', e.gate ? `<span class="gate">${e.gate}</span>` : '');
+}
+for (const r of TABLE_EXTRA) edgeRow(r[0], r[1], r[2], r[3], r[4]);
+
+/* ---- ③ 意图卡 ---- */
+const cardBox = document.getElementById('intent-cards');
+for (const c of INTENTS) {
+  const d = document.createElement('div');
+  d.className = 'intent-card';
+  d.innerHTML = `<h3>${c.t}</h3><p class="how">怎么转: ${c.how}</p><p>为什么: ${c.why}</p>` +
+    (c.gate ? `<p class="gate">🚧 闸门: ${c.gate}</p>` : '');
+  cardBox.appendChild(d);
+}
+
+/* ---- ④ 类速查 ---- */
+const classBox = document.getElementById('class-cards');
+for (const c of CLASSES) {
+  const d = document.createElement('div');
+  d.className = 'class-card';
+  d.style.borderLeftColor = c[1];
+  d.innerHTML = `<h3 style="color:${c[1]}">${c[0]}</h3><p>${c[2]}</p><p class="vals">${c[3]}</p>`;
+  classBox.appendChild(d);
+}
+
+/* 初始: 尽量看全图 */
+requestAnimationFrame(() => zoomWrap.querySelector('#fitall').click());
+</script>
+</body>
+</html>
