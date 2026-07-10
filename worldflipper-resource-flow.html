@@ -113,20 +113,27 @@
   .chip.on { color: var(--text); border-color: var(--line-strong); background: rgba(255,255,255,0.08); }
   .chip.off { opacity: 0.42; }
   .zoom-wrap { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: var(--muted); font-size: 12.5px; }
+  .pan-hint { padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--cyan); font-size: 11px; white-space: nowrap; }
   .zoom-wrap input { accent-color: var(--gold); width: 150px; }
   .zoom-wrap button {
     border: 1px solid var(--line); background: rgba(255,255,255,0.05); color: var(--text);
     border-radius: 6px; padding: 4px 10px; font-size: 12.5px; cursor: pointer;
   }
   .board {
-    position: relative; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius);
+    position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius);
     background:
       linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
       #0b0d10;
     background-size: 40px 40px, 40px 40px;
     max-height: 90vh;
+    cursor: grab;
+    touch-action: none;
+    scrollbar-width: none;
   }
+  .board::-webkit-scrollbar { display: none; }
+  .board.dragging { cursor: grabbing; }
+  .board.dragging svg { pointer-events: none; }
   .board svg { display: block; }
   .tooltip {
     position: fixed; z-index: 40; max-width: 380px; padding: 12px 14px; border-radius: 8px;
@@ -283,6 +290,17 @@
 <div class="page-shell">
   <div class="container">
 
+    <!-- ===================== DIAGRAM ===================== -->
+    <section class="panel" id="diagram">
+      <div class="section-head">
+        <h2>① 战斗资源流类图</h2>
+        <p>读法: 每个盒子是字段集合,不是说明文。左侧从 <b>角色定义 → 当前编队 → 球体状态 / 玩家 HP / 解锁字段</b> 展开;中间是 Combo、三条大招槽、PF、Fever;右侧是怪物 HP、清房和成绩单。连线表示字段写入、读取或转换。</p>
+      </div>
+      <div class="board-tools" id="kind-chips"></div>
+      <div class="board" id="board"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </section>
+
     <!-- ===================== HERO ===================== -->
     <section class="panel">
       <h1>游戏战斗系统资源流转图</h1>
@@ -318,17 +336,6 @@
         <div class="metric"><strong>49 张</strong><span>在池碎片(改写汇率的手)</span></div>
         <div class="metric"><strong>2 条</strong><span>局外循环: 解锁资格 / 成绩单</span></div>
       </div>
-    </section>
-
-    <!-- ===================== DIAGRAM ===================== -->
-    <section class="panel" id="diagram">
-      <div class="section-head">
-        <h2>① 战斗资源流类图</h2>
-        <p>读法: 每个盒子是字段集合,不是说明文。左侧从 <b>角色定义 → 当前编队 → 球体状态 / 玩家 HP / 解锁字段</b> 展开;中间是 Combo、三条大招槽、PF、Fever;右侧是怪物 HP、清房和成绩单。连线表示字段写入、读取或转换。</p>
-      </div>
-      <div class="board-tools" id="kind-chips"></div>
-      <div class="board" id="board"></div>
-      <div class="tooltip" id="tooltip"></div>
     </section>
 
     <!-- ===================== FIELD GLOSSARY ===================== -->
@@ -1091,6 +1098,41 @@ function moveTip(e) {
 }
 function hideTip() { tooltip.classList.remove('show'); }
 
+/* 按住图面直接平移，不再依赖侧边滚动条。 */
+const PAN_THRESHOLD = 4;
+let panState = null;
+function finishPan(event) {
+  if (!panState) return;
+  if (board.hasPointerCapture(event.pointerId)) board.releasePointerCapture(event.pointerId);
+  board.classList.remove('dragging');
+  panState = null;
+}
+board.addEventListener('pointerdown', event => {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  panState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, left: board.scrollLeft, top: board.scrollTop, dragged: false };
+  board.setPointerCapture(event.pointerId);
+});
+board.addEventListener('pointermove', event => {
+  if (!panState || event.pointerId !== panState.pointerId) return;
+  const dx = event.clientX - panState.startX;
+  const dy = event.clientY - panState.startY;
+  if (!panState.dragged && Math.hypot(dx, dy) < PAN_THRESHOLD) return;
+  panState.dragged = true;
+  board.classList.add('dragging');
+  hideTip();
+  board.scrollLeft = panState.left - dx;
+  board.scrollTop = panState.top - dy;
+  event.preventDefault();
+});
+board.addEventListener('pointerup', finishPan);
+board.addEventListener('pointercancel', finishPan);
+board.addEventListener('lostpointercapture', event => {
+  if (panState && event.pointerId === panState.pointerId) {
+    board.classList.remove('dragging');
+    panState = null;
+  }
+});
+
 const allEdgeGs = [...gEdges.querySelectorAll('g.edge-g')];
 const allNodeGs = [...gNodes.querySelectorAll('g.node-g')];
 for (const e of EDGES) {
@@ -1141,7 +1183,7 @@ for (const k in KIND_NAMES) {
 /* 缩放 */
 const zoomWrap = document.createElement('span');
 zoomWrap.className = 'zoom-wrap';
-zoomWrap.innerHTML = `缩放 <input type="range" min="30" max="160" value="100" id="zoom"> <button id="fitall">看全图</button><button id="fitw">适配宽度</button>`;
+zoomWrap.innerHTML = `<span class="pan-hint">按住图面拖拽平移</span> 缩放 <input type="range" min="30" max="160" value="100" id="zoom"> <button id="fitall">看全图</button><button id="fitw">适配宽度</button>`;
 chipBox.appendChild(zoomWrap);
 const zoomInput = zoomWrap.querySelector('#zoom');
 zoomInput.oninput = () => { svg.style.width = (VB_W * zoomInput.value / 100) + 'px'; };
