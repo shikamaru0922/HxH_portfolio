@@ -14,14 +14,14 @@
     // 进入视口时淡入上升的元素（父容器内自动错峰）
     reveal: [
       '.section-label', '.section-title', '.section-desc',
-      '.project-card', '.ai-card', '.case-card',
+      '.project-card', '.ai-story-card', '.ai-manifesto', '.ai-story-finale', '.case-card',
       '.analysis-category', '.analysis-groups > .analysis-item',
       '.stat-card', '.about-philosophy', '.about-info .info-row',
-      '.ai-pipeline', '.contact-btn', '.project-whitebox-col'
+      '.ai-distance-map', '.contact-btn', '.project-whitebox-col'
     ],
     // 悬停出现「编辑器选框」四角的卡片
     brackets: [
-      '.project-card', '.ai-card', '.case-card',
+      '.project-card', '.ai-story-card', '.case-card',
       '.stat-card', '.about-philosophy', '.analysis-category'
     ],
     // 鼠标追踪辉光（更新 --mx/--my）

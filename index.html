@@ -1203,124 +1203,480 @@ html.fx .rv.rv-in { opacity: 1; transform: translateY(0); }
   background: var(--bg-secondary);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  padding: 60px;
   position: relative;
   overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 .ai-section::before {
   content: '';
   position: absolute;
-  top: 0; right: 0;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, var(--accent2-glow), transparent 70%);
+  inset: 0;
+  background:
+    linear-gradient(rgba(93, 150, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(93, 150, 255, .035) 1px, transparent 1px),
+    radial-gradient(circle at 86% 8%, var(--accent2-glow), transparent 34%),
+    radial-gradient(circle at 8% 92%, var(--accent-glow), transparent 28%);
+  background-size: 24px 24px, 24px 24px, auto, auto;
   pointer-events: none;
 }
+.ai-story-hero {
+  min-height: 570px;
+  padding: 72px 68px 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
+  align-items: center;
+  gap: 64px;
+  position: relative;
+  z-index: 2;
+}
+.ai-story-copy { max-width: 700px; }
+.ai-story-copy .section-label { margin-bottom: 18px; }
+.ai-story-title {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 4.6vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -2px;
+  max-width: 760px;
+}
+.ai-story-title .warm {
+  color: var(--accent);
+  text-shadow: 0 0 28px rgba(255, 107, 53, .18);
+}
+.ai-story-title .playable {
+  color: var(--accent2);
+  text-shadow: 0 0 28px rgba(47, 214, 189, .16);
+}
+.ai-story-lede {
+  max-width: 650px;
+  margin-top: 26px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.95;
+}
+.ai-story-lede strong { color: var(--text-primary); }
 
-.ai-pipeline {
+.ai-distance-map {
+  min-height: 390px;
+  border: 1px solid rgba(126, 160, 220, .16);
+  border-radius: 18px;
+  background: rgba(7, 9, 14, .62);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 30px;
+  isolation: isolate;
+}
+.ai-distance-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 50%, rgba(255, 107, 53, .12), transparent 28%),
+    radial-gradient(circle at 82% 50%, rgba(47, 214, 189, .11), transparent 28%);
+  z-index: -1;
+}
+.ai-distance-map::after {
+  content: 'IDEA → PLAYABLE';
+  position: absolute;
+  left: 24px;
+  top: 20px;
+  color: var(--text-muted);
+  font: 9px/1 var(--font-mono);
+  letter-spacing: 2px;
+}
+.ai-distance-node {
+  width: 112px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+}
+.ai-distance-node span {
+  font: 9px/1 var(--font-mono);
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+.ai-distance-node strong { font-size: 13px; line-height: 1.55; }
+.ai-distance-node.idea {
+  color: #ffd1bf;
+  border: 1px solid rgba(255, 107, 53, .5);
+  background: rgba(255, 107, 53, .08);
+  box-shadow: 0 0 36px rgba(255, 107, 53, .12);
+}
+.ai-distance-node.idea span { color: var(--accent); }
+.ai-distance-node.result {
+  color: #bffbf2;
+  border: 1px solid rgba(47, 214, 189, .5);
+  background: rgba(47, 214, 189, .08);
+  box-shadow: 0 0 36px rgba(47, 214, 189, .12);
+}
+.ai-distance-node.result span { color: var(--accent2); }
+.ai-distance-wall {
+  width: 70px;
+  height: 230px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin: 32px 0 12px;
+  z-index: 2;
+}
+.ai-distance-wall::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(93, 150, 255, .12) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(315deg, rgba(93, 150, 255, .08) 25%, transparent 25%) 0 0 / 18px 18px,
+    rgba(15, 19, 29, .92);
+  border: 1px solid rgba(126, 160, 220, .22);
+  clip-path: polygon(0 0, 100% 0, 100% 38%, 75% 44%, 100% 52%, 100% 100%, 0 100%, 0 60%, 28% 53%, 0 45%);
+}
+.ai-distance-wall span {
+  writing-mode: vertical-rl;
+  color: var(--text-muted);
+  font: 10px/1 var(--font-mono);
+  letter-spacing: 4px;
+  position: relative;
+  z-index: 2;
+}
+.ai-distance-beam {
+  position: absolute;
+  left: 86px;
+  right: 86px;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), rgba(255,255,255,.5), var(--accent2));
+  box-shadow: 0 0 10px rgba(255,255,255,.26);
+  z-index: 1;
+}
+.ai-distance-beam::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 13px #fff;
+  animation: aiBridge 2.8s var(--ease-out) infinite;
+}
+@keyframes aiBridge {
+  0% { left: 0; opacity: 0; }
+  14% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { left: calc(100% - 7px); opacity: 0; }
+}
+
+.ai-manifesto {
+  padding: 44px 68px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, rgba(255, 107, 53, .04), rgba(47, 214, 189, .04));
+  position: relative;
+  z-index: 2;
+}
+.ai-manifesto blockquote {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.55;
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+.ai-manifesto blockquote::before { content: '“'; color: var(--accent); margin-right: 8px; }
+.ai-manifesto blockquote::after { content: '”'; color: var(--accent2); margin-left: 8px; }
+
+.ai-story-list {
+  padding: 70px 68px 36px;
+  display: grid;
+  gap: 30px;
+  position: relative;
+  z-index: 2;
+}
+.ai-story-hero > *, .ai-story-card > *, .ai-demo { min-width: 0; }
+.ai-story-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .9fr);
+  min-height: 360px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(7, 9, 14, .5);
+  transition: border-color .35s, transform .35s var(--ease-out), box-shadow .35s;
+}
+.ai-story-card:hover {
+  border-color: rgba(47, 214, 189, .4);
+  transform: translateY(-4px);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, .3);
+}
+.ai-story-card.reverse .ai-story-card-copy { order: 2; }
+.ai-story-card.reverse .ai-demo { order: 1; border-left: none; border-right: 1px solid var(--border); }
+.ai-story-card-copy {
+  padding: 48px 48px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ai-story-index {
+  color: var(--accent);
+  font: 11px/1 var(--font-mono);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.ai-story-card h3 {
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+.ai-story-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.95;
+}
+.ai-story-card p + p { margin-top: 13px; }
+.ai-story-payoff {
+  margin-top: 24px;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent2);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ai-demo {
+  min-height: 330px;
+  border-left: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(93, 150, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(93, 150, 255, .035) 1px, transparent 1px),
+    rgba(9, 12, 18, .72);
+  background-size: 20px 20px;
+}
+.ai-demo-label {
+  position: absolute;
+  left: 20px;
+  top: 18px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  color: var(--text-muted);
+  z-index: 5;
+}
+
+/* Demo 01 · 神之时间 */
+.ai-time-stage { position: absolute; inset: 0; }
+.ai-eye {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 104px; height: 104px;
+  border: 1px solid rgba(47, 214, 189, .65);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 42px rgba(47, 214, 189, .12), inset 0 0 28px rgba(47, 214, 189, .08);
+}
+.ai-eye::before, .ai-eye::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  inset: 20px;
+  border: 1px dashed rgba(47, 214, 189, .55);
+  animation: eyeSpin 9s linear infinite;
+}
+.ai-eye::after {
+  inset: 39px;
+  border: none;
+  background: var(--accent2);
+  box-shadow: 0 0 18px var(--accent2);
+  animation: eyePulse 2s ease-in-out infinite;
+}
+@keyframes eyeSpin { to { transform: rotate(360deg); } }
+@keyframes eyePulse { 50% { transform: scale(.72); opacity: .65; } }
+.ai-time-orbit {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 260px; height: 260px;
+  border: 1px dashed rgba(126, 160, 220, .16);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.ai-projectile {
+  position: absolute;
+  width: 28px; height: 6px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  box-shadow: 0 0 12px rgba(255, 107, 53, .35);
+}
+.ai-projectile.p1 { left: 12%; top: 34%; transform: rotate(14deg); }
+.ai-projectile.p2 { right: 11%; top: 58%; transform: rotate(184deg); }
+.ai-projectile.p3 { left: 20%; bottom: 20%; transform: rotate(-34deg); }
+.ai-projectile::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ffd2c1;
+}
+.ai-speed-tag {
+  position: absolute;
+  bottom: 24px;
+  font: 9px/1 var(--font-mono);
+  letter-spacing: 1.5px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: rgba(7,9,14,.7);
+}
+.ai-speed-tag.world { left: 24px; color: var(--accent); }
+.ai-speed-tag.player { right: 24px; color: var(--accent2); }
+
+/* Demo 02 · 一名敌人，两种意义 */
+.ai-choice-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.ai-choice-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  text-align: center;
+  padding: 44px 18px 20px;
+}
+.ai-choice-side:first-child { border-right: 1px solid var(--border); background: rgba(255, 107, 53, .025); }
+.ai-choice-side:last-child { background: rgba(47, 214, 189, .025); }
+.ai-choice-glyph {
+  width: 76px; height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 28px;
+  border: 1px solid currentColor;
+}
+.ai-choice-side.freeze { color: var(--accent); }
+.ai-choice-side.use { color: var(--accent2); }
+.ai-choice-side strong { font-size: 15px; color: var(--text-primary); }
+.ai-choice-side small { color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+.ai-choice-arrow { font: 18px/1 var(--font-mono); opacity: .75; }
+
+/* Demo 03 · 让游戏回答 */
+.ai-loop-stage {
+  position: absolute;
+  inset: 48px 24px 24px;
+  display: grid;
+  place-items: center;
+}
+.ai-loop-ring {
+  width: min(270px, 78%);
+  aspect-ratio: 1;
+  border: 1px dashed rgba(47, 214, 189, .35);
+  border-radius: 50%;
+  position: relative;
+  animation: loopSpin 24s linear infinite;
+}
+@keyframes loopSpin { to { transform: rotate(360deg); } }
+.ai-loop-node {
+  position: absolute;
+  width: 84px;
+  min-height: 52px;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px solid var(--border-hover);
+  border-radius: 8px;
+  background: #0b0e15;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+  animation: loopCounterSpin 24s linear infinite;
+}
+@keyframes loopCounterSpin { to { transform: rotate(-360deg); } }
+.ai-loop-node.n1 { left: 50%; top: -25px; margin-left: -42px; color: #ffc5af; }
+.ai-loop-node.n2 { right: -38px; top: 50%; margin-top: -26px; color: #d7deed; }
+.ai-loop-node.n3 { left: 50%; bottom: -25px; margin-left: -42px; color: #baf7ee; }
+.ai-loop-node.n4 { left: -38px; top: 50%; margin-top: -26px; color: #d7deed; }
+.ai-loop-core {
+  position: absolute;
+  inset: 50%;
+  width: 92px; height: 92px;
+  margin: -46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: rgba(47, 214, 189, .08);
+  border: 1px solid rgba(47, 214, 189, .4);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  box-shadow: 0 0 30px rgba(47, 214, 189, .1);
+}
+
+.ai-story-finale {
+  margin: 18px 68px 68px;
+  padding: 56px 48px;
+  border: 1px solid rgba(47, 214, 189, .22);
+  border-radius: 18px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, rgba(255, 107, 53, .05), rgba(47, 214, 189, .06));
+}
+.ai-story-finale .overline {
+  color: var(--accent2);
+  font: 10px/1 var(--font-mono);
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+}
+.ai-story-finale h3 {
+  font-size: clamp(27px, 4vw, 44px);
+  line-height: 1.35;
+  max-width: 900px;
+  margin: 0 auto;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px rgba(47, 214, 189, .09);
+}
+.ai-story-finale p {
+  margin: 18px auto 0;
+  max-width: 760px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.ai-tool-footnote {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   flex-wrap: wrap;
 }
-.pipeline-step {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  padding: 5px 12px;
+.ai-tool-footnote span, .ai-tool-footnote a {
+  padding: 7px 11px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(126, 160, 220, .03);
-  transition: color .3s, border-color .3s, transform .3s var(--ease-spring);
-}
-.pipeline-step:hover {
-  color: var(--accent2);
-  border-color: rgba(47, 214, 189, .5);
-  transform: translateY(-2px);
-}
-.pipeline-arrow {
-  color: var(--accent2);
-  font-size: 14px;
-  animation: arrowPulse 2.5s infinite;
-}
-.pipeline-arrow:nth-of-type(2) { animation-delay: .3s; }
-.pipeline-arrow:nth-of-type(4) { animation-delay: .6s; }
-.pipeline-arrow:nth-of-type(6) { animation-delay: .9s; }
-.pipeline-arrow:nth-of-type(8) { animation-delay: 1.2s; }
-@keyframes arrowPulse {
-  0%, 100% { opacity: .35; transform: translateX(0); }
-  50% { opacity: 1; transform: translateX(3px); }
-}
-
-.ai-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 32px;
-}
-.ai-grid-bottom {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-top: 24px;
-  max-width: 66.66%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.ai-card {
-  padding: 32px 24px;
-  background: rgba(126, 160, 220, 0.02);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: border-color .35s, background .35s, transform .35s var(--ease-out), box-shadow .35s;
-  position: relative;
-}
-.ai-card:hover {
-  border-color: var(--accent2);
-  background: rgba(47, 214, 189, 0.04);
-  transform: translateY(-5px);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, .32);
-}
-.ai-icon {
-  font-size: 28px;
-  margin-bottom: 16px;
-  display: inline-block;
-  transition: transform .4s var(--ease-spring);
-}
-.ai-card:hover .ai-icon { transform: translateY(-3px) rotate(-8deg) scale(1.12); }
-.ai-card h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.ai-card p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-.ai-coming {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent2);
-  margin-top: 12px;
-  letter-spacing: 1px;
-}
-.ai-card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--accent2);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font: 9px/1 var(--font-mono);
+  letter-spacing: .8px;
   text-decoration: none;
-  font-weight: 500;
-  opacity: 0.7;
-  transition: opacity 0.3s, gap 0.3s;
+  transition: color .25s, border-color .25s;
 }
-.ai-card-link:hover { opacity: 1; gap: 10px; }
-.ai-card-link::after { content: '→'; }
+.ai-tool-footnote a:hover { color: var(--accent2); border-color: rgba(47, 214, 189, .4); }
 
 /* ═══════════════════════════════════════════
    更多案例
@@ -1645,6 +2001,9 @@ body.whitebox .pv-meme, body.whitebox .pv-q, body.whitebox .pv-sky, body.whitebo
 body.whitebox .pv-dislocation { background: #b9b8b4; }
 body.whitebox .project-card,
 body.whitebox .ai-card,
+body.whitebox .ai-story-card,
+body.whitebox .ai-demo,
+body.whitebox .ai-distance-map,
 body.whitebox .case-card,
 body.whitebox .stat-card,
 body.whitebox .analysis-item,
@@ -1781,9 +2140,16 @@ body.whitebox .project-visual {
     border-left: none;
     border-top: 1px solid var(--border);
   }
-  .ai-grid { grid-template-columns: 1fr; }
-  .ai-grid-bottom { grid-template-columns: 1fr; max-width: 100%; }
-  .ai-section { padding: 40px 24px; }
+  .ai-story-hero { grid-template-columns: 1fr; padding: 56px 36px; gap: 44px; }
+  .ai-distance-map { min-height: 340px; max-width: 560px; width: 100%; margin: 0 auto; }
+  .ai-manifesto { padding: 40px 36px; }
+  .ai-story-list { padding: 52px 36px 24px; }
+  .ai-story-card { grid-template-columns: 1fr; }
+  .ai-story-card.reverse .ai-story-card-copy,
+  .ai-story-card.reverse .ai-demo { order: initial; }
+  .ai-story-card.reverse .ai-demo,
+  .ai-demo { border-left: none; border-right: none; border-top: 1px solid var(--border); }
+  .ai-story-finale { margin: 18px 36px 52px; }
   .cases-grid { grid-template-columns: 1fr 1fr; }
   .contact-section { padding: 100px 24px; }
   .analysis-groups {
@@ -1798,6 +2164,28 @@ body.whitebox .project-visual {
 }
 
 @media (max-width: 600px) {
+  .ai-story-hero { padding: 44px 22px; gap: 34px; min-height: 0; }
+  .ai-story-title { font-size: clamp(34px, 10.5vw, 42px); letter-spacing: -1px; }
+  .ai-story-lede { font-size: 14px; line-height: 1.85; }
+  .ai-distance-map { min-height: 270px; padding: 38px 10px 20px; }
+  .ai-distance-node { width: 76px; }
+  .ai-distance-node strong { font-size: 10px; }
+  .ai-distance-node span { font-size: 8px; letter-spacing: 1px; }
+  .ai-distance-wall { width: 42px; height: 164px; }
+  .ai-distance-wall span { font-size: 9px; letter-spacing: 2px; }
+  .ai-distance-beam { left: 52px; right: 52px; }
+  .ai-manifesto { padding: 34px 22px; }
+  .ai-manifesto blockquote { font-size: 20px; overflow-wrap: anywhere; }
+  .ai-story-list { padding: 38px 18px 18px; gap: 20px; }
+  .ai-story-card-copy { padding: 36px 26px 32px; }
+  .ai-story-card h3 { font-size: 25px; }
+  .ai-demo { min-height: 300px; }
+  .ai-choice-side { padding-left: 10px; padding-right: 10px; }
+  .ai-choice-glyph { width: 62px; height: 62px; font-size: 24px; }
+  .ai-loop-ring { width: 220px; }
+  .ai-loop-node { width: 72px; font-size: 10px; }
+  .ai-loop-node.n1, .ai-loop-node.n3 { margin-left: -36px; }
+  .ai-story-finale { margin: 12px 18px 38px; padding: 42px 22px; }
   .cases-grid { grid-template-columns: 1fr; }
   .about-stats { grid-template-columns: 1fr; }
   .hero-name-en { letter-spacing: 3px; }
@@ -2371,66 +2759,138 @@ body.whitebox .project-visual {
 <!-- AI Workflow -->
 <section id="ai">
   <div class="ai-section">
-    <div class="section-label">// AI-Enhanced Workflow</div>
-    <div class="section-title">AI 如何提升我的设计效率</div>
-    <p class="section-desc" style="margin-bottom:0">
-      为每款AI找到最适合的工作场景，构建从创意构思到资产产出的全链路工具体系——<br>
-      不是让AI替代设计，而是让设计师更快、更准地实现想法。
-    </p>
+    <header class="ai-story-hero">
+      <div class="ai-story-copy">
+        <div class="section-label">// AI-ENHANCED DESIGN PRACTICE</div>
+        <h2 class="ai-story-title">
+          让好点子，<br>
+          在<span class="warm">灵感冷却前</span><br>
+          变成<span class="playable">能玩的东西</span>。
+        </h2>
+        <p class="ai-story-lede">
+          游戏策划最痛苦的，往往不是没有创意，而是<strong>已经看见了那个瞬间，却还没有办法玩到它</strong>。
+          一个画面要先变成文档、需求和等待；等它终于能够游玩，我们讨论的可能只剩下“功能有没有完成”，而不是“玩家有没有感受到它”。
+        </p>
+      </div>
 
-    <div class="ai-pipeline">
-      <span class="pipeline-step">创意构思</span>
-      <span class="pipeline-arrow">→</span>
-      <span class="pipeline-step">信息检索</span>
-      <span class="pipeline-arrow">→</span>
-      <span class="pipeline-step">文档与代码</span>
-      <span class="pipeline-arrow">→</span>
-      <span class="pipeline-step">开发实现</span>
-      <span class="pipeline-arrow">→</span>
-      <span class="pipeline-step">美术资产</span>
+      <div class="ai-distance-map" aria-label="AI 缩短创意到可玩原型之间的距离">
+        <div class="ai-distance-beam" aria-hidden="true"></div>
+        <div class="ai-distance-node idea">
+          <span>IDEA</span>
+          <strong>我已经<br>看见那个瞬间</strong>
+        </div>
+        <div class="ai-distance-wall"><span>实现墙</span></div>
+        <div class="ai-distance-node result">
+          <span>PLAYABLE</span>
+          <strong>现在就能<br>亲手验证它</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="ai-manifesto">
+      <blockquote>我希望创意还带着温度时，<br>它就已经可以被试玩。</blockquote>
     </div>
 
-    <div class="ai-grid">
-      <div class="ai-card">
-        <div class="ai-icon">💡</div>
-        <h3>Gemini — 头脑风暴引擎</h3>
-        <p>灵感卡壳时的第一选择。能敏锐抓取零散思路，按重要性和优先级梳理成结构化的设计方案，极大加速前期创意构思。</p>
-        <a class="ai-card-link" href="https://gemini.google.com/share/db0eefc56ac6" target="_blank">查看对话示例</a>
-      </div>
-      <div class="ai-card">
-        <div class="ai-icon">🛠️</div>
-        <h3>Codex 智能编辑器 — 开发加速器</h3>
-        <p>彻底改变游戏开发体验：不只是写脚本，而是能读取整个项目文件，自动配置场景、挂载组件、精准定位报错，告别繁琐的手动"连连看"。</p>
-      </div>
-      <div class="ai-card">
-        <div class="ai-icon">🔎</div>
-        <h3>ChatGPT — 精准检索专家</h3>
-        <p>扮演"严谨的理科生"角色：精准查找日程、文献、活动记录，找不到就是找不到，绝不编造。配合内置Python处理格式化数据。</p>
-        <a class="ai-card-link" href="https://chatgpt.com/share/69a7afed-5b00-8011-81ac-db4188148ff0" target="_blank">查看对话示例</a>
-      </div>
+    <div class="ai-story-list">
+      <article class="ai-story-card">
+        <div class="ai-story-card-copy">
+          <div class="ai-story-index">01 · TRANSLATE THE FEELING</div>
+          <h3>让 AI 翻译感觉，<br>不替我决定。</h3>
+          <p>
+            我提出的起点通常不是功能，而是一种玩家感受：开启轮回眼后，飞来的火球凝固在空中，玩家仍能自由行动——我要的是“像神一样”的掌控感。
+          </p>
+          <p>
+            AI 帮助我继续追问：玩家为什么不能一直使用？高速威胁被放慢后，游戏是在降低难度，还是把操作压力转化成更从容的策略判断？模糊的幻想因此逐渐变成可以讨论、可以取舍的设计规则。
+          </p>
+          <div class="ai-story-payoff">AI 没有替我发明感觉，它帮助我看见：究竟是哪几条规则在支撑这种感觉。</div>
+        </div>
+        <div class="ai-demo" aria-label="轮回眼神之时间设计示意">
+          <div class="ai-demo-label">CASE 01 / 神之时间</div>
+          <div class="ai-time-stage" aria-hidden="true">
+            <div class="ai-time-orbit"></div>
+            <div class="ai-eye"></div>
+            <i class="ai-projectile p1"></i>
+            <i class="ai-projectile p2"></i>
+            <i class="ai-projectile p3"></i>
+            <span class="ai-speed-tag world">WORLD × 0.1</span>
+            <span class="ai-speed-tag player">PLAYER × 1.0</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="ai-story-card reverse">
+        <div class="ai-story-card-copy">
+          <div class="ai-story-index">02 · RECOMBINE THE RULES</div>
+          <h3>不急着增加系统，<br>先让旧规则发生碰撞。</h3>
+          <p>
+            在《冰 × 工业》的第一关，我先让玩家建立一个安全直觉：锤打机是会把冰块击飞的障碍，把它降温冻结，通路就安全了。
+          </p>
+          <p>
+            到第二关，我没有继续发明机关，而是与 AI 重新排列冰块、传送带、锤打机和冻结已经拥有的规则：冻结错误朝向的锤打机，保留正确的那一台，再借它把冰块击向墙体。原本需要避开的危险，就这样变成了主动利用的工具。
+          </p>
+          <div class="ai-story-payoff">问题从“要不要冻结”，升级成“该冻结哪一个”。</div>
+        </div>
+        <div class="ai-demo" aria-label="冰工厂中锤打机从障碍变为工具的示意">
+          <div class="ai-demo-label">CASE 02 / 同一机关，两种意义</div>
+          <div class="ai-choice-stage" aria-hidden="true">
+            <div class="ai-choice-side freeze">
+              <div class="ai-choice-glyph">❄</div>
+              <strong>第一关 · 冻结</strong>
+              <div class="ai-choice-arrow">STOP</div>
+              <small>锤打机是障碍<br>冻住，安全通过</small>
+            </div>
+            <div class="ai-choice-side use">
+              <div class="ai-choice-glyph">◆</div>
+              <strong>第二关 · 利用</strong>
+              <div class="ai-choice-arrow">STRIKE →</div>
+              <small>保留正确朝向<br>击飞冰块破墙</small>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="ai-story-card">
+        <div class="ai-story-card-copy">
+          <div class="ai-story-index">03 · LET THE GAME ANSWER</div>
+          <h3>不再用争论证明创意，<br>让游戏自己回答。</h3>
+          <p>
+            “一百只缓慢下落的怪物会不会有割草感？”“S 型激光扫五秒会形成压迫，还是只显得漫长？”这些问题无法在文档里得到答案。
+          </p>
+          <p>
+            我让 AI 先做一个只回答当前问题的验证场景，暂时不追求完整关卡。亲手试玩后，我描述具体的不适；AI 协助定位原因、开放关键参数，再把受击来源、通关时间和构筑变化变成可观察的证据。
+          </p>
+          <div class="ai-story-payoff">我负责判断“体验哪里不对”，AI 协助追查“系统为什么会这样”。</div>
+        </div>
+        <div class="ai-demo" aria-label="设计假设通过原型、试玩和证据持续迭代的示意">
+          <div class="ai-demo-label">CASE 03 / 让游戏回答</div>
+          <div class="ai-loop-stage" aria-hidden="true">
+            <div class="ai-loop-ring">
+              <span class="ai-loop-node n1">体验假设</span>
+              <span class="ai-loop-node n2">最小原型</span>
+              <span class="ai-loop-node n3">试玩证据</span>
+              <span class="ai-loop-node n4">具体纠偏</span>
+            </div>
+            <div class="ai-loop-core">下一次<br>设计判断</div>
+          </div>
+        </div>
+      </article>
     </div>
 
-    <div class="ai-grid-bottom">
-      <div class="ai-card">
-        <div class="ai-icon">📄</div>
-        <h3>Claude — 长文本与代码搬运工</h3>
-        <p>处理万字文档和大型代码库的首选。超强长上下文稳定性，极速将表格、文档转化为格式化内容，代码逻辑一致性极高。</p>
+    <footer class="ai-story-finale">
+      <div class="overline">THE REAL BENEFIT</div>
+      <h3>我得到的不是更快的代码，<br>而是更多次设计机会。</h3>
+      <p>
+        AI 缩短了想象与试玩之间的距离。它让我更早看见结果、更快推翻错误，并把有限的时间重新花在体验、选择与节奏上。工具会改变，但这套以策划判断为核心的协作方式不会。
+      </p>
+      <div class="ai-tool-footnote" aria-label="AI 协作工具与对话案例">
+        <span>TOOLS IN THE LOOP</span>
+        <a href="https://gemini.google.com/share/db0eefc56ac6" target="_blank" rel="noopener noreferrer">GEMINI · 创意梳理</a>
+        <span>CODEX · 原型与验证</span>
+        <a href="https://chatgpt.com/share/69a7afed-5b00-8011-81ac-db4188148ff0" target="_blank" rel="noopener noreferrer">CHATGPT · 检索分析</a>
+        <span>CLAUDE · 长文本整理</span>
       </div>
-      <div class="ai-card">
-        <div class="ai-icon">🎨</div>
-        <h3>生图流水线 — 2D概念到3D资产</h3>
-        <p>用Nano Banana 2精准生成关卡概念图，再通过腾讯混元3D大模型一键转化为3D模型，实现从平面到立体的极速资产构建。</p>
-      </div>
+    </footer>
 
-      <!-- ┌─〔AI 卡片模板〕新增 AI 工具时复制此块并取消注释 ─────┐
-      <div class="ai-card">
-        <div class="ai-icon">🤖</div>
-        <h3>工具名 — 一句话定位</h3>
-        <p>这个工具在你的工作流中解决什么问题、怎么用。</p>
-        <a class="ai-card-link" href="链接地址" target="_blank">查看对话示例</a>
-      </div>
-      └（上排 ai-grid 三列 / 下排 ai-grid-bottom 两列，按需放置）┘ -->
-    </div>
   </div>
 </section>
 
