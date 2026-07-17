@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="战术竞技类大地图关卡规划精读：从目标体验、地图尺度、POI布局与吸引力，到缩圈节奏、城镇动线和性能预算的完整设计推导。">
+<title>战术竞技类大地图关卡规划与设计 | 韩徐泓</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="analysis-theme.css">
+<style>
+  .container { max-width: 1040px; }
+
+  .br-hero {
+    min-height: 610px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
+    align-items: center;
+    gap: 4rem;
+    text-align: left;
+    padding: 4.4rem 0 3.4rem;
+  }
+  .br-hero::after { left: 0; transform: none; width: 100%; }
+  .br-hero .hero-sub { margin: 1.2rem 0 0; max-width: 560px; }
+  .br-hero h1 { font-size: clamp(2.7rem, 6vw, 5.4rem); line-height: 1.03; letter-spacing: -.05em; }
+  .br-hero h1 small {
+    display: block;
+    margin-top: .8rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-tertiary);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    -webkit-text-fill-color: initial;
+  }
+  .hero-thesis {
+    margin-top: 1.8rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--accent-gold);
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .tactical-map {
+    position: relative;
+    width: min(100%, 430px);
+    aspect-ratio: 1;
+    justify-self: end;
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      linear-gradient(rgba(93,150,255,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(93,150,255,.055) 1px, transparent 1px),
+      radial-gradient(circle at 64% 36%, rgba(47,214,189,.08), transparent 34%),
+      #0b0f17;
+    background-size: 28px 28px, 28px 28px, auto, auto;
+    box-shadow: 0 24px 70px rgba(0,0,0,.36);
+  }
+  .tactical-map::before,
+  .tactical-map::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(47,214,189,.55);
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .tactical-map::before { width: 77%; height: 77%; }
+  .tactical-map::after { width: 43%; height: 43%; border-style: solid; border-color: rgba(255,107,53,.72); box-shadow: 0 0 35px rgba(255,107,53,.1); }
+  .map-coord {
+    position: absolute;
+    z-index: 2;
+    font: 500 .58rem/1 'JetBrains Mono', monospace;
+    color: var(--text-tertiary);
+    letter-spacing: .08em;
+  }
+  .map-coord.tl { left: 14px; top: 14px; }
+  .map-coord.br { right: 14px; bottom: 14px; }
+  .poi {
+    position: absolute;
+    z-index: 3;
+    width: 10px; height: 10px;
+    border: 2px solid currentColor;
+    background: #0b0f17;
+    transform: translate(-50%, -50%) rotate(45deg);
+    color: var(--accent-blue);
+  }
+  .poi::after {
+    content: attr(data-name);
+    position: absolute;
+    left: 12px; top: -10px;
+    transform: rotate(-45deg);
+    transform-origin: left center;
+    white-space: nowrap;
+    font: 500 .58rem/1 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+  }
+  .poi.hot { color: var(--accent-gold); box-shadow: 0 0 18px currentColor; }
+  .poi.mid { color: var(--accent-teal); }
+  .route {
+    position: absolute;
+    z-index: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(93,150,255,.1), rgba(93,150,255,.7), rgba(93,150,255,.1));
+    transform-origin: left center;
+  }
+  .map-caption {
+    position: absolute;
+    z-index: 4;
+    left: 18px; bottom: 18px;
+    padding: .7rem .8rem;
+    border: 1px solid var(--border);
+    background: rgba(7,9,14,.8);
+    backdrop-filter: blur(8px);
+    font: .62rem/1.6 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+  }
+  .map-caption strong { color: var(--accent-gold); font-weight: 500; }
+
+  .quick-read {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    background: var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2.5rem 0 3rem;
+  }
+  .quick-cell { background: var(--bg-card); padding: 1.15rem; }
+  .quick-cell span { display: block; font: .65rem/1 'JetBrains Mono', monospace; color: var(--accent-teal); letter-spacing: .12em; margin-bottom: .7rem; }
+  .quick-cell strong { color: var(--text-primary); font-size: .9rem; line-height: 1.55; }
+
+  .design-chain {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: .5rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .chain-step {
+    min-height: 120px;
+    position: relative;
+    padding: 1rem .8rem;
+    border: 1px solid var(--border);
+    background: linear-gradient(145deg, rgba(93,150,255,.045), rgba(16,20,29,.85));
+    border-radius: 8px;
+  }
+  .chain-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    z-index: 2;
+    right: -.62rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-gold);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .chain-step b { display: block; font: .66rem/1 'JetBrains Mono', monospace; color: var(--accent-gold); margin-bottom: .7rem; }
+  .chain-step strong { display: block; color: var(--text-primary); font-size: .88rem; margin-bottom: .35rem; }
+  .chain-step small { color: var(--text-tertiary); font-size: .72rem; line-height: 1.5; }
+
+  .formula {
+    margin: 1.7rem 0;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+  .formula-box { padding: 1.2rem .8rem; border: 1px solid var(--border); background: var(--bg-surface); border-radius: 10px; }
+  .formula-box span { display: block; font: .65rem/1 'JetBrains Mono', monospace; color: var(--text-tertiary); margin-bottom: .55rem; }
+  .formula-box strong { color: var(--text-primary); }
+  .formula-op { color: var(--accent-gold); font: 1.4rem/1 'JetBrains Mono', monospace; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.3rem 0 1.8rem; }
+  .compare-card { padding: 1.4rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+  .compare-card.satellite { border-top: 2px solid var(--accent-blue); }
+  .compare-card.compact { border-top: 2px solid var(--accent-gold); }
+  .compare-card .eyebrow { font: .65rem/1 'JetBrains Mono', monospace; color: var(--text-tertiary); letter-spacing: .12em; }
+  .compare-card h3 { margin: .65rem 0 .7rem; }
+  .compare-card .verdict { margin-top: 1rem; color: var(--text-primary); font-weight: 700; }
+
+  .attraction-model {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .attraction-factor { padding: 1.25rem; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border); }
+  .factor-num { font: 700 1.55rem/1 'JetBrains Mono', monospace; color: var(--accent-gold); opacity: .75; }
+  .attraction-factor h3 { margin: .7rem 0 .45rem; font-size: 1rem; }
+  .attraction-factor p { font-size: .87rem; margin: 0; }
+
+  .signal-flow {
+    margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .signal-node { position: relative; padding: 1rem .75rem; background: var(--bg-card); border-right: 1px solid var(--border); }
+  .signal-node:last-child { border-right: 0; }
+  .signal-node b { display: block; color: var(--accent-teal); font: .64rem/1 'JetBrains Mono', monospace; margin-bottom: .55rem; }
+  .signal-node span { color: var(--text-primary); font-size: .82rem; }
+
+  .br-mp-table td:first-child { color: var(--text-primary); font-weight: 700; }
+
+  .principle-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: .6rem; margin: 1.3rem 0 1.8rem; }
+  .principle-strip div { padding: .85rem .55rem; text-align: center; border: 1px dashed var(--border-light); color: var(--text-secondary); font-size: .78rem; }
+
+  .performance-note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.2rem;
+    align-items: center;
+    margin: 1.5rem 0;
+    padding: 1.4rem;
+    border: 1px solid rgba(47,214,189,.28);
+    background: linear-gradient(100deg, rgba(47,214,189,.07), transparent);
+    border-radius: 10px;
+  }
+  .performance-icon { width: 72px; height: 72px; border: 1px solid var(--accent-teal); border-radius: 50%; display: grid; place-items: center; color: var(--accent-teal); font: 700 .76rem/1.2 'JetBrains Mono', monospace; text-align: center; }
+
+  .reflection-card { margin: 1.5rem 0; padding: 1.6rem; border: 1px solid rgba(255,107,53,.28); background: linear-gradient(135deg, rgba(255,107,53,.07), rgba(16,20,29,.85)); border-radius: 12px; }
+  .reflection-card h3 { margin-top: 0; }
+  .reflection-path { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; margin-top: 1rem; }
+  .reflection-path div { padding: .8rem; background: rgba(7,9,14,.55); border: 1px solid var(--border); border-radius: 7px; font-size: .78rem; color: var(--text-secondary); text-align: center; }
+
+  .final-answer { padding: 2rem; margin: 2rem 0; text-align: center; border: 1px solid var(--border-light); background: radial-gradient(circle at 50% 0, rgba(255,107,53,.1), transparent 55%), var(--bg-card); border-radius: 14px; }
+  .final-answer small { display: block; font: .66rem/1 'JetBrains Mono', monospace; letter-spacing: .16em; color: var(--accent-gold); margin-bottom: .9rem; }
+  .final-answer strong { display: block; color: var(--text-primary); font-family: 'Noto Serif SC', serif; font-size: clamp(1.35rem, 3vw, 2rem); line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .br-hero { grid-template-columns: 1fr; min-height: auto; gap: 2.5rem; }
+    .br-hero > * { min-width: 0; }
+    .tactical-map { justify-self: center; width: min(100%, 520px); }
+    .design-chain { grid-template-columns: repeat(3, 1fr); }
+    .chain-step:nth-child(3)::after { display: none; }
+    .quick-read { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 680px) {
+    .br-hero { padding-top: 3rem; }
+    .tactical-map { width: 100%; max-width: 100%; min-width: 0; }
+    .br-hero h1 { font-size: clamp(2.25rem, 11.2vw, 3rem); letter-spacing: -.065em; }
+    .br-hero h1 small { font-size: .55rem; letter-spacing: .1em; }
+    .quick-read, .compare-grid, .attraction-model { grid-template-columns: 1fr; }
+    .design-chain { grid-template-columns: 1fr 1fr; }
+    .chain-step:nth-child(3)::after { display: block; }
+    .chain-step:nth-child(2n)::after { display: none; }
+    .formula { grid-template-columns: 1fr; }
+    .formula-op { transform: rotate(90deg); }
+    .signal-flow { grid-template-columns: 1fr; }
+    .signal-node { border-right: 0; border-bottom: 1px solid var(--border); }
+    .signal-node:last-child { border-bottom: 0; }
+    .principle-strip, .reflection-path { grid-template-columns: 1fr 1fr; }
+    .performance-note { grid-template-columns: 1fr; }
+    .performance-icon { width: 60px; height: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-links reveal">
+    <a class="top-link" href="index.html#analysis">返回设计思考</a>
+    <a class="top-link" href="analysis-06-world-flipper-system-analysis.html">上一篇</a>
+  </div>
+
+  <header class="hero br-hero">
+    <div>
+      <div class="hero-label reveal">LEVEL DESIGN STUDY · 07</div>
+      <h1 class="reveal"><span>一张大地图，<br>如何控制一局<br>游戏？</span><small>TACTICAL BATTLE ROYALE MAP PLANNING</small></h1>
+      <p class="hero-sub reveal">战术竞技类大地图关卡规划与设计精读：把地图尺度、POI、缩圈与城镇空间放回同一条体验链中。</p>
+      <div class="hero-thesis reveal">地图不是装内容的容器。它是一台持续改变玩家密度、转移压力与交战概率的节奏机器。</div>
+    </div>
+
+    <div class="tactical-map reveal" aria-label="POI、转移路线与安全区关系示意图">
+      <span class="map-coord tl">GRID / 08×08</span>
+      <span class="map-coord br">PHASE / 04</span>
+      <span class="poi hot" data-name="HOT ZONE" style="left:63%;top:37%"></span>
+      <span class="poi mid" data-name="CITY" style="left:32%;top:27%"></span>
+      <span class="poi" data-name="PORT" style="left:22%;top:68%"></span>
+      <span class="poi mid" data-name="DEPOT" style="left:77%;top:72%"></span>
+      <span class="poi" data-name="OUTPOST" style="left:47%;top:82%"></span>
+      <span class="route" style="left:31%;top:29%;width:35%;transform:rotate(17deg)"></span>
+      <span class="route" style="left:23%;top:68%;width:55%;transform:rotate(4deg)"></span>
+      <span class="route" style="left:48%;top:81%;width:39%;transform:rotate(-48deg)"></span>
+      <div class="map-caption"><strong>SAFE ZONE ≠ 只是边界</strong><br>它在重新分配玩家与时间</div>
+    </div>
+  </header>
+
+  <div class="quick-read reveal-on-scroll" aria-label="文章速览">
+    <div class="quick-cell"><span>01 / START</span><strong>先定义这一局要给玩家什么体验</strong></div>
+    <div class="quick-cell"><span>02 / CONTROL</span><strong>用转移时间而非面积理解节奏</strong></div>
+    <div class="quick-cell"><span>03 / DISTRIBUTE</span><strong>用POI吸引力塑造玩家密度</strong></div>
+    <div class="quick-cell"><span>04 / VERIFY</span><strong>把性能与数据放进前期规划</strong></div>
+  </div>
+
+  <nav class="toc reveal-on-scroll">
+    <div class="toc-title">阅读路径 · Contents</div>
+    <ul class="toc-list">
+      <li><a href="#core"><span class="toc-num">01</span>从体验目标开始</a></li>
+      <li><a href="#tempo"><span class="toc-num">02</span>地图尺度与节奏</a></li>
+      <li><a href="#layout"><span class="toc-num">03</span>POI布局与缩圈</a></li>
+      <li><a href="#attraction"><span class="toc-num">04</span>POI吸引力模型</a></li>
+      <li><a href="#inside"><span class="toc-num">05</span>城镇内部空间</a></li>
+      <li><a href="#production"><span class="toc-num">06</span>主题、叙事与性能</a></li>
+      <li><a href="#reflection"><span class="toc-num">07</span>阅读后的自我校准</a></li>
+    </ul>
+  </nav>
+
+  <section class="analysis-section reveal-on-scroll" id="core">
+    <div class="section-label">01 · EXPERIENCE FIRST</div>
+    <article class="analysis-content">
+      <h2>不要先问地图多大，先问这一局想让玩家怎样活下来。</h2>
+      <p>战术竞技把<strong>生存本能、策略博弈、操作技巧与社交互动</strong>压进一个不断变化的沙盒。玩家的路线会被航线、资源、敌人和安全区持续改写，因此“大”并不是核心体验，<strong>动态选择</strong>才是。</p>
+      <p>这次精读让我建立了一条更完整的前期规划链：地图的每一个空间决定，都应该能一路追溯回玩家体验与产品定位。</p>
+
+      <div class="design-chain" aria-label="战术竞技地图前期设计链">
+        <div class="chain-step"><b>01</b><strong>体验定位</strong><small>生存、对抗、探索，哪一个优先？</small></div>
+        <div class="chain-step"><b>02</b><strong>单局节奏</strong><small>期望多久遭遇、转移与决战？</small></div>
+        <div class="chain-step"><b>03</b><strong>地图尺度</strong><small>面积只是满足节奏的变量之一</small></div>
+        <div class="chain-step"><b>04</b><strong>POI颗粒</strong><small>玩家会被分散还是快速聚集？</small></div>
+        <div class="chain-step"><b>05</b><strong>引导系统</strong><small>毒圈、任务与经济怎样驱动移动？</small></div>
+        <div class="chain-step"><b>06</b><strong>生产约束</strong><small>性能、成本与内容密度能否承载？</small></div>
+      </div>
+
+      <blockquote>新地图不是“再做一张不同主题的地图”，而是为产品补上一种尚未被满足的节奏与玩家偏好。</blockquote>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="tempo">
+    <div class="section-label">02 · TIME, NOT AREA</div>
+    <article class="analysis-content">
+      <h2>地图尺寸不会独自决定节奏，真正起作用的是时间。</h2>
+      <p>直觉会告诉我们“大地图更慢，小地图更快”，但这只是常见结果，不是必然规律。只要改变载具速度、补给位置、POI距离、缩圈速度和玩家密度，同一尺寸也能产生完全不同的节奏。</p>
+
+      <div class="formula" aria-label="转移时间关系式">
+        <div class="formula-box"><span>DESIGN RESULT</span><strong>转移时间</strong></div>
+        <div class="formula-op">≈</div>
+        <div class="formula-box"><span>SPATIAL INPUT</span><strong>POI距离</strong></div>
+        <div class="formula-op">÷</div>
+        <div class="formula-box"><span>SYSTEM INPUT</span><strong>有效移动速度</strong></div>
+      </div>
+
+      <p>例如，8×8公里的大地图可以用载具缩短移动时间；2×2公里的小地图也可以通过减少载具、拉长搜集过程，让转移仍然具有压力。因此前期规划不该把“地图面积”当作答案，而要把它放进<strong>目标单局时长与体验曲线</strong>中检验。</p>
+      <ul>
+        <li><strong>从慢到快容易制造爽感</strong>：接敌频率逐步提升，玩家更容易接受压力递增。</li>
+        <li><strong>从快到慢容易形成空档</strong>：前期刚建立的兴奋被长距离无效移动打断。</li>
+        <li><strong>后期不是只服务幸存者</strong>：缩圈要让仍在场的所有玩家共同感受到密度与威胁的上升。</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="layout">
+    <div class="section-label">03 · DISTRIBUTE THE PLAYERS</div>
+    <article class="analysis-content">
+      <h2>POI布局的本质，是提前设计玩家如何分开、相遇，再被重新聚拢。</h2>
+
+      <div class="compare-grid">
+        <div class="compare-card satellite">
+          <div class="eyebrow">SATELLITE POI</div>
+          <h3>离散卫星城</h3>
+          <p>小型资源点彼此分散，城镇关联较弱。风险较低、转移距离更长，适合搜集、观察与长线运营，也能把性能压力拆散。</p>
+          <div class="verdict">分散发育，长线运营</div>
+        </div>
+        <div class="compare-card compact">
+          <div class="eyebrow">COMPACT URBAN POI</div>
+          <h3>紧凑城市群</h3>
+          <p>建筑、街道与立体路径高密度咬合。资源集中、争夺激烈，容易形成清晰热区，适合近距离交战与快速决策。</p>
+          <div class="verdict">落地开战，短兵决胜</div>
+        </div>
+      </div>
+
+      <h3>缩圈不是倒计时，而是玩家密度的重排器。</h3>
+      <p>每一次缩圈都在同步改变安全空间、转移路径与可用POI数量。圈缩得多快、剩下多少城镇、这些城镇能承载多少队伍，共同决定下一阶段的交战强度。</p>
+      <div class="signal-flow" aria-label="从缩圈到交战的因果链">
+        <div class="signal-node"><b>PHASE 01</b><span>安全区收缩</span></div>
+        <div class="signal-node"><b>PHASE 02</b><span>可用POI减少</span></div>
+        <div class="signal-node"><b>PHASE 03</b><span>转移路线重叠</span></div>
+        <div class="signal-node"><b>PHASE 04</b><span>玩家密度上升</span></div>
+        <div class="signal-node"><b>PHASE 05</b><span>冲突概率提高</span></div>
+      </div>
+      <p>这也是为什么POI“颗粒度”必须与玩家数量配合：POI越小、越密，玩家聚集得越快；POI过少会让落点高度同质化，过多则可能让玩家长时间彼此错开。</p>
+
+      <h3>PUBG 与 Warzone：空间引导和系统引导的两种重心</h3>
+      <table>
+        <thead><tr><th>维度</th><th>PUBG</th><th>Warzone</th></tr></thead>
+        <tbody>
+          <tr><td>主要引导</td><td>安全区与资源分布</td><td>任务、经济系统与目标设施</td></tr>
+          <tr><td>POI关系</td><td>卫星城相对独立，重视单城吸引力</td><td>功能被任务与购买点进一步分层</td></tr>
+          <tr><td>设计重心</td><td>宏观落点与转移风险</td><td>局部目标点的高密度策略</td></tr>
+        </tbody>
+      </table>
+      <p>不能把一种游戏的热区方案直接移植到另一种游戏。引导系统不同，玩家理解地图和选择路线的方式也不同。</p>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="attraction">
+    <div class="section-label">04 · WHY PLAYERS LAND HERE</div>
+    <article class="analysis-content">
+      <h2>POI吸引力不是“资源越多越好”，而是一组玩家成本与收益的综合判断。</h2>
+      <div class="attraction-model">
+        <div class="attraction-factor">
+          <div class="factor-num">01</div>
+          <h3>资源搜索效率</h3>
+          <p>玩家不仅在意能捡到多少，也在意需要花多少时间、走多复杂的路线。清晰的大空间可能比资源更多的迷宫更受欢迎。</p>
+        </div>
+        <div class="attraction-factor">
+          <div class="factor-num">02</div>
+          <h3>地图位置</h3>
+          <p>更靠近中心通常意味着更低的跑圈风险和更多后续选择，因此位置本身就是一种隐形资源。</p>
+        </div>
+        <div class="attraction-factor">
+          <div class="factor-num">03</div>
+          <h3>Landmark辨识度</h3>
+          <p>独特形态、尺度、材质、色彩和视野关系帮助玩家快速定位，并让一次路线选择更容易被记住。</p>
+        </div>
+      </div>
+
+      <p>前期应先规划POI的高、中、低吸引力层级，再用资源效率、地理位置和地标性解释每个层级。这样才能在数据出现后知道<strong>该调整哪一个变量</strong>，而不是凭感觉移动整座城。</p>
+      <blockquote>一个热区过强，不只是让其他区域没人去。它还会让整张地图的重复体验逐渐收缩成同一种开局。</blockquote>
+      <ul>
+        <li><strong>过热</strong>：削弱资源效率、增加风险，或提高其他区域的目标价值。</li>
+        <li><strong>过冷</strong>：改善搜索路径、补充功能目标，或强化地标与交通连接。</li>
+        <li><strong>距离失衡</strong>：用实际转移时间与玩家行为数据校准，而不是只看俯视图是否均匀。</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="inside">
+    <div class="section-label">05 · INSIDE THE POI</div>
+    <article class="analysis-content">
+      <h2>进入单个城镇后，BR地图不能照搬传统MP图的动线逻辑。</h2>
+      <p>MP地图从固定出生点和固定目标出发，设计师可以用主路、侧翼与卡口强控制交火；BR玩家却可能降落在任意屋顶、窗口或街角，动线只能被资源、视野、掩体和安全区<strong>间接塑造</strong>。</p>
+      <table class="br-mp-table">
+        <thead><tr><th>维度</th><th>BR城镇</th><th>传统MP图</th></tr></thead>
+        <tbody>
+          <tr><td>起点</td><td>随机降落，可从POI任意位置开始</td><td>固定阵营出生点</td></tr>
+          <tr><td>目标</td><td>搜索 → 生存 → 转移 → 决战</td><td>占点、击杀、攻防等固定任务</td></tr>
+          <tr><td>动线控制</td><td>由资源、视野、掩体与圈间接引导</td><td>用主通道、绕后路线与卡口硬控制</td></tr>
+          <tr><td>设计重点</td><td>随机冲突与多种离开方式</td><td>公平对抗与可预测节奏</td></tr>
+        </tbody>
+      </table>
+
+      <h3>空间结构仍然需要清晰，但清晰不等于单一路线。</h3>
+      <div class="principle-strip" aria-label="POI内部布局原则">
+        <div>主建筑锚点</div><div>距离与高差分区</div><div>道路组织转移</div><div>自然地形咬合</div><div>特异形态辨识</div>
+      </div>
+      <p>常见的主路穿城、沿街矮墙和对街阳台，能形成易理解、易记忆、易交战的基础空间；但它们也容易平庸。真正的差异化来自：这些结构是否服务于明确的枪械距离、队伍关系和主题体验。</p>
+
+      <h3>同样是建筑，PUBG与Apex表达的是不同的玩家态度。</h3>
+      <div class="compare-grid">
+        <div class="compare-card satellite">
+          <div class="eyebrow">PUBG · SURVIVAL</div>
+          <h3>建筑是避风港</h3>
+          <p>多房间、复杂出入口与丰富掩体支持躲藏、伏击和长时间防守。空间允许玩家“苟”，因为生存本身就是体验的一部分。</p>
+        </div>
+        <div class="compare-card compact">
+          <div class="eyebrow">APEX · CONFRONTATION</div>
+          <h3>建筑是交战框架</h3>
+          <p>大门、开阔室内、较少遮蔽和内外通透视野降低寻找敌人的成本，鼓励正面交锋与技能应对。</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="production">
+    <div class="section-label">06 · BUILD WHAT MATTERS</div>
+    <article class="analysis-content">
+      <h2>好的大地图规划，必须在白盒阶段就同时看见主题、叙事与性能。</h2>
+      <p>POI主题不是最后贴上的美术皮肤。机场意味着跑道、航站楼与飞机等必要锚点；这些锚点会反过来决定体量、开阔度、交战距离和制作成本。主题越早被抽象成空间元素，关卡与美术的协作越具体。</p>
+      <ul>
+        <li><strong>场景直接记录</strong>：用破坏痕迹、遗留物与空间状态讲述发生过的事件。</li>
+        <li><strong>地图迭代叙事</strong>：让赛季或事件真实改变地图，使世界变化成为长期内容。</li>
+        <li><strong>角色与空间互动</strong>：通过任务和角色行为，让玩家在场景中拼出故事。</li>
+      </ul>
+
+      <div class="performance-note">
+        <div class="performance-icon">LOAD<br>RING</div>
+        <div>
+          <h3>性能预算也是地图布局的一部分</h3>
+          <p>同一个加载范围内应避免同时压入多个大型POI，超大型建筑之间需要拉开距离。这样不是单纯“省性能”，而是把有限预算留给真正影响辨识、战斗和氛围的地方。</p>
+        </div>
+      </div>
+      <p><strong>先决定哪里值得昂贵，再开始堆内容。</strong>性能、制作成本和体验优先级应该共享同一张地图，而不是等场景完成后才彼此妥协。</p>
+    </article>
+  </section>
+
+  <section class="analysis-section reveal-on-scroll" id="reflection">
+    <div class="section-label">07 · SELF CALIBRATION</div>
+    <article class="analysis-content">
+      <h2>这次精读真正补上的，不只是术语，而是一条可以继续追问的思考链。</h2>
+      <p>原始笔记里，我坦白记录了自己仍处于学习阶段：面对POI、热区、loading ring等行业表达，第一步不是生硬复述，而是先用自己的语言解释它为何影响玩家，再逐渐压缩成更准确的专业表达。</p>
+
+      <div class="reflection-card">
+        <h3>我发现的遗漏：宏观地图谈清楚了，但“掩体”没有继续向下推。</h3>
+        <p>掩体既影响玩家能否安全转移，也决定交战距离、信息交换与攻守节奏。它难以在宏观文章里被统一概括，却正是把POI结构落实成实际战斗体验的关键层。</p>
+        <div class="reflection-path" aria-label="后续学习路径">
+          <div>宏观POI分布</div><div>城镇空间结构</div><div>掩体与视野关系</div><div>具体交战体验</div>
+        </div>
+      </div>
+
+      <p>我的下一步不是继续收集更多孤立知识点，而是训练线性推导：当一个变量出现时，继续追问它改变了谁的选择、改变了多少时间、又会在哪个空间产生可观察的结果。</p>
+      <div class="final-answer">
+        <small>THE DESIGNER'S QUESTION</small>
+        <strong>地图有多大，不是起点。<br>玩家为什么移动、多久相遇、在哪里做决定，才是。</strong>
+      </div>
+      <p style="color:var(--text-tertiary);font-size:.8rem;">说明：本文为专业关卡设计资料的精读整理与个人推导，重点呈现我对知识的理解、重组与后续学习方向，并非一张已落地的大地图项目方案。</p>
+    </article>
+  </section>
+
+  <div class="article-nav reveal-on-scroll">
+    <a class="article-link" href="analysis-06-world-flipper-system-analysis.html">← 阅读上一篇</a>
+    <a class="article-link primary" href="index.html#analysis">返回设计思考</a>
+  </div>
+
+  <footer>
+    <p>Level Design Study · 战术竞技类大地图关卡规划与设计</p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.gsap) return;
+  gsap.fromTo('.hero .reveal',
+    { opacity: 0, y: 24 },
+    { opacity: 1, y: 0, duration: 0.75, stagger: 0.12, ease: 'power2.out' }
+  );
+  const blocks = document.querySelectorAll('.reveal-on-scroll');
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      gsap.fromTo(entry.target,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }
+      );
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1 });
+  blocks.forEach(el => io.observe(el));
+});
+</script>
+<script src="nav-boost.js" defer></script>
+</body>
+</html>
