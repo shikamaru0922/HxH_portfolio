@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="韩徐泓的仓库大逃杀射击关卡白盒练习：从体验目标、空间分区、玩家动线到掩体尺度与下一轮验证。">
+<title>仓库射击关卡白盒设计 | 韩徐泓</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="analysis-theme.css">
+<style>
+  :root {
+    --warehouse-red: #ff4c3b;
+    --warehouse-violet: #c122ff;
+    --warehouse-paper: #d9d3ca;
+  }
+
+  body {
+    background:
+      linear-gradient(rgba(93,150,255,.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(93,150,255,.028) 1px, transparent 1px),
+      var(--bg-deep);
+    background-size: 32px 32px;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(47,214,189,.08), transparent 28rem),
+      radial-gradient(circle at 92% 26%, rgba(255,107,53,.07), transparent 32rem);
+  }
+
+  .container { max-width: 1120px; }
+
+  .case-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.25rem;
+  }
+
+  .case-nav .top-links {
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .case-index {
+    color: var(--text-tertiary);
+    font: 500 .64rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .12em;
+  }
+
+  .warehouse-hero {
+    min-height: 760px;
+    display: grid;
+    grid-template-columns: minmax(0, .92fr) minmax(440px, 1.08fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+    padding: 4.5rem 0 5rem;
+    text-align: left;
+  }
+
+  .warehouse-hero::after {
+    left: 0;
+    width: 100%;
+    transform: none;
+  }
+
+  .warehouse-hero .hero-label {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    color: var(--accent-teal);
+    letter-spacing: .18em;
+  }
+
+  .warehouse-hero .hero-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .warehouse-hero h1 {
+    max-width: 660px;
+    margin: 0;
+    font-size: clamp(3rem, 6.2vw, 5.9rem);
+    line-height: 1.02;
+    letter-spacing: -.065em;
+  }
+
+  .warehouse-hero h1 span {
+    display: block;
+    background: none;
+    color: var(--text-primary);
+    -webkit-text-fill-color: initial;
+  }
+
+  .warehouse-hero h1 em {
+    display: block;
+    margin-top: .18em;
+    color: var(--accent-gold);
+    font-style: normal;
+  }
+
+  .warehouse-hero .hero-sub {
+    max-width: 610px;
+    margin: 1.6rem 0 0;
+    color: var(--text-secondary);
+    font-size: 1.08rem;
+    line-height: 1.85;
+  }
+
+  .hero-claim {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .9rem;
+    align-items: start;
+    max-width: 610px;
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(255,107,53,.25);
+    border-left: 2px solid var(--accent-gold);
+    border-radius: 0 10px 10px 0;
+    background: rgba(255,107,53,.055);
+  }
+
+  .hero-claim b {
+    color: var(--accent-gold);
+    font: 700 .66rem/1.5 'JetBrains Mono', monospace;
+    letter-spacing: .1em;
+  }
+
+  .hero-claim span {
+    color: var(--text-primary);
+    font-size: .92rem;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
+    margin-top: 1.6rem;
+  }
+
+  .hero-meta span {
+    padding: .4rem .65rem;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    background: rgba(16,20,29,.72);
+    font: 500 .64rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+  }
+
+  .hero-board {
+    position: relative;
+    min-height: 610px;
+    perspective: 1100px;
+  }
+
+  .hero-board::before {
+    content: 'WHITEBOX / WORKING DRAWINGS';
+    position: absolute;
+    right: 0;
+    top: -1.8rem;
+    color: var(--text-tertiary);
+    font: 500 .6rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .16em;
+  }
+
+  .board-sheet {
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid rgba(236,234,228,.16);
+    border-radius: 10px;
+    background: #77736f;
+    box-shadow: 0 30px 70px rgba(0,0,0,.48);
+  }
+
+  .board-sheet img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .board-sheet.back {
+    inset: 9% 10% 7% 0;
+    transform: rotate(-4deg) translateX(-1%);
+    filter: saturate(.76) brightness(.66);
+  }
+
+  .board-sheet.front {
+    inset: 3% 0 0 11%;
+    transform: rotate(2.2deg);
+  }
+
+  .board-sheet.front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+    pointer-events: none;
+  }
+
+  .sheet-tab {
+    position: absolute;
+    z-index: 3;
+    left: 1.25rem;
+    bottom: 1.2rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 5px;
+    color: white;
+    background: rgba(7,9,14,.78);
+    backdrop-filter: blur(10px);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+  }
+
+  .hero-board-note {
+    position: absolute;
+    z-index: 5;
+    right: -1.2rem;
+    bottom: 1.8rem;
+    width: 190px;
+    padding: 1rem;
+    color: var(--text-primary);
+    border: 1px solid rgba(47,214,189,.35);
+    background: rgba(7,9,14,.9);
+    box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    font-size: .8rem;
+    line-height: 1.65;
+  }
+
+  .hero-board-note b {
+    display: block;
+    margin-bottom: .55rem;
+    color: var(--accent-teal);
+    font: 700 .6rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .12em;
+  }
+
+  .case-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 0 0 5.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--border);
+    gap: 1px;
+  }
+
+  .case-fact {
+    min-height: 124px;
+    padding: 1.25rem;
+    background: rgba(16,20,29,.98);
+  }
+
+  .case-fact small {
+    display: block;
+    margin-bottom: .7rem;
+    color: var(--text-tertiary);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .12em;
+  }
+
+  .case-fact strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: .92rem;
+    line-height: 1.5;
+  }
+
+  .chapter {
+    padding: 5.2rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .chapter-head {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .chapter-num {
+    padding-top: .6rem;
+    color: var(--accent-gold);
+    font: 700 .68rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .15em;
+  }
+
+  .chapter-title {
+    max-width: 850px;
+    margin: 0;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(2rem, 4vw, 3.55rem);
+    line-height: 1.24;
+    letter-spacing: -.035em;
+  }
+
+  .chapter-lead {
+    max-width: 760px;
+    margin: 1.1rem 0 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.9;
+  }
+
+  .villain-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 1rem;
+  }
+
+  .villain-card {
+    min-height: 280px;
+    padding: clamp(1.5rem, 4vw, 2.4rem);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+  }
+
+  .villain-card.bad {
+    background:
+      linear-gradient(145deg, rgba(255,76,59,.08), transparent 64%),
+      var(--bg-card);
+  }
+
+  .villain-card.answer {
+    background:
+      linear-gradient(145deg, rgba(47,214,189,.09), transparent 64%),
+      var(--bg-card);
+  }
+
+  .villain-card small {
+    color: var(--text-tertiary);
+    font: 500 .63rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .12em;
+  }
+
+  .villain-card h3 {
+    margin: 1.2rem 0 .8rem;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+    line-height: 1.35;
+  }
+
+  .villain-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.85;
+  }
+
+  .workbench {
+    display: grid;
+    grid-template-columns: minmax(0, 1.48fr) minmax(280px, .52fr);
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .workbench.reverse {
+    grid-template-columns: minmax(280px, .52fr) minmax(0, 1.48fr);
+  }
+
+  .drawing-frame {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: #77736f;
+  }
+
+  .drawing-frame button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    cursor: zoom-in;
+    background: transparent;
+  }
+
+  .drawing-frame img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.01;
+    object-fit: cover;
+    transition: transform .7s cubic-bezier(.22,.61,.36,1), filter .5s;
+  }
+
+  .drawing-frame:hover img {
+    transform: scale(1.018);
+    filter: contrast(1.03);
+  }
+
+  .drawing-badge {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 5px;
+    color: #fff;
+    background: rgba(7,9,14,.76);
+    backdrop-filter: blur(10px);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+    pointer-events: none;
+  }
+
+  .drawing-caption {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: min(360px, 72%);
+    padding: .75rem .9rem;
+    border-left: 2px solid var(--accent-gold);
+    color: rgba(255,255,255,.92);
+    background: rgba(7,9,14,.78);
+    backdrop-filter: blur(10px);
+    font-size: .76rem;
+    line-height: 1.65;
+    pointer-events: none;
+  }
+
+  .notes-rail {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--border);
+    gap: 1px;
+  }
+
+  .note-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.35rem;
+    background: var(--bg-card);
+  }
+
+  .note-block b {
+    display: block;
+    margin-bottom: .5rem;
+    color: var(--text-primary);
+    font-size: .98rem;
+  }
+
+  .note-block span {
+    color: var(--text-secondary);
+    font-size: .82rem;
+    line-height: 1.65;
+  }
+
+  .note-block[data-tone="violet"] {
+    box-shadow: inset 2px 0 0 var(--warehouse-violet);
+  }
+
+  .note-block[data-tone="red"] {
+    box-shadow: inset 2px 0 0 var(--warehouse-red);
+  }
+
+  .note-block[data-tone="teal"] {
+    box-shadow: inset 2px 0 0 var(--accent-teal);
+  }
+
+  .route-thesis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.4rem;
+    margin-top: 1rem;
+    padding: 1.35rem 1.5rem;
+    border: 1px solid rgba(255,76,59,.25);
+    border-radius: 10px;
+    background: linear-gradient(90deg, rgba(255,76,59,.08), transparent);
+  }
+
+  .route-thesis span {
+    color: var(--text-secondary);
+    font-size: .9rem;
+  }
+
+  .route-thesis strong {
+    flex: 0 0 auto;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.2rem;
+  }
+
+  .ccc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .ccc-card {
+    min-height: 230px;
+    padding: 1.45rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+  }
+
+  .ccc-card:nth-child(1) { border-top: 2px solid var(--accent-gold); }
+  .ccc-card:nth-child(2) { border-top: 2px solid var(--accent-blue); }
+  .ccc-card:nth-child(3) { border-top: 2px solid var(--accent-teal); }
+
+  .ccc-card small {
+    color: var(--text-tertiary);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .1em;
+  }
+
+  .ccc-card h3 {
+    margin: .9rem 0 .7rem;
+    color: var(--text-primary);
+    font-size: 1.08rem;
+  }
+
+  .ccc-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: .84rem;
+    line-height: 1.75;
+  }
+
+  .metric-equation {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1.25fr;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .metric-box {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.3rem;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+  }
+
+  .metric-box small {
+    margin-bottom: .75rem;
+    color: var(--text-tertiary);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .1em;
+  }
+
+  .metric-box strong {
+    color: var(--text-primary);
+    font: 700 clamp(1.55rem, 3vw, 2.5rem)/1 'JetBrains Mono', monospace;
+  }
+
+  .metric-box.result {
+    border-color: rgba(47,214,189,.34);
+    background: linear-gradient(145deg, rgba(47,214,189,.1), var(--bg-card));
+  }
+
+  .metric-box.result strong { color: var(--accent-teal); }
+
+  .metric-op {
+    color: var(--accent-gold);
+    font: 700 1.6rem/1 'JetBrains Mono', monospace;
+  }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .metric-chip {
+    min-height: 145px;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(16,20,29,.68);
+  }
+
+  .metric-chip b {
+    display: block;
+    margin-bottom: .75rem;
+    color: var(--accent-gold);
+    font: 700 1.45rem/1 'JetBrains Mono', monospace;
+  }
+
+  .metric-chip span {
+    display: block;
+    color: var(--text-primary);
+    font-size: .85rem;
+    line-height: 1.55;
+  }
+
+  .metric-chip small {
+    display: block;
+    margin-top: .45rem;
+    color: var(--text-tertiary);
+    font-size: .72rem;
+    line-height: 1.55;
+  }
+
+  .metaphor-panel {
+    display: grid;
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+    gap: 1rem;
+  }
+
+  .big-metaphor {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.6rem, 4vw, 2.6rem);
+    border: 1px solid rgba(255,107,53,.28);
+    border-radius: 12px;
+    background:
+      linear-gradient(160deg, rgba(255,107,53,.11), transparent 55%),
+      var(--bg-card);
+  }
+
+  .big-metaphor small {
+    color: var(--accent-gold);
+    font: 700 .65rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .12em;
+  }
+
+  .big-metaphor strong {
+    color: var(--text-primary);
+    font: 900 clamp(2.4rem, 5vw, 4.8rem)/1.18 'Noto Serif SC', serif;
+    letter-spacing: -.045em;
+  }
+
+  .big-metaphor p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .cover-matrix {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--border);
+  }
+
+  .cover-cell {
+    min-height: 205px;
+    padding: 1.4rem;
+    background: var(--bg-card);
+  }
+
+  .cover-cell small {
+    color: var(--text-tertiary);
+    font: 500 .6rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+  }
+
+  .cover-cell h3 {
+    margin: .8rem 0 .55rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .cover-cell p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: .8rem;
+    line-height: 1.7;
+  }
+
+  .cover-cell.signature {
+    background: linear-gradient(145deg, rgba(47,214,189,.11), var(--bg-card));
+  }
+
+  .cover-cell.signature h3 { color: var(--accent-teal); }
+
+  .process-line {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: .65rem;
+  }
+
+  .process-line::before {
+    content: '';
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 18px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent-teal), var(--accent-gold));
+  }
+
+  .process-step {
+    position: relative;
+    padding-top: 3.3rem;
+  }
+
+  .process-step::before {
+    content: attr(data-step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-light);
+    border-radius: 50%;
+    color: var(--text-primary);
+    background: var(--bg-deep);
+    font: 700 .65rem/1 'JetBrains Mono', monospace;
+  }
+
+  .process-step b {
+    display: block;
+    margin-bottom: .55rem;
+    color: var(--text-primary);
+    font-size: .88rem;
+  }
+
+  .process-step span {
+    color: var(--text-tertiary);
+    font-size: .74rem;
+    line-height: 1.6;
+  }
+
+  .iteration-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .iteration-quote {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+  }
+
+  .iteration-quote small {
+    color: var(--text-tertiary);
+    font: 500 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .1em;
+  }
+
+  .iteration-quote strong {
+    display: block;
+    margin-top: 1rem;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.35rem;
+    line-height: 1.55;
+  }
+
+  .iteration-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--border);
+    gap: 1px;
+  }
+
+  .iteration-card {
+    min-height: 220px;
+    padding: 1.55rem;
+    background: var(--bg-card);
+  }
+
+  .iteration-card b {
+    display: block;
+    margin-bottom: .8rem;
+    color: var(--warehouse-red);
+    font: 700 .66rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+  }
+
+  .iteration-card:nth-child(3n+2) b { color: var(--accent-teal); }
+  .iteration-card:nth-child(3n) b { color: var(--accent-gold); }
+
+  .iteration-card h3 {
+    margin: 0 0 .75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .iteration-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: .8rem;
+    line-height: 1.72;
+  }
+
+  .validation-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .validation-card {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+  }
+
+  .validation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin-bottom: 1.2rem;
+    color: var(--accent-gold);
+    font: 700 .62rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .08em;
+  }
+
+  .validation-status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 12px currentColor;
+  }
+
+  .validation-card h3 {
+    margin: 0 0 .7rem;
+    color: var(--text-primary);
+    font-size: 1.02rem;
+  }
+
+  .validation-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: .82rem;
+    line-height: 1.75;
+  }
+
+  .webgl-stage {
+    position: relative;
+    min-height: 480px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    background:
+      linear-gradient(rgba(93,150,255,.065) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(93,150,255,.065) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, rgba(47,214,189,.08), transparent 40%),
+      #0a0d14;
+    background-size: 28px 28px, 28px 28px, auto, auto;
+  }
+
+  .webgl-stage::before,
+  .webgl-stage::after {
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    pointer-events: none;
+  }
+
+  .webgl-stage::before {
+    left: 1rem;
+    top: 1rem;
+    border-left: 1px solid var(--accent-teal);
+    border-top: 1px solid var(--accent-teal);
+  }
+
+  .webgl-stage::after {
+    right: 1rem;
+    bottom: 1rem;
+    border-right: 1px solid var(--accent-gold);
+    border-bottom: 1px solid var(--accent-gold);
+  }
+
+  .webgl-empty {
+    position: relative;
+    z-index: 2;
+    max-width: 560px;
+    padding: 2.5rem;
+    text-align: center;
+  }
+
+  .webgl-empty .build-mark {
+    width: 74px;
+    height: 74px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 1.5rem;
+    border: 1px dashed var(--accent-teal);
+    border-radius: 14px;
+    color: var(--accent-teal);
+    font: 700 1rem/1 'JetBrains Mono', monospace;
+    transform: rotate(45deg);
+  }
+
+  .webgl-empty .build-mark span { transform: rotate(-45deg); }
+
+  .webgl-empty small {
+    color: var(--accent-teal);
+    font: 500 .65rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .14em;
+  }
+
+  .webgl-empty h3 {
+    margin: 1rem 0 .75rem;
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.65rem, 3vw, 2.5rem);
+  }
+
+  .webgl-empty p {
+    margin: 0 auto 1.4rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .build-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    padding: .75rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: 7px;
+    color: var(--text-tertiary);
+    background: rgba(16,20,29,.8);
+    font: 500 .7rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+  }
+
+  .build-button.ready {
+    color: #07110f;
+    border-color: var(--accent-teal);
+    background: var(--accent-teal);
+    cursor: pointer;
+  }
+
+  .webgl-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: none;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #000;
+  }
+
+  .webgl-stage.loaded .webgl-frame { display: block; }
+  .webgl-stage.loaded .webgl-empty { display: none; }
+  .webgl-stage.loaded { min-height: 680px; }
+
+  .final-thesis {
+    padding: 7rem 0 6rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .final-thesis small {
+    color: var(--accent-teal);
+    font: 500 .68rem/1 'JetBrains Mono', monospace;
+    letter-spacing: .16em;
+  }
+
+  .final-thesis strong {
+    display: block;
+    max-width: 920px;
+    margin: 1.35rem auto 1.5rem;
+    color: var(--text-primary);
+    font: 900 clamp(2.2rem, 5.4vw, 4.8rem)/1.25 'Noto Serif SC', serif;
+    letter-spacing: -.05em;
+  }
+
+  .final-thesis p {
+    max-width: 680px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+  }
+
+  .lightbox {
+    width: min(94vw, 1180px);
+    max-width: none;
+    padding: 0;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    color: var(--text-primary);
+    background: #080b11;
+    box-shadow: 0 30px 100px rgba(0,0,0,.75);
+  }
+
+  .lightbox::backdrop {
+    background: rgba(0,0,0,.84);
+    backdrop-filter: blur(8px);
+  }
+
+  .lightbox img {
+    display: block;
+    width: 100%;
+    max-height: 88vh;
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    right: .8rem;
+    top: .8rem;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(7,9,14,.8);
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  footer a {
+    color: var(--accent-teal);
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .warehouse-hero {
+      min-height: auto;
+      grid-template-columns: 1fr;
+      padding-top: 3.5rem;
+    }
+    .hero-board {
+      width: min(100%, 660px);
+      min-height: 620px;
+      justify-self: center;
+    }
+    .case-facts,
+    .metric-grid,
+    .iteration-grid { grid-template-columns: repeat(2, 1fr); }
+    .validation-board { grid-template-columns: 1fr; }
+    .workbench,
+    .workbench.reverse { grid-template-columns: 1fr; }
+    .workbench.reverse .notes-rail { order: 2; }
+    .notes-rail { grid-template-columns: repeat(3, 1fr); grid-template-rows: none; }
+    .note-block { min-height: 160px; }
+    .metric-equation { grid-template-columns: 1fr; }
+    .metric-op { transform: rotate(90deg); justify-self: center; }
+    .metaphor-panel { grid-template-columns: 1fr; }
+    .big-metaphor { min-height: 340px; }
+    .process-line { grid-template-columns: repeat(3, 1fr); row-gap: 2rem; }
+    .process-line::before { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .container { padding: 0 1rem; }
+    .case-index { display: none; }
+    .warehouse-hero { padding: 3rem 0 3.7rem; }
+    .warehouse-hero h1 { font-size: clamp(2.7rem, 14vw, 4.2rem); }
+    .warehouse-hero .hero-sub { font-size: .96rem; }
+    .hero-board { min-height: 430px; }
+    .board-sheet.back { inset: 9% 7% 4% 1%; }
+    .board-sheet.front { inset: 3% 0 0 8%; }
+    .hero-board-note { right: -.3rem; bottom: .8rem; width: 170px; }
+    .case-facts { grid-template-columns: 1fr 1fr; margin-bottom: 3.8rem; }
+    .case-fact { min-height: 112px; padding: 1rem; }
+    .chapter { padding: 3.8rem 0; }
+    .chapter-head { grid-template-columns: 1fr; gap: .7rem; margin-bottom: 2rem; }
+    .chapter-num { padding: 0; }
+    .chapter-title { font-size: clamp(1.8rem, 8.2vw, 2.6rem); }
+    .villain-grid,
+    .iteration-intro { grid-template-columns: 1fr; }
+    .drawing-caption { max-width: calc(100% - 2rem); }
+    .notes-rail { grid-template-columns: 1fr; }
+    .note-block { min-height: auto; }
+    .route-thesis { align-items: flex-start; flex-direction: column; }
+    .metric-grid,
+    .iteration-grid,
+    .ccc-grid,
+    .cover-matrix { grid-template-columns: 1fr; }
+    .metric-chip,
+    .iteration-card,
+    .cover-cell { min-height: auto; }
+    .process-line { grid-template-columns: 1fr 1fr; }
+    .webgl-stage { min-height: 420px; }
+    .webgl-stage.loaded { min-height: 620px; }
+    .webgl-empty { padding: 1.5rem; }
+    .final-thesis { padding: 5rem 0 4rem; }
+    footer { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <nav class="case-nav reveal" aria-label="案例导航">
+    <div class="top-links">
+      <a class="top-link" href="index.html#whitebox">返回白盒练习</a>
+      <a class="top-link" href="analysis-07-battle-royale-map-planning.html">前置研究</a>
+    </div>
+    <span class="case-index">CASE / WH-01 · 2026</span>
+  </nav>
+
+  <header class="hero warehouse-hero">
+    <div class="hero-copy">
+      <div class="hero-label reveal">UNITY WHITEBOX · BATTLE ROYALE POI</div>
+      <h1 class="reveal">
+        <span>设计主题：</span>
+        <em>仓库</em>
+      </h1>
+      <p class="hero-sub reveal">这是一项关于战斗决策与交战区域组织的白盒练习。我关注的是：如何通过空间分区、动线、掩体和资源，引导玩家进入特定区域发生战斗，并在进攻、换位与撤离之间做出判断。</p>
+      <div class="hero-claim reveal">
+        <b>DESIGN QUESTION</b>
+        <span>空间如何组织交战，又如何为玩家保留多种可以判断的行动路线？</span>
+      </div>
+      <div class="hero-meta reveal" aria-label="项目信息">
+        <span>关卡策划 / 独立练习</span>
+        <span>3 人小队</span>
+        <span>1–2 队争夺</span>
+        <span>Unity / 白盒练习</span>
+      </div>
+    </div>
+
+    <div class="hero-board reveal" aria-label="仓库白盒工作图">
+      <figure class="board-sheet back">
+        <img src="images/warehouse-whitebox/warehouse-routes.png" alt="仓库白盒俯视动线手绘图">
+      </figure>
+      <figure class="board-sheet front">
+        <img src="images/warehouse-whitebox/warehouse-zones.png" alt="仓库白盒俯视分区手绘图">
+        <figcaption class="sheet-tab">FIG.01 / ZONING STUDY</figcaption>
+      </figure>
+      <aside class="hero-board-note">
+        <b>DESIGN EVIDENCE</b>
+        两张工作图记录的不是最终答案，而是我如何从空间分区继续追问玩家路线。
+      </aside>
+    </div>
+  </header>
+
+  <div class="case-facts reveal-on-scroll" aria-label="项目速览">
+    <div class="case-fact"><small>FORMAT</small><strong>APEX-like<br>中型仓库 POI</strong></div>
+    <div class="case-fact"><small>CORE FEELING</small><strong>打 — 移 — 再打<br>快速换位</strong></div>
+    <div class="case-fact"><small>DESIGN FOCUS</small><strong>分区 · 动线<br>掩体 · 风险收益</strong></div>
+    <div class="case-fact"><small>CURRENT STATE</small><strong>空间白盒<br>待实机跑表</strong></div>
+  </div>
+
+  <main>
+    <section class="chapter reveal-on-scroll" id="problem">
+      <header class="chapter-head">
+        <div class="chapter-num">01 / THE PROBLEM</div>
+        <div>
+          <h2 class="chapter-title">仓库看起来很大，但“大”很容易只剩一种答案。</h2>
+          <p class="chapter-lead">长视线、空地和少量硬掩体会把战斗压成枪法检定：先手的人继续压，失势的人无处断线。对高机动、长 TTK 的战术竞技来说，这浪费了最有价值的那一秒——玩家中枪后重新做决定的时间。</p>
+        </div>
+      </header>
+
+      <div class="villain-grid">
+        <article class="villain-card bad">
+          <small>SPACE PROBLEM / 大空箱</small>
+          <h3>空间越通透，<br>选择反而越少。</h3>
+          <p>一眼穿透整个房间，交火便会隔着几十米提前发生。玩家不敢进、不敢搜，也没有安全重整的片刻；仓库退化成几条固定枪线。</p>
+        </article>
+        <article class="villain-card answer">
+          <small>DESIGN RESPONSE / 隔而不断</small>
+          <h3>把一场大混战拆开，<br>再让局势重新流动起来。</h3>
+          <p>我不把中心默认成唯一热区，而是让集散、分拣、库存各自拥有“去的理由”、战斗距离和风险画像；它们能分别承接交火，也能通过多条路线互相外溢。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="zones">
+      <header class="chapter-head">
+        <div class="chapter-num">02 / ZONING</div>
+        <div>
+          <h2 class="chapter-title">先把“仓库”分成三座子战场。</h2>
+          <p class="chapter-lead">我先按真实仓储功能切大区，再让功能决定道具词汇与战斗尺度。这样，掩体首先像仓库里本来就有的东西，其次才承担玩法作用。</p>
+        </div>
+      </header>
+
+      <div class="workbench">
+        <figure class="drawing-frame">
+          <button type="button" class="zoom-drawing" data-image="images/warehouse-whitebox/warehouse-zones.png" aria-label="放大查看空间分区图">
+            <img src="images/warehouse-whitebox/warehouse-zones.png" alt="仓库白盒俯视空间分区图：上方集散区、中部分拣区、下方库存区">
+          </button>
+          <span class="drawing-badge">WORKING MAP / 空间分区</span>
+          <figcaption class="drawing-caption">紫色手绘框标出第一轮功能微分。点击图片可查看原图。</figcaption>
+        </figure>
+
+        <aside class="notes-rail" aria-label="三个子战场说明">
+          <div class="note-block" data-tone="violet">
+            <b>集散区 · 中距混战</b>
+            <span>大体量地标与开放地面形成主接触面；高位给信息和先手，但上行过程必须暴露。</span>
+          </div>
+          <div class="note-block" data-tone="violet">
+            <b>分拣区 · 机动翼侧</b>
+            <span>输送线、打包台与周转笼切出低姿态路线，用真实功能替代均匀撒箱子。</span>
+          </div>
+          <div class="note-block" data-tone="violet">
+            <b>库存区 · 货架 CQC</b>
+            <span>密集货架制造短视距与绕后机会，同时给落地搜索和脱战整理留出局部安全气泡。</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="routes">
+      <header class="chapter-head">
+        <div class="chapter-num">03 / ROUTES</div>
+        <div>
+          <h2 class="chapter-title">然后让路线像血液一样流动，而不是像铁轨一样规定答案。</h2>
+          <p class="chapter-lead">红色动线记录了我对入口、汇合与撤离的第一轮推演。路线可以在中央发生交集，却不能把所有人永久吸进同一个火力漏斗；一条路的价值，也必须能随敌人、装备与毒圈方向改变。</p>
+        </div>
+      </header>
+
+      <div class="workbench reverse">
+        <aside class="notes-rail" aria-label="动线设计说明">
+          <div class="note-block" data-tone="red">
+            <b>快线 · 正面承诺</b>
+            <span>更快抵达核心，但暴露更早；适合抢节奏，也更容易被预瞄。</span>
+          </div>
+          <div class="note-block" data-tone="red">
+            <b>绕线 · 时间换角度</b>
+            <span>用更长行程换侧背信息。若收益不足以抵消时间成本，就缩短或增加中途节点。</span>
+          </div>
+          <div class="note-block" data-tone="teal">
+            <b>撤线 · 先断视线</b>
+            <span>撤离不是进攻的反向播放；第一段必须快速断开接触，并通往下一个有意义的位置。</span>
+          </div>
+        </aside>
+
+        <figure class="drawing-frame">
+          <button type="button" class="zoom-drawing" data-image="images/warehouse-whitebox/warehouse-routes.png" aria-label="放大查看玩家动线图">
+            <img src="images/warehouse-whitebox/warehouse-routes.png" alt="仓库白盒俯视玩家动线图，多条红色路线从不同入口进入并在各区域间流动">
+          </button>
+          <span class="drawing-badge">WORKING MAP / 玩家动线</span>
+          <figcaption class="drawing-caption">红线不是唯一推荐路线，而是用来暴露汇合过密、长段无决策等结构问题。</figcaption>
+        </figure>
+      </div>
+
+      <div class="route-thesis">
+        <span>当玩家已经交完技能、弹药或位置优势，关卡仍要给他一个真实的生存决定。</span>
+        <strong>进攻与撤离，同权。</strong>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="metrics">
+      <header class="chapter-head">
+        <div class="chapter-num">04 / TIME × 3C</div>
+        <div>
+          <h2 class="chapter-title">从时间与 3C 参数推导空间距离。</h2>
+          <p class="chapter-lead">空间尺寸不能只靠俯视图判断。我把 Character、Camera、Controls 放回同一次战斗行为里：角色移动了多远、玩家能看到什么、输入后能否及时完成动作，共同决定一段距离是否真的可玩。</p>
+        </div>
+      </header>
+
+      <div class="ccc-grid" aria-label="用3C参数推导关卡空间">
+        <article class="ccc-card">
+          <small>3C / CHARACTER</small>
+          <h3>角色能在多久内移动多远？</h3>
+          <p>冲刺、持枪移动、滑铲与跳跃决定了玩家跨越空地的速度和姿态。这里以约 7.6 m/s 的收枪冲刺为基准，把“危险”换算成实际暴露时间。</p>
+        </article>
+        <article class="ccc-card">
+          <small>3C / CAMERA</small>
+          <h3>玩家在什么高度获得信息？</h3>
+          <p>站立与蹲伏眼高决定掩体能否探射、能否完全断视线；俯角、开窗和货架镂空则决定不同高度之间交换多少信息。</p>
+        </article>
+        <article class="ccc-card">
+          <small>3C / CONTROLS</small>
+          <h3>这段距离允许完成什么操作？</h3>
+          <p>玩家需要在冲刺、滑铲、跳跃、攀爬和持枪之间切换。空间必须给输入和动作完成留出时间，否则路线看似存在，实战中却无法选择。</p>
+        </article>
+      </div>
+
+      <div class="metric-equation" aria-label="从移动速度推导掩体间距">
+        <div class="metric-box">
+          <small>SPRINT SPEED</small>
+          <strong>7.6 m/s</strong>
+        </div>
+        <div class="metric-op">×</div>
+        <div class="metric-box">
+          <small>EXPOSURE WINDOW</small>
+          <strong>≈ 1 s</strong>
+        </div>
+        <div class="metric-op">=</div>
+        <div class="metric-box result">
+          <small>COVER RHYTHM</small>
+          <strong>6–8 m</strong>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-chip">
+          <b>1.3 m</b>
+          <span>半身掩体</span>
+          <small>站立探射，蹲下全遮；也是一次跳跃可登上的高度。</small>
+        </div>
+        <div class="metric-chip">
+          <b>2.5 m</b>
+          <span>全身掩体</span>
+          <small>完全断视线、重置交火，让玩家真正获得换位后的喘息。</small>
+        </div>
+        <div class="metric-chip">
+          <b>≥15 m</b>
+          <span>刻意惩罚带</span>
+          <small>必须承担两段暴露；只在高收益、可绕开的选择上使用。</small>
+        </div>
+        <div class="metric-chip">
+          <b>≤40 m</b>
+          <span>仓内最长视线</span>
+          <small>把主交战压在步枪与冲锋枪区间，避免整个室内被远距穿透。</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="cover">
+      <header class="chapter-head">
+        <div class="chapter-num">05 / COVER LANGUAGE</div>
+        <div>
+          <h2 class="chapter-title">掩体不是家具。它是战斗句子里的标点。</h2>
+          <p class="chapter-lead">有的掩体让玩家停顿，有的透露信息，有的诱导绕行，还有一种能由玩家亲手改变空间。它们不是“多摆几个箱子”，而是不同的战术语言。</p>
+        </div>
+      </header>
+
+      <div class="metaphor-panel">
+        <article class="big-metaphor">
+          <small>THE METAPHOR</small>
+          <strong>门，<br>是决策阀。</strong>
+          <p>关门能暂时挡人、挡视线；开门意味着承诺进入；踹碎它又会永久改变这一局的空间拓扑。它让“局部安全”成为可被玩家主动争夺和破坏的资源。</p>
+        </article>
+
+        <div class="cover-matrix" aria-label="信息与穿透四类掩体">
+          <article class="cover-cell">
+            <small>NO INFO / NO PENETRATION</small>
+            <h3>硬掩体 · 重置战斗</h3>
+            <p>混凝土墙、集装箱与满载托盘堆。看不见，也打不穿，给换位后的玩家一段完整停顿。</p>
+          </article>
+          <article class="cover-cell signature">
+            <small>INFO / NO PENETRATION</small>
+            <h3>防弹玻璃 · 只给先手</h3>
+            <p>看得到却不能直接击杀，迫使占位者离开安全处，把信息优势转化成一次路线选择。</p>
+          </article>
+          <article class="cover-cell">
+            <small>INFO / PENETRATION</small>
+            <h3>货架镂空 · 伤害通过</h3>
+            <p>能看、能打、不能穿人。它切割身体移动，却保留交火信息，适合库存区的短距博弈。</p>
+          </article>
+          <article class="cover-cell">
+            <small>NO INFO / PENETRATION</small>
+            <h3>薄铁皮 · 用声音换伤害</h3>
+            <p>视线被遮挡，但脚步与枪线可穿透。它惩罚贴墙死守，同时让听觉信息真正影响决策。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="process">
+      <header class="chapter-head">
+        <div class="chapter-num">06 / DESIGN PROCESS</div>
+        <div>
+          <h2 class="chapter-title">这张白盒不是从一张平面图开始，而是从一条推导链开始。</h2>
+          <p class="chapter-lead">每一轮都先回答“为什么”，再回答“摆什么”。这样发现结构问题时，我能回到上游判断修改，而不是只在场景里继续堆细节。</p>
+        </div>
+      </header>
+
+      <div class="process-line" aria-label="关卡白盒设计流程">
+        <div class="process-step" data-step="01"><b>定义体验</b><span>爽感、快速决策、动态目的</span></div>
+        <div class="process-step" data-step="02"><b>研究母本</b><span>真实仓库尺寸与功能构件</span></div>
+        <div class="process-step" data-step="03"><b>建立尺度</b><span>移速、跳跃、视线与掩体</span></div>
+        <div class="process-step" data-step="04"><b>先分后连</b><span>子战场性格与区际规则</span></div>
+        <div class="process-step" data-step="05"><b>推演局势</b><span>进攻、防守、撤离与第三方</span></div>
+        <div class="process-step" data-step="06"><b>下场验证</b><span>跑表、热度、死角与路线选择</span></div>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="iteration">
+      <header class="chapter-head">
+        <div class="chapter-num">07 / DESIGN QUESTIONS</div>
+        <div>
+          <h2 class="chapter-title">我在设计过程中持续追问的十个问题。</h2>
+          <p class="chapter-lead">这些问题把“让玩家做决策”继续拆到具体空间里。每一次摆放门、掩体、高差或资源时，我都用它们检查：战斗是否在预期区域发生，玩家是否真的拥有可以判断的下一步。</p>
+        </div>
+      </header>
+
+      <div class="iteration-intro">
+        <div class="iteration-quote">
+          <small>SPATIAL QUESTION</small>
+          <strong>战斗为什么会在这里发生？</strong>
+        </div>
+        <div class="iteration-quote">
+          <small>PLAYER QUESTION</small>
+          <strong>玩家为什么进入，又为什么离开？</strong>
+        </div>
+      </div>
+
+      <div class="iteration-grid">
+        <article class="iteration-card">
+          <b>01 / COMBAT LOCATION</b>
+          <h3>战斗为什么发生在这个区域？</h3>
+          <p>分区名称本身不会制造战斗。每个子战场必须提供独立的资源收益、进攻角度或轮转价值；否则它只是俯视图上的一个框。</p>
+        </article>
+        <article class="iteration-card">
+          <b>02 / ENTRY BUFFER</b>
+          <h3>玩家进门后先看到什么？</h3>
+          <p>核心战位不直接对门。入口后先留出观察与选路的缓冲空间，让交火发生在玩家进入区域之后，而不是把门口做成固定枪线。</p>
+        </article>
+        <article class="iteration-card">
+          <b>03 / MOTIVATION</b>
+          <h3>玩家为什么愿意离开当前掩体？</h3>
+          <p>用更好的信息、装备、高位或侧背角度提供移动收益，并让暴露时间成为清楚的代价。没有收益的危险路线不会形成选择，只会被放弃。</p>
+        </article>
+        <article class="iteration-card">
+          <b>04 / RETREAT</b>
+          <h3>失去优势后，玩家能否真的撤离？</h3>
+          <p>每个交火点至少需要两条脱离线；撤离首段先利用门、拐角或高差快速断开视线，再把玩家送往下一条掩体带或轮转路线。</p>
+        </article>
+        <article class="iteration-card">
+          <b>05 / HIGH GROUND</b>
+          <h3>高位给的是先手权，还是处决权？</h3>
+          <p>夹层和屋顶可以更早获得信息，但必须保留背面暴露、俯角死区与多个上行口。强点应该可以守住一段时间，而不是让对手失去反制。</p>
+        </article>
+        <article class="iteration-card">
+          <b>06 / THIRD PARTY</b>
+          <h3>第三支队伍会从哪里切进来？</h3>
+          <p>两队交火的枪声会吸引新的队伍。因此每个区域都要按三队同场推演：第三方先看到谁、从哪条线进入、原交火双方如何获得预警。</p>
+        </article>
+        <article class="iteration-card">
+          <b>07 / LOCAL SAFETY</b>
+          <h3>室内有没有可以短暂经营的安全气泡？</h3>
+          <p>门和近距离隔断要阻止视线穿透整个仓库，让玩家能够搜索、换甲和整理信息；但这些安全区仍可通过开门、踹门或绕行被打破。</p>
+        </article>
+        <article class="iteration-card">
+          <b>08 / COMBAT BOUNDARY</b>
+          <h3>区域外的枪线会不会破坏区域内战斗？</h3>
+          <p>仓内结构需要减少跨区击杀，让库存区的 CQC、分拣区的低姿态机动和集散区的中距交火各自成立，同时保留人员流动的通路。</p>
+        </article>
+        <article class="iteration-card">
+          <b>09 / ENVIRONMENT LOGIC</b>
+          <h3>每一件掩体为什么会出现在仓库里？</h3>
+          <p>托盘、叉车、周转笼和打包台先遵守仓储功能，再承担掩体作用。道具按作业关系成组出现，避免均匀撒箱子带来的竞技场感。</p>
+        </article>
+        <article class="iteration-card">
+          <b>10 / POI STRUCTURE</b>
+          <h3>核心区一定应该最热吗？</h3>
+          <p>不一定。热度必须由资源与据点价值支撑。对 BR POI 来说，更重要的是把大战拆成数个有意义的子战场，并让它们保持隔而不断。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="validation">
+      <header class="chapter-head">
+        <div class="chapter-num">08 / VERIFY</div>
+        <div>
+          <h2 class="chapter-title">接下来，不靠形容词判断它好不好玩。</h2>
+          <p class="chapter-lead">网页版试玩接入后，我会把“爽、动态、快速决策”翻译成能观察和记录的行为：玩家在哪停、为何换路、失势时能否真的逃走。</p>
+        </div>
+      </header>
+
+      <div class="validation-board">
+        <article class="validation-card">
+          <span class="validation-status">READY TO TEST</span>
+          <h3>跑表 · 路线是否产生决定</h3>
+          <p>记录外围到核心、进攻到撤离的耗时；任何连续 10 秒没有新信息或新选择的段落进入重构。</p>
+        </article>
+        <article class="validation-card">
+          <span class="validation-status">READY TO TEST</span>
+          <h3>站位 · 强点是否守得死</h3>
+          <p>测试夹层、屋顶与货架高位的先手收益，同时确认背面暴露、多路上行与视野死角能否形成反制。</p>
+        </article>
+        <article class="validation-card">
+          <span class="validation-status">READY TO TEST</span>
+          <h3>复盘 · 玩家为何改变路线</h3>
+          <p>不只记录走了哪条路，还追问是敌情、资源、毒圈还是撤离压力触发选择，验证空间是否真的在驱动决策。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="chapter reveal-on-scroll" id="playtest">
+      <header class="chapter-head">
+        <div class="chapter-num">09 / PLAY IT</div>
+        <div>
+          <h2 class="chapter-title">直接体验 Unity WebGL 白盒。</h2>
+          <p class="chapter-lead">试玩内容已经接入，但不会随案例页自动下载。玩家主动点击“开始加载游戏”后，页面才会载入 Unity 构建，避免约 21 MB 的游戏资源影响前面的阅读体验。</p>
+        </div>
+      </header>
+
+      <div class="webgl-stage" id="webglStage" data-build-path="warehouse-webgl/index.html">
+        <div class="webgl-empty">
+          <div class="build-mark"><span>W</span></div>
+          <small>UNITY WEBGL / ON-DEMAND LOAD</small>
+          <h3>仓库白盒试玩</h3>
+          <p>游戏尚未加载。只有点击下方按钮后，页面才会开始下载约 21 MB 的 Unity WebGL 内容。</p>
+          <button class="build-button ready" id="buildButton" type="button">点击开始加载游戏</button>
+        </div>
+        <iframe class="webgl-frame" id="webglFrame" title="仓库白盒 Unity WebGL 试玩" loading="lazy" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>
+      </div>
+    </section>
+  </main>
+
+  <section class="final-thesis reveal-on-scroll">
+    <small>DESIGN FOCUS</small>
+    <strong>让战斗在合适的区域发生，<br>让玩家在战斗中有路可选。</strong>
+    <p>这次练习重点呈现空间分区、玩家动线与战斗决策之间的关系，以及这些判断如何在后续实测中被验证和调整。</p>
+  </section>
+
+  <div class="article-nav reveal-on-scroll">
+    <a class="article-link" href="index.html#whitebox">← 返回白盒练习</a>
+    <a class="article-link primary" href="analysis-07-battle-royale-map-planning.html">查看前置研究 →</a>
+  </div>
+
+  <footer>
+    <p>Warehouse Whitebox · Level Design Case Study</p>
+    <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">回到顶部 ↑</a>
+  </footer>
+</div>
+
+<dialog class="lightbox" id="drawingLightbox" aria-label="设计图大图预览">
+  <button class="lightbox-close" type="button" aria-label="关闭大图">×</button>
+  <img id="lightboxImage" alt="">
+</dialog>
+
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (window.gsap && !reduceMotion) {
+    window.gsap.fromTo('.warehouse-hero .reveal',
+      { opacity: 0, y: 26 },
+      { opacity: 1, y: 0, duration: .78, stagger: .11, ease: 'power2.out' }
+    );
+  }
+
+  var blocks = document.querySelectorAll('.reveal-on-scroll');
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var observer = new IntersectionObserver(function (entries, io) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        if (window.gsap) {
+          window.gsap.fromTo(entry.target,
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: .72, ease: 'power2.out' }
+          );
+        }
+        io.unobserve(entry.target);
+      });
+    }, { threshold: .08 });
+    blocks.forEach(function (block) { observer.observe(block); });
+  }
+
+  var dialog = document.getElementById('drawingLightbox');
+  var dialogImage = document.getElementById('lightboxImage');
+  document.querySelectorAll('.zoom-drawing').forEach(function (button) {
+    button.addEventListener('click', function () {
+      dialogImage.src = button.dataset.image;
+      dialogImage.alt = button.querySelector('img').alt;
+      if (dialog.showModal) dialog.showModal();
+    });
+  });
+
+  dialog.querySelector('.lightbox-close').addEventListener('click', function () {
+    dialog.close();
+  });
+  dialog.addEventListener('click', function (event) {
+    if (event.target === dialog) dialog.close();
+  });
+
+  var stage = document.getElementById('webglStage');
+  var buildButton = document.getElementById('buildButton');
+  var webglFrame = document.getElementById('webglFrame');
+  var buildPath = stage.dataset.buildPath;
+
+  buildButton.addEventListener('click', function () {
+    buildButton.disabled = true;
+    buildButton.textContent = '正在启动…';
+    stage.setAttribute('aria-busy', 'true');
+    webglFrame.src = buildPath;
+    stage.classList.add('loaded');
+  });
+
+  webglFrame.addEventListener('load', function () {
+    stage.setAttribute('aria-busy', 'false');
+  });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="nav-boost.js" defer></script>
+</body>
+</html>

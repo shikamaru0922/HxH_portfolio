@@ -1147,7 +1147,7 @@ html.fx .rv.rv-in { opacity: 1; transform: translateY(0); }
 
 .project-whitebox-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1171,11 +1171,32 @@ html.fx .rv.rv-in { opacity: 1; transform: translateY(0); }
 }
 .project-whitebox-col:hover { background: rgba(126, 160, 220, 0.035); }
 .project-whitebox-col:hover::before { transform: scaleX(1); }
-.project-whitebox-col + .project-whitebox-col { border-left: 1px solid var(--border); }
+.project-whitebox-col:nth-child(even) { border-left: 1px solid var(--border); }
+.project-whitebox-col:nth-child(n+3) { border-top: 1px solid var(--border); }
 .project-whitebox-col h4 {
   font-size: 20px;
   font-weight: 800;
   margin-bottom: 14px;
+}
+.project-whitebox-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0 0 16px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.project-whitebox-preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.62;
+  object-fit: cover;
+  filter: saturate(.82) contrast(1.03);
+  transition: filter .35s, transform .45s var(--ease-out);
+}
+.project-whitebox-col:hover .project-whitebox-preview img {
+  filter: saturate(1) contrast(1.05);
+  transform: scale(1.025);
 }
 .project-whitebox-focus {
   font-size: 14px;
@@ -2136,7 +2157,8 @@ body.whitebox .project-visual {
   .project-card { grid-template-columns: 1fr; }
   .project-visual { min-height: 220px; }
   .project-whitebox-grid { grid-template-columns: 1fr; }
-  .project-whitebox-col + .project-whitebox-col {
+  .project-whitebox-col:nth-child(even) { border-left: none; }
+  .project-whitebox-col:nth-child(n+2) {
     border-left: none;
     border-top: 1px solid var(--border);
   }
@@ -2476,9 +2498,28 @@ body.whitebox .project-visual {
         <span class="project-type-note">设计观察 × 空间实践 × 玩法验证</span>
       </div>
       <h3 class="project-name">关卡白盒补充作品</h3>
-      <div class="project-subtitle">三组关卡白盒：同一方法论（三线协同）下的解谜、机制与Boss战验证</div>
+      <div class="project-subtitle">四组关卡白盒：从战术射击空间、机制解谜到 Boss 战的设计验证</div>
 
       <div class="project-whitebox-grid">
+        <article class="project-whitebox-col">
+          <h4>仓库 · 大逃杀射击 POI</h4>
+          <div class="project-whitebox-preview" aria-hidden="true">
+            <img src="images/warehouse-whitebox/warehouse-zones.png" alt="">
+            <img src="images/warehouse-whitebox/warehouse-routes.png" alt="">
+          </div>
+          <p class="project-whitebox-focus">核心体验：把一场大混战拆成三个“隔而不断”的子战场，让玩家持续在进攻、换位与撤离之间做决定。</p>
+          <p class="project-whitebox-desc">APEX-like 中型仓库 POI（Unity 白盒）。从时间与 3C 参数推导分区、动线、掩体尺度与风险收益，并整理交火区域、撤离、高位和第三方切入等设计思考。</p>
+          <div class="project-tags">
+            <span class="tag">战术射击</span>
+            <span class="tag">POI设计</span>
+            <span class="tag">动线推演</span>
+            <span class="tag">Unity白盒</span>
+          </div>
+          <div class="project-links">
+            <a href="warehouse-whitebox.html" class="project-link">查看设计案例</a>
+          </div>
+        </article>
+
         <article class="project-whitebox-col">
           <h4>博物馆+放大缩小 关卡白盒</h4>
           <p class="project-whitebox-focus">核心体验：在博物馆空间中完成自身放大/缩小解谜，并在关底通过Boss战完成节奏收束。</p>
@@ -2536,7 +2577,7 @@ body.whitebox .project-visual {
             <a href="链接地址" class="project-link" target="_blank" rel="noopener noreferrer">查看GDD</a>
           </div>
         </article>
-        └（注：栏目为三列网格，第 4 个起自动换行，移动端自动单列）┘ -->
+        └（注：栏目为两列网格，第 3 个起自动换行，移动端自动单列）┘ -->
       </div>
     </div>
   </div>
@@ -2632,13 +2673,13 @@ body.whitebox .project-visual {
         </div>
 
         <div class="analysis-item">
-          <a class="analysis-header" href="https://zhuanlan.zhihu.com/p/1981353607728211430" target="_blank" rel="noopener noreferrer">
+          <a class="analysis-header" href="analysis-07-battle-royale-map-planning.html">
             <div class="analysis-num">C02</div>
             <div class="analysis-info">
-              <h3>《神秘海域4》序章：精心设计的教学与情感体验</h3>
-              <p>拆解顽皮狗如何用空间叙事与节奏控制打造完美的开场体验</p>
+              <h3>战术竞技类大地图关卡规划与设计</h3>
+              <p>从目标体验、转移时间与POI吸引力出发，推导缩圈节奏、城镇空间和性能预算</p>
             </div>
-            <div class="analysis-external">↗</div>
+            <div class="analysis-external">→</div>
           </a>
         </div>
 
@@ -2687,13 +2728,13 @@ body.whitebox .project-visual {
         </div>
 
         <div class="analysis-item">
-          <a class="analysis-header" href="analysis-07-battle-royale-map-planning.html">
+          <a class="analysis-header" href="https://zhuanlan.zhihu.com/p/1981353607728211430" target="_blank" rel="noopener noreferrer">
             <div class="analysis-num">C07</div>
             <div class="analysis-info">
-              <h3>战术竞技类大地图关卡规划与设计</h3>
-              <p>从目标体验、转移时间与POI吸引力出发，推导缩圈节奏、城镇空间和性能预算</p>
+              <h3>《神秘海域4》序章：精心设计的教学与情感体验</h3>
+              <p>拆解顽皮狗如何用空间叙事与节奏控制打造完美的开场体验</p>
             </div>
-            <div class="analysis-external">→</div>
+            <div class="analysis-external">↗</div>
           </a>
         </div>
       </div>
