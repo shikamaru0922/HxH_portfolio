@@ -9,3 +9,10 @@ S-demo-design*
 S-industry-design*
 s-demo-design*
 s-industry-design*
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
